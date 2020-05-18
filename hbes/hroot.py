@@ -10,16 +10,11 @@ This is a package document.
     Content:
 
         @root_dict:
-            把root文件转换为字典对象
         @root_pkl:
-            把root文件转换为pkl文件
         @dump:
-            批量转换root文件为pkl文件
         @hist1d:
         @hist2d:
-            转换数组为hist对象并保存
         @tree1d:
-            转换数组为tree对象并保存
 
 '''
 # Public package
