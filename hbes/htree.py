@@ -6,30 +6,18 @@ This is a package document.
 
         python2
         python3
-        能够在python2,3下使用的通用程序，请不要引入numpy ROOT
 
     Content:
 
         @pkl_read:
-            读取pkl对象
         @massage_read:
-            读取massage.txt文件内的列表信息
         @tree_read:
-            读取massage,获取real, mc, pwa-mc, topology的python_tree并返回
         @tree_range:
-            输入python_tree,ranges列表
-            返回ranges后的python_tree
         @tree_cut:
-            输入python_tree，cuts列表，需要cut的branch
-            返回cuts后的python_tree
         @bin_search:
-            输入单个数据，最标轴信息，返回分bin位置
         @tree_addweight2d:
-            对于2Dweight，输入原tree，weight信息列表，返回加入weight数组的新tree
         @tree_addweight1d
-            对于1Dweight，输入原tree，weight信息列表，返回加入weight数组的新tree
         @branch_title:
-            输入branch，对应的横坐标，返回[xtitle, ytitle]
 '''
 # Public package
 import re
@@ -42,7 +30,11 @@ import headpy.hfile.hpickle as hpickle
 
 def massage_read(file_read='massage.txt',
                  print_text=''):
-    '获取目录下文件内容,默认为"massage.txt",输出列表'
+    '''
+    file_read 为读取文件名\n
+    print_text 如果不为空，则输出读取内容\n
+    作用：读取txt内信息，返回字典\n
+    '''
     # 读取文件
     with open(file_read, 'r') as infile:
         lines = infile.readlines()
@@ -67,7 +59,12 @@ def massage_read(file_read='massage.txt',
 def tree_read(energy=0,
               tree='',
               read=[]):
-    '读取对应的tree文件并返回trees{}'
+    '''
+    energy 为文件名中的能量点\n
+    tree 为文件名中的tree名\n
+    read 为读取的method名组成的列表\n
+    作用：读取pkl文件内的tree，地址为massage中的指定文件夹，返回字典\n
+    '''
     # 读取文件
     massage = massage_read(print_text='yes')
     # 建立项目名字
@@ -87,7 +84,13 @@ def tree_read(energy=0,
 
 
 def bin_search(data, l, r, i, d):
-    '输入单个数据，最标轴信息，返回分bin位置，超越范围返回empty'
+    '''
+    data 为数值\n
+    l, r 为左边界和右边界\n
+    i 为总bin数\n
+    d 为分bin间隔\n
+    作用：数组数值，输入坐标轴信息，返回所在bin\n
+    '''
     output = int((data - l) / d)
     if(output > i - 1 or output < 0):
         output = 'empty'
@@ -98,7 +101,13 @@ def tree_addweight2d(in_tree={},
                      weight={},
                      name_branch='',
                      name_ratio=''):
-    '对于2Dweight，输入原tree，weight信息列表，返回加入weight数组的新tree'
+    '''
+    in_tree 为tree\n
+    weight 为weight信息字典\n
+    name_branch 为tree中存放权重的branch名\n
+    name_ratio 为weight中存放权重矩阵的key名\n
+    作用：输入weight信息字典，给tree添加权重的branch\n
+    '''
     # 新tree初始化
     out_tree = in_tree
     num = 0
@@ -128,7 +137,13 @@ def tree_addweight1d(in_tree={},
                      weight={},
                      name_branch='',
                      name_ratio=''):
-    '对于1Dweight，输入原tree，weight信息列表，返回加入weight数组的新tree'
+    '''
+    in_tree 为tree\n
+    weight 为weight信息字典\n
+    name_branch 为tree中存放权重的branch名\n
+    name_ratio 为weight中存放权重矩阵的key名\n
+    作用：输入weight信息字典，给tree添加权重的branch\n
+    '''
     # 新tree初始化
     out_tree = in_tree
     num = 0
@@ -150,7 +165,11 @@ def tree_addweight1d(in_tree={},
 
 
 def branch_title(cuts, branch):
-    '输入branch，对应的横坐标，返回[xtitle, ytitle]'
+    '''
+    cuts 为branch信息字典\n
+    branch 为branch名\n
+    作用：返回字典，分别对应xtitle,ytitle字符串\n
+    '''
     if('string' in cuts[branch]):
         xtitle = cuts[branch]['string']
     else:
@@ -216,8 +235,8 @@ class HEPVECTOR:
 def tree_range(in_tree={},
                ranges={}):
     '''
-    in_tree为输入tree\n
-    ranges为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
+    in_tree 为输入tree\n
+    ranges 为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
     '''
     out_tree = {}
     num = 0
@@ -240,9 +259,9 @@ def tree_cut(in_tree={},
              branchs=[],
              print_text=''):
     '''
-    in_tree为输入tree\n
-    cuts为字典，key值为branch名，value值为字典\n
-    branchs为列表，值为需要cut的branch名\n
+    in_tree 为输入tree\n
+    cuts 为字典，key为branch名\n
+    branchs 为需要cut的branch名的列表\n
     '''
     # 输出信息
     if(print_text != ''):
@@ -269,8 +288,8 @@ class TREE:
     def range(self,
               ranges={}):
         '''
-        in_tree为输入tree\n
-        ranges为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
+        in_tree 为输入tree\n
+        ranges 为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
         '''
         self.tree = tree_range(self.tree, ranges=ranges)
         return 0
@@ -280,9 +299,9 @@ class TREE:
             branchs=[],
             print_text=''):
         '''
-        in_tree为输入tree\n
-        cuts为字典，key值为branch名，value值为字典\n
-        branchs为列表，值为需要cut的branch名\n
+        in_tree 为输入tree\n
+        cuts 为字典，key为branch名\n
+        branchs 为需要cut的branch名的列表\n
         '''
         self.tree = tree_cut(self.tree, cuts, branchs)
         return 0
@@ -313,6 +332,10 @@ class TREE:
                               branch_name='',
                               value_list=[],
                               value_expression=''):
+        '''
+        branch_name 为新添加的branch\n
+        作用：添加一个branch，value分别为需要调用的其它branch和其组成新branch的表达式\n
+        '''
         num = self.get_len()
         new_branch = []
         for i1 in range(num):

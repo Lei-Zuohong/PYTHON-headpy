@@ -6,7 +6,6 @@ This is a package document.
 
         python2
         python3
-        提供程序使用的物理学常数
 
     Content:
     
