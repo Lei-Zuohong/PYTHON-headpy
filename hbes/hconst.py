@@ -35,9 +35,9 @@ def energy_list():
     作用: 提供tQCD合作做所使用的能量点信息\n
     格式为:\n
         {energy:[runnumber_lower,\n
-            runnumber_upper,\n
-            luminosity,\n
-            luminosity string for latex]}\n
+                runnumber_upper,\n
+                luminosity,\n
+                luminosity string for latex]}\n
     '''
     out_list = {2.0000: [41729, 41909, 10.077, '10.1$\pm$0.1'],
                 2.0500: [41911, 41958, 3.351, '3.34$\pm$0.03'],
