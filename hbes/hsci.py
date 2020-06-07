@@ -5,7 +5,6 @@ This is a package document.
     Environment version:
 
         python2
-        请在python2环境下运行程序
 
     Content:
 
@@ -353,3 +352,6 @@ class ALLDATA:
         '''
         output = htree.branch_title(self.cuts, branch)
         return output
+
+    def get_tree(self,name):
+        return self.trees[name]

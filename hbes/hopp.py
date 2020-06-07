@@ -84,6 +84,13 @@ def cut():
     作用: 返回进行opp分析的绘图选项\n
     '''
     output = {}
+    l1 = 0.009274 * 2
+    l2 = 0.008766 * 2
+    l3 = 0.007139 * 2
+    r1 = 0.007873 * 2
+    r2 = 0.010412 * 2
+    r3 = 0.009957 * 2
+    m0 = hconst.pdg()['m_pi0']
     # 质量部分
     output['momega'] = {'mass': hconst.pdg()['m_omega'],
                         'cut': hconst.pdg()['m_omega'],
@@ -99,20 +106,20 @@ def cut():
                       'range': 0.045,
                       'inter': 90,
                       'string': r'M_{#pi^{-}}(GeV/c^{2})'}
-    output['mpi01'] = {'mass': hconst.pdg()['m_pi0'],
-                       'cut': 0.015,
+    output['mpi01'] = {'mass': m0 + 0.5 * r1 - 0.5 * l1,
+                       'cut': 0.5 * (r1 + l1),
                        'range': 0.045,
                        'inter': 90,
                        'string': r'M_{#pi_{1}^{0}}(GeV/c^{2})',
                        'shift': 0}
-    output['mpi02'] = {'mass': hconst.pdg()['m_pi0'],
-                       'cut': 0.015,
+    output['mpi02'] = {'mass': m0 + 0.5 * r2 - 0.5 * l2,
+                       'cut': 0.5 * (r2 + l2),
                        'range': 0.045,
                        'inter': 90,
                        'string': r'M_{#pi_{2}^{0}}(GeV/c^{2})',
                        'shift': 0}
-    output['mpi03'] = {'mass': hconst.pdg()['m_pi0'],
-                       'cut': 0.015,
+    output['mpi03'] = {'mass': m0 + 0.5 * r3 - 0.5 * l3,
+                       'cut': 0.5 * (r3 + l3),
                        'range': 0.045,
                        'inter': 90,
                        'string': r'M_{#pi_{3}^{0}}(GeV/c^{2})',
