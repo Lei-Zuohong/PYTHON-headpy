@@ -330,7 +330,13 @@ def doalg(algroot=[],
 
 
 class WORKSPACE:
-    '整合工作参数，并执行操作'
+    '''
+    整合数据信息，操作工作函数\n
+    dodec 提供衰变卡输入\n
+    dosim 提供sim过程\n
+    dorec 提供rec过程\n
+    dosima 提供ana过程\n
+    '''
 
     def __init__(self, version, name):
         self.version = version
@@ -356,6 +362,7 @@ class WORKSPACE:
         # 读取能量点和分析包数据
         self.energy_list = {}
         self.algroot = []
+        # 读取包文件数据
         exec('import headpy.hbes.h%s as ana' % (name))
         exec('self.energy_list = ana.energy_list()')
         exec('self.algroot = ana.algroot()')

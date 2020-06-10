@@ -33,7 +33,7 @@ def addfolder(name, path):
     name: string, 输入新建的文件夹的名字
     path: string, 输入目标位置的绝对路径
 
-    function: 查看某绝对路径下是否存在某名字的文件夹，没有则创建
+    作用: 查看某绝对路径下是否存在某名字的文件夹，没有则创建
     '''
     filelist = os.listdir(path)
     if(name not in filelist):
