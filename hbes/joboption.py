@@ -14,7 +14,6 @@ This is a package document.
 # Public package
 import os
 import re
-import sys
 import random
 # Private package
 import headpy.hscreen.hprint as hprint
@@ -35,7 +34,7 @@ def sim(txtfile='',
         rtrawfile='',
         datalevel=0,
         events=0,
-        condor=0):
+        condor='0'):
     '生成MC joboption文件并运行'
     seed = random.randint(0, 99)
     line = []
@@ -77,7 +76,7 @@ def sim(txtfile='',
     # 整合line并输出
     output = ''
     for i in line:
-        output += i+'\n'
+        output += i + '\n'
     with open(txtfile, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
@@ -94,7 +93,7 @@ def dosim(txtfolder='',
           files=0,
           events=0,
           energy=0,
-          condor=0):
+          condor='0'):
     # 输出数据
     hprint.pstar()
     hprint.ppoint('txt folder', txtfolder)
@@ -122,7 +121,7 @@ def dosim(txtfolder='',
                 decfile = ''
             # 填充datfile
             if(datfolder != ''):
-                datfile = '%s/%05d.dat' % (datfolder, 10000*energy)
+                datfile = '%s/%05d.dat' % (datfolder, 10000 * energy)
             else:
                 datfile = ''
             # 填充runid
@@ -156,7 +155,7 @@ def dosim(txtfolder='',
                     decfile = ''
                 # 填充datfile
                 if(datfolder != ''):
-                    datfile = '%s/%05d.dat' % (datfolder, 10000*energy)
+                    datfile = '%s/%05d.dat' % (datfolder, 10000 * energy)
                 else:
                     datfile = ''
                 # 填充runid
@@ -180,10 +179,10 @@ def dosim(txtfolder='',
         print('能量点选项输入错误')
 
 
-def rec(txtfile,
-        rtrawfile,
-        dstfile,
-        condor):
+def rec(txtfile='',
+        rtrawfile='',
+        dstfile='',
+        condor='0'):
     'Reconstruct a rtraw file'
     seed = random.randint(0, 99)
     line = []
@@ -211,23 +210,23 @@ def rec(txtfile,
     line.append('#include "$EVENTNAVIGATORROOT/share/EventNavigator.txt"')
     line.append('#include "$ROOTIOROOT/share/jobOptions_Dst2Root.txt"')
     line.append('#include "$CALIBSVCROOT/share/calibConfig_rec_mc.txt"')
-    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed+100))
+    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed + 100))
     line.append('MessageSvc.OutputLevel = 6;')
     line.append('EventCnvSvc.digiRootInputFile = {"%s"};' % (rtrawfile))
     line.append('EventCnvSvc.digiRootOutputFile ="%s";' % (dstfile))
     line.append('ApplicationMgr.EvtMax = -1;')
     output = ''
     for i in line:
-        output += i+'\n'
+        output += i + '\n'
     with open(txtfile, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
         os.system('boss.condor %s' % (txtfile))
 
 
-def dorec(txtfolder,
-          rtrawfolder,
-          dstfolder,
+def dorec(txtfolder='',
+          rtrawfolder='',
+          dstfolder='',
           condor='0'):
     'Reconstruct all rtraw files'
     hprint.pstar()
@@ -255,12 +254,12 @@ def dorec(txtfolder,
             condor)
 
 
-def alg(algroot,
-        txtfile,
-        dst_list,
-        rootfile,
-        option_list,
-        condor):
+def alg(algroot=[],
+        txtfile='',
+        dst_list=[],
+        rootfile='',
+        option_list=[],
+        condor='0'):
     'Analysis a dst file'
     line = []
     # deal with head file
@@ -286,18 +285,18 @@ def alg(algroot,
         'NTupleSvc.Output = { "FILE1 DATAFILE=\'%s\' OPT=\'NEW\' TYP=\'ROOT\'"};' % (rootfile))
     output = ''
     for i in line:
-        output += i+'\n'
+        output += i + '\n'
     with open(txtfile, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
         os.system('boss.condor %s' % (txtfile))
 
 
-def doalg(algroot,
-          txtfolder,
-          dstfolder,
-          rootfolder,
-          options,
+def doalg(algroot=[],
+          txtfolder='',
+          dstfolder='',
+          rootfolder='',
+          options=[],
           condor='0'):
     'Analysis all dst files'
     hprint.pstar()
