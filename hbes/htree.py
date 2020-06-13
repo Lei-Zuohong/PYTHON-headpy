@@ -279,6 +279,44 @@ def tree_cut(in_tree={},
     return out_tree
 
 
+def tree_select(in_tree={},
+                select_branch='',
+                select_value=0):
+    '''
+    in_tree 为输入tree\n
+    ranges 为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
+    '''
+    out_tree = {}
+    num = 0
+    for branch in in_tree:
+        out_tree[branch] = []
+        num = len(in_tree[branch])
+    for entry in range(num):
+        if(in_tree[select_branch][entry] == select_value):
+            for branch in in_tree:
+                out_tree[branch].append(in_tree[branch][entry])
+    return out_tree
+
+
+def tree_reject(in_tree={},
+                reject_branch='',
+                reject_value=0):
+    '''
+    in_tree 为输入tree\n
+    ranges 为字典，key值为需要cut的branch名，value值为二维数组，为数值的下界与上界\n
+    '''
+    out_tree = {}
+    num = 0
+    for branch in in_tree:
+        out_tree[branch] = []
+        num = len(in_tree[branch])
+    for entry in range(num):
+        if(in_tree[reject_branch][entry] != reject_value):
+            for branch in in_tree:
+                out_tree[branch].append(in_tree[branch][entry])
+    return out_tree
+
+
 class TREE:
     'tree 类型'
 
@@ -347,3 +385,34 @@ class TREE:
             new_branch.append(output)
         self.add_branch(branch_name=branch_name,
                         branch_list=new_branch)
+
+
+def get_topo(filename='',
+             signals=[],
+             num_backgrounds=0):
+    '''
+    '''
+    with open(filename, 'r') as infile:
+        lines = infile.readlines()
+    itopo = {}
+    itopo['signal'] = []
+    stopo = {}
+    stopo['signal'] = []
+    count = 0
+    method = r'([0-9]*)& (.*) & (.*) & (.*) & (.*) & (.*) \\'
+    for line in lines:
+        check_line = re.match(method, line)
+        if(check_line):
+            if(check_line.group(2) in signals):
+                itopo['signal'].append(int(check_line.group(4)))
+                stopo['signal'].append(check_line.group(2))
+            else:
+                if(count >= num_backgrounds):
+                    continue
+                itopo[count] = int(check_line.group(4))
+                stopo[count] = check_line.group(2)
+                count += 1
+    output = {}
+    output['itopo'] = itopo
+    output['stopo'] = stopo
+    return output

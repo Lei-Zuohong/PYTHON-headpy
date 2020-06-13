@@ -138,7 +138,11 @@ class ALLDATA:
                branch='',
                docuts=[],
                doweight='',
-               name=''):
+               name='',
+               select_branchs=[],
+               select_values=[],
+               reject_branchs=[],
+               reject_values=[]):
         '内部调用函数'
         # 输出信息
         hprint.pline('Building TH1D')
@@ -146,6 +150,14 @@ class ALLDATA:
         hprint.ppoint('Branch', branch)
         # 得到cut后的tree
         ntree = htree.tree_cut(self.trees[data], self.cuts, docuts)
+        for selecti in range(len(select_branchs)):
+            ntree = htree.tree_select(ntree,
+                                      select_branchs[selecti],
+                                      select_values[selecti])
+        for rejecti in range(len(reject_branchs)):
+            ntree = htree.tree_reject(ntree,
+                                      reject_branchs[rejecti],
+                                      reject_values[rejecti])
         # 新建root文件,hist对象
         tfilename = 'ftemp/root/%s_%s_%s.root' % (data, branch, name)
         histname = '%s_%s' % (data, branch)
@@ -186,7 +198,11 @@ class ALLDATA:
                branch2='',
                docuts=[],
                doweight='',
-               name=''):
+               name='',
+               select_branchs=[],
+               select_values=[],
+               reject_branchs=[],
+               reject_values=[]):
         '内部调用函数'
         # 输出信息
         hprint.pline('Building TH1D')
@@ -195,6 +211,14 @@ class ALLDATA:
         hprint.ppoint('Branch2', branch2)
         # 得到cut后的tree
         ntree = htree.tree_cut(self.trees[data], self.cuts, docuts)
+        for selecti in range(len(select_branchs)):
+            ntree = htree.tree_select(ntree,
+                                      select_branchs[selecti],
+                                      select_values[selecti])
+        for rejecti in range(len(reject_branchs)):
+            ntree = htree.tree_reject(ntree,
+                                      reject_branchs[rejecti],
+                                      reject_values[rejecti])
         # 新建root文件,hist对象
         tfilename = 'ftemp/root/%s_%s_%s_%s.root' % (data,
                                                      branch1,
@@ -281,7 +305,11 @@ class ALLDATA:
              branchs=[],
              docuts=[],
              doweight='',
-             name=''):
+             name='',
+             select_branchs=[],
+             select_values=[],
+             reject_branchs=[],
+             reject_values=[]):
         '''
         data为字符，输入数据来源的tree\n
         branchs为列表，输入提取的数据的branch名\n
@@ -297,14 +325,22 @@ class ALLDATA:
                                  branchs[0],
                                  docuts,
                                  doweight,
-                                 name)
+                                 name,
+                                 select_branchs=select_branchs,
+                                 select_values=select_values,
+                                 reject_branchs=reject_branchs,
+                                 reject_values=reject_values)
         if(len(branchs) == 2):
             output = self.hist2d(data,
                                  branchs[0],
                                  branchs[1],
                                  docuts,
                                  doweight,
-                                 name)
+                                 name,
+                                 select_branchs=select_branchs,
+                                 select_values=select_values,
+                                 reject_branchs=reject_branchs,
+                                 reject_values=reject_values)
         return output
 
     def statis(self,
@@ -353,5 +389,5 @@ class ALLDATA:
         output = htree.branch_title(self.cuts, branch)
         return output
 
-    def get_tree(self,name):
+    def get_tree(self, name):
         return self.trees[name]
