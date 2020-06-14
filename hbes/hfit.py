@@ -104,7 +104,9 @@ def dofit_method1(energy=0,
                   backfunction='',
                   signfunction='',
                   picture='',
-                  result=''):
+                  result='',
+                  toy='',
+                  replace_roodataset=0):
     '''
     histpkl         输入存储数据的文件信息，格式为{'r':[file,name],'m':[file,name]}\n
     optionpkl       输入存储初始参数的信息\n
@@ -186,11 +188,16 @@ def dofit_method1(energy=0,
                             ROOT.RooArgList(parameter['npdf1'],
                                             parameter['npdf2']))
     # 3.输入真实数据
-    realpdf = ROOT.RooDataSet('datar', 'datar',
-                              datar,
-                              ROOT.RooArgSet(ROOT.RooArgList(mass)))
     # 4.拟合
-    fitresult = allpdf.fitTo(realpdf)
+    if(toy != 'again'):
+        realpdf = ROOT.RooDataSet('datar', 'datar',
+                                  datar,
+                                  ROOT.RooArgSet(ROOT.RooArgList(mass)))
+        fitresult = allpdf.fitTo(realpdf, ROOT.RooFit.Save())
+    # sp.是否toymc拟合
+    if(toy == 'again'):
+        realpdf = replace_roodataset
+        fitresult = allpdf.fitTo(realpdf, ROOT.RooFit.Save())
     # 5.输出数据
     output = {}
     output['nevent'] = parameter['npdf1'].getVal()
@@ -230,11 +237,15 @@ def dofit_method1(energy=0,
         pt.AddText('Bkg:  ' + str(round(parameter['npdf2'].getVal(), 1)) +
                    '#pm' + str(round(parameter['npdf2'].getError(), 1)))
         pt.Draw()
+        # input()
         cvs.Print(picture)
     del tfilem
     del tfiler
     del datar
     del datam
+    if(toy == 'returntoy'):
+        output = allpdf.generate(ROOT.RooArgSet(ROOT.RooArgList(mass)),
+                                 (parameter['npdf1'].getVal() + parameter['npdf2'].getVal()))
     return output
 
 
@@ -326,134 +337,3 @@ def dofit_sample(energy=0,
             hprint.ppoint('%1.4f not Fit' % (energy), 'success %d times' % (check + 1))
             hprint.pstar()
     return result
-
-
-'''
-def getchose(result):
-    '在reault[i]["nevent"]中，选择最接近平均值的一个'
-    nevent = []
-    for i in range(9):
-        nevent.append(result[i]['nevent'])
-    average = 0
-    for i in range(9):
-        average += nevent[i]
-    average = average / 9
-    chi = 1000
-    chosei = 1000
-    for i in range(9):
-        thischi = abs(average - nevent[i])
-        if(thischi < chi):
-            chi = thischi
-            chosei = i
-    return chosei
-
-
-def fit(energy=0,
-        tree='',
-        read=[],
-        cuts=[],
-        datar='',
-        datam='',
-        branch='',
-        docuts=[],
-        tempfolder='',
-        projectname='',
-        option_list='',
-        backfunction='',
-        signfunction='',
-        picture=''):
-    # 写入前两个缓存文件
-    hist = fit_dump(energy,
-                    tree,
-                    read,
-                    cuts,
-                    datar,
-                    datam,
-                    branch,
-                    docuts)
-    histpkl = '%s/%s/temphist.pkl' % (tempfolder, projectname)
-    optionpkl = '%s/%s/tempoption.pkl' % (tempfolder, projectname)
-    datasetpkl = '%s/%s/tempdataset.pkl' % (tempfolder, projectname)
-    with open(histpkl, 'wb') as outfile:
-        pickle.dump(hist, outfile)
-    dataset = {}
-    dataset['name'] = branch
-    dataset['mass'] = cuts[branch]['mass']
-    dataset['cut'] = cuts[branch]['cut']
-    with open(datasetpkl, 'wb') as outfile:
-        pickle.dump(dataset, outfile)
-    # 开始进行多次拟合
-    check = 0
-    result = {}
-    for count in range(1000):
-        if(check > 8):
-            continue
-        # 写入最后一个缓存文件
-        option = {}
-        for i in option_list:
-            option[i] = [random.random()
-                         * (option_list[i][1] - option_list[i][0])
-                         + option_list[i][0],
-                         option_list[i][2],
-                         option_list[i][3]]
-        with open(optionpkl, 'wb') as outfile:
-            pickle.dump(option, outfile)
-        # 开始运行拟合，并提取log文件
-        os.system('python2 /afs/ihep.ac.cn/users/l/leizh/myscript/dofit.py %s/%s %s %s %s| tee %s/%s/tempfit.log' % (tempfolder, projectname,
-                                                                                                                     backfunction,
-                                                                                                                     signfunction,
-                                                                                                                     '%1.4f' % (energy),
-                                                                                                                     tempfolder, projectname))
-        checkok = fit_checkok('%s/%s/tempfit.log' % (tempfolder, projectname))
-        if(checkok == 1):
-            # 判断一次拟合成功
-            hprint.pstar()
-            hprint.ppoint('%1.4f Fit' % (energy), 'run %d times' % (count))
-            hprint.ppoint('%1.4f Fit' % (energy), 'success %d times' % (check + 1))
-            hprint.pstar()
-            # 转移log文件
-            os.system('mv %s/%s/tempfit.log %s/%s/%1.4f_%d.log' % (tempfolder, projectname,
-                                                                   tempfolder, projectname,
-                                                                   energy,
-                                                                   check))
-            # 将option写入result
-            result[check] = {}
-            result[check]['option'] = option
-            outputcheck = dofit_method1(energy,
-                                        histpkl,
-                                        optionpkl,
-                                        datasetpkl,
-                                        backfunction,
-                                        signfunction,
-                                        result='yes')
-            input()
-            result[check]['nevent'] = outputcheck['nevent']
-            check += 1
-        else:
-            # 判断一次拟合不成功
-            hprint.pstar()
-            hprint.ppoint('%1.4f not Fit' % (energy), 'run %d times' % (count))
-            hprint.ppoint('%1.4f not Fit' % (energy), 'success %d times' % (check + 1))
-            hprint.pstar()
-    # 得到最优结果的编号
-    chosei = getchose(result)
-    # 保存最优结果log
-    os.system('mv %s/%s/%1.4f_%d.log %s/%s/%1.4f.log' % (tempfolder, projectname,
-                                                         energy,
-                                                         check,
-                                                         tempfolder, projectname,
-                                                         energy))
-    os.system('rm %s/%s/*_*.log' % (tempfolder, projectname))
-    option = result[chosei]['option']
-    # 绘图最优结果
-    with open(optionpkl, 'wb') as outfile:
-        pickle.dump(option, outfile)
-    output = dofit_method1(energy,
-                           histpkl,
-                           optionpkl,
-                           datasetpkl,
-                           backfunction,
-                           signfunction,
-                           picture=picture)
-    return output
-'''
