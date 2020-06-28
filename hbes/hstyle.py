@@ -191,9 +191,9 @@ def set_background_alter(hist):
     hist.SetFillStyle(3001)
 
 
-def set_background_stack(hist):
+def set_background_stack(hist, Fillcolor=2, Linecolor=2, Linewidth=0, Fillstyle=3001):
     'Set hist of a sideband'
-    hist.SetLineColor(2)
-    hist.SetFillColor(2)
-    hist.SetLineWidth(0)
-    hist.SetFillStyle(3001)
+    hist.SetLineColor(Linecolor)
+    hist.SetFillColor(Fillcolor)
+    hist.SetLineWidth(Linewidth)
+    hist.SetFillStyle(Fillstyle)

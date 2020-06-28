@@ -104,9 +104,10 @@ def dofit_method1(energy=0,
                   backfunction='',
                   signfunction='',
                   picture='',
+                  picture_stop='',
                   result='',
-                  toy='',
-                  replace_roodataset=0):
+                  toy_option='',
+                  toy_data=0):
     '''
     histpkl         输入存储数据的文件信息，格式为{'r':[file,name],'m':[file,name]}\n
     optionpkl       输入存储初始参数的信息\n
@@ -115,6 +116,9 @@ def dofit_method1(energy=0,
     signfunction    输入信号函数形式[None,evolution]\n
     outputpkl       不为空，则输入，输出数据信息的文件位置\n
     picture         不为空，则输入，输出图片的文件位置\n
+    result          
+    toy_option      取'toy_option'，则使用toy_data拟合\n
+    toy_data        替换data sample进行拟合
     \n
     作用1：         根据输入参数进行一次拟合\n
     作用2：         输出拟合的数值结果\n
@@ -189,13 +193,13 @@ def dofit_method1(energy=0,
                                             parameter['npdf2']))
     # 3.输入真实数据
     # 4.拟合
-    if(toy != 'again'):
+    if(toy_option != 'toy_fit'):
         realpdf = ROOT.RooDataSet('datar', 'datar',
                                   datar,
                                   ROOT.RooArgSet(ROOT.RooArgList(mass)))
         fitresult = allpdf.fitTo(realpdf, ROOT.RooFit.Save())
     # sp.是否toymc拟合
-    if(toy == 'again'):
+    if(toy_option == 'toy_fit'):
         realpdf = replace_roodataset
         fitresult = allpdf.fitTo(realpdf, ROOT.RooFit.Save())
     # 5.输出数据
@@ -237,13 +241,14 @@ def dofit_method1(energy=0,
         pt.AddText('Bkg:  ' + str(round(parameter['npdf2'].getVal(), 1)) +
                    '#pm' + str(round(parameter['npdf2'].getError(), 1)))
         pt.Draw()
-        # input()
+        if(picture_stop != ''):
+            input()
         cvs.Print(picture)
     del tfilem
     del tfiler
     del datar
     del datam
-    if(toy == 'returntoy'):
+    if(toy_option == 'toy_return'):
         output = allpdf.generate(ROOT.RooArgSet(ROOT.RooArgList(mass)),
                                  (parameter['npdf1'].getVal() + parameter['npdf2'].getVal()))
     return output
@@ -260,15 +265,16 @@ def dofit_sample(energy=0,
                  doweight='yes',
                  tempfolder='',
                  projectname='',
+                 scriptname='',
                  option_list={},
                  backfunction='',
                  signfunction='',
                  num=100):
-    # 1. 得到缓存文件地址
+    # 1.1 得到缓存文件地址
     histpkl = '%s/%s/temphist.pkl' % (tempfolder, projectname)
     optionpkl = '%s/%s/tempoption.pkl' % (tempfolder, projectname)
     datasetpkl = '%s/%s/tempdataset.pkl' % (tempfolder, projectname)
-    # 1. 输入数据缓存文件
+    # 1.2 输入数据缓存文件
     hist = fit_dump(energy=energy,
                     tree=tree,
                     read=read,
@@ -279,7 +285,7 @@ def dofit_sample(energy=0,
                     docuts=docuts,
                     doweight=doweight)
     hpickle.pkl_dump(histpkl, hist)
-    # 1. 输入坐标轴缓存文件
+    # 1.3 输入坐标轴缓存文件
     dataset = {}
     dataset['name'] = branch
     dataset['mass'] = cuts[branch]['mass']
@@ -288,7 +294,7 @@ def dofit_sample(energy=0,
     # 2. 开始进行多次拟合
     check = 0
     result = {}
-    for count in range(10000):
+    for count in range(100 * num):
         if(check > num - 1):
             continue
         # 1. 输入初始值缓存文件
@@ -301,17 +307,28 @@ def dofit_sample(energy=0,
                          option_list[i][3]]
         hpickle.pkl_dump(optionpkl, option)
         # 2.1. 开始运行拟合，并提取log文件
-        os.system('python2 /afs/ihep.ac.cn/users/l/leizh/myscript/dofit.py %s/%s %s %s %s| tee %s/%s/tempfit.log' % (tempfolder, projectname,
-                                                                                                                     backfunction,
-                                                                                                                     signfunction,
-                                                                                                                     '%1.4f' % (energy),
-                                                                                                                     tempfolder, projectname))
-        checkok = fit_checkok('%s/%s/tempfit.log' % (tempfolder, projectname))
+        command1 = 'python2'
+        command2 = scriptname
+        argv1 = '%s/%s' % (tempfolder, projectname)
+        argv2 = backfunction
+        argv3 = signfunction
+        argv4 = '%1.4f' % (energy)
+        tee1 = 'tee'
+        tee2 = '%s/%s/tempfit.log' % (tempfolder, projectname)
+        os.system('%s %s %s %s %s %s| %s %s' % (command1,
+                                                command2,
+                                                argv1,
+                                                argv2,
+                                                argv3,
+                                                argv4,
+                                                tee1,
+                                                tee2))
+        checkok = fit_checkok(tee2)
         if(checkok == 1):
             # 判断一次拟合成功
             hprint.pstar()
             hprint.ppoint('%1.4f Fit' % (energy), 'run %d times' % (count + 1))
-            hprint.ppoint('%1.4f Fit' % (energy), 'success %d times' % (check + 1))
+            hprint.ppoint('%1.4f Fit' % (energy), 'success %d times' % (check))
             hprint.pstar()
             # 转移log文件
             os.system('mv %s/%s/tempfit.log %s/%s/%1.4f_%d.log' % (tempfolder, projectname,
@@ -334,6 +351,6 @@ def dofit_sample(energy=0,
             # 判断一次拟合不成功
             hprint.pstar()
             hprint.ppoint('%1.4f not Fit' % (energy), 'run %d times' % (count + 1))
-            hprint.ppoint('%1.4f not Fit' % (energy), 'success %d times' % (check + 1))
+            hprint.ppoint('%1.4f not Fit' % (energy), 'success %d times' % (check))
             hprint.pstar()
     return result
