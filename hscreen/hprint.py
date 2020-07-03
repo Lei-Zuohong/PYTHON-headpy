@@ -106,3 +106,5 @@ def pika():
 def ppika():
     '输出一个皮卡丘\n输出一个皮卡丘'
     print(pika())
+
+

@@ -347,9 +347,9 @@ class WORKSPACE:
         self.path['work'] = '%s/%s' % (self.path['scratchfs'], self.name)
         self.path['data'] = '%s/%s_data' % (self.path['scratchfs'], self.name)
         # 初始化工作区地址
-        self.path['reala'] = '%s/reala' % (self.path['work'])
-        self.path['backa'] = '%s/backa' % (self.path['work'])
-        self.path['sima'] = '%s/sima' % (self.path['work'])
+        self.path['sima'] = '%s/1.sima' % (self.path['work'])
+        self.path['reala'] = '%s/2.reala' % (self.path['work'])
+        self.path['backa'] = '%s/3.backa' % (self.path['work'])
         self.path['dec'] = '%s/mc/dec' % (self.path['work'])
         self.path['sim'] = '%s/mc/sim' % (self.path['work'])
         self.path['rec'] = '%s/mc/rec' % (self.path['work'])
