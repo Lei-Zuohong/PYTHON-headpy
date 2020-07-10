@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import ROOT
 
-
 # Format for data points
 def FormatAxis(axis):
     axis.SetLabelFont(42)
