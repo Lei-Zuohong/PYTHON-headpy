@@ -60,6 +60,11 @@ class SELECTER:
         self.left = center - width
         self.right = center + width
 
+    def set_width(self, value):
+        self.width = value
+        self.left = self.center - self.width
+        self.right = self.center + self.width
+
     def set_text(self, text):
         self.text = text
 
@@ -78,12 +83,17 @@ class SELECTER:
         self.right = self.right + value
         self.center = self.center + value
 
+    def scale(self, value):
+        self.width = self.width * value
+        self.left = self.center - self.width
+        self.right = self.center + self.width
+
     def reverse(self):
         self.reverse = 1 - self.reverse
 
     # 方法：获取信息
     def get_range(self):
-        return self.left, self.right
+        return self.center - self.show, self.center + self.show
 
     def get_title(self):
         value = 2 * self.show / self.inter
@@ -500,12 +510,13 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selections[weight['branchx']].set_by_edge(weight['xl'], weight['xr'])
-        self.selections[weight['branchx']].set_inter(weight['xi'])
-        self.selections[weight['branchy']].set_by_edge(weight['yl'], weight['yr'])
-        self.selections[weight['branchy']].set_inter(weight['yi'])
+        self.selecters[weight['branchx']].center = 0.5 * (weight['xr'] + weight['xl'])
+        self.selecters[weight['branchx']].set_show(0.5 * (weight['xr'] - weight['xl']))
+        self.selecters[weight['branchx']].set_inter(weight['xi'])
+        self.selecters[weight['branchy']].center = 0.5 * (weight['yr'] + weight['yl'])
+        self.selecters[weight['branchy']].set_show(0.5 * (weight['yr'] - weight['yl']))
+        self.selecters[weight['branchy']].set_inter(weight['yi'])
         # 添加tree[weight_name]的weight数组branch
-        self.weights.append(name_branch)
         self.trees[data] = tree_addweight2d(self.trees[data],
                                             weight,
                                             name_branch=name_branch,
@@ -524,8 +535,9 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selections[weight['branchx']].set_by_edge(weight['xl'], weight['xr'])
-        self.selections[weight['branchx']].set_inter(weight['xi'])
+        self.selecters[weight['branchx']].center = 0.5 * (weight['xl'] + weight['xr'])
+        self.selecters[weight['branchx']].set_show(0.5 * (weight['xl'] - weight['xr']))
+        self.selecters[weight['branchx']].set_inter(weight['xi'])
         # 添加tree[name]的weight数组branch
         self.weights.append(name_branch)
         self.trees[data] = tree_addweight1d(self.trees[data],
@@ -647,15 +659,15 @@ class ALLDATA:
         if (len(doweight) == 0):
             hprint.ppoint('Weight', 'NO')
             tfilename, histname = hist2d(name_tfile=tfilename,
-                                               name_hist=histname,
-                                               inter1=inter1,
-                                               left1=left1,
-                                               right1=right1,
-                                               inter2=inter2,
-                                               left2=left2,
-                                               right2=right2,
-                                               data1=data1,
-                                               data2=data2)
+                                         name_hist=histname,
+                                         inter1=inter1,
+                                         left1=left1,
+                                         right1=right1,
+                                         inter2=inter2,
+                                         left2=left2,
+                                         right2=right2,
+                                         data1=data1,
+                                         data2=data2)
         else:
             hprint.ppoint('Weight', 'YES')
             weight = []
@@ -665,16 +677,16 @@ class ALLDATA:
                     factor = factor * ntree[name][i]
                 weight.append(factor)
             tfilename, histname = hist2d(name_tfile=tfilename,
-                                               name_hist=histname,
-                                               inter1=inter1,
-                                               left1=left1,
-                                               right1=right1,
-                                               inter2=inter2,
-                                               left2=left2,
-                                               right2=right2,
-                                               data1=data1,
-                                               data2=data2,
-                                               weight=weight)
+                                         name_hist=histname,
+                                         inter1=inter1,
+                                         left1=left1,
+                                         right1=right1,
+                                         inter2=inter2,
+                                         left2=left2,
+                                         right2=right2,
+                                         data1=data1,
+                                         data2=data2,
+                                         weight=weight)
         hprint.pstar()
         return tfilename, histname
 

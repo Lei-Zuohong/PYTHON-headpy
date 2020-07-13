@@ -269,12 +269,12 @@ def selecters():
                                         title=r'M_{#pi_{2}^{0}#pi_{3}^{0}}(GeV/c^{2})')
     output['momegapi02'] = hnew.SELECTER(center=1.5,
                                          width=1.5,
-                                         show=0.8,
+                                         show=1.5,
                                          inter=160,
                                          title=r'M_{#omega#pi_{2}^{0}}(GeV/c^{2})')
     output['momegapi03'] = hnew.SELECTER(center=1.5,
                                          width=1.5,
-                                         show=0.8,
+                                         show=1.5,
                                          inter=160,
                                          title=r'M_{#omega#pi_{3}^{0}}(GeV/c^{2})')
     # 角分布部分

@@ -38,7 +38,7 @@ def get_canvas(x=800, y=600, dx=1, dy=1):
 
 
 def get_legend(legendlist=[],
-               l=0.7, r=0.93, d=0.7, u=0.93,
+               l=0.6, r=0.93, d=0.7, u=0.93,
                fillcolor=0,
                textfont=42,
                textsize=0.035,
