@@ -276,9 +276,9 @@ def tree1d(name_tfile='',
 # tree_numpy 处理类
 
 
-def ntree_cut(dict_tree,
-              dict_selecter,
-              branchs=[]):
+def tree_cut(dict_tree,
+             dict_selecter,
+             branchs=[]):
     '''
     dict_tree: tree型字典\n
     dict_selecter: selecter型字典\n
@@ -329,9 +329,9 @@ def massage_read(file_read='massage.txt',
     return massage
 
 
-def tree_read(energy=0,
-              tree='',
-              read=[]):
+def trees_read(energy=0,
+               tree='',
+               read=[]):
     '''
     energy: 文件名中的能量点\n
     tree: 文件名中的tree名\n
@@ -355,3 +355,104 @@ def tree_read(energy=0,
         output[method] = hpickle.pkl_read(filename)
     hprint.pstar()
     return output
+
+
+class ALLDATA:
+    '''
+    数据处理整合类
+    '''
+
+    def __init__(self,
+                 trees={},
+                 selecters={},
+                 massages={}):
+        '''
+        数据集合类初始化\n
+        trees: 入对应method的tree\n
+        selecters: 对应branch的各项参数\n
+        massages: 对应key的信息\n
+        '''
+        self.trees = trees
+        self.selecters = selecters
+        self.massages = massages
+
+    def get_weight_2d(self,
+                      data='',
+                      energy=0,
+                      name_weight='',
+                      name_branch='',
+                      name_ratio=''):
+        '内部调用函数'
+        # 读取weight信息
+        weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
+                                           name_weight,
+                                           energy)
+        weight = hpickle.pkl_read(weight_file)
+        # 更改cut
+        self.selections[weight['branchx']].set_by_edge(weight['xl'], weight['xr'])
+        self.selections[weight['branchx']].set_inter(weight['xi'])
+        self.selections[weight['branchy']].set_by_edge(weight['yl'], weight['yr'])
+        self.selections[weight['branchy']].set_inter(weight['yi'])
+        # 添加tree[weight_name]的weight数组branch
+        self.weights.append(name_branch)
+        self.trees[data] = tree_addweight2d(self.trees[data],
+                                            weight,
+                                            name_branch=name_branch,
+                                            name_ratio=name_ratio)
+
+    def get_weight_1d(self,
+                      data='',
+                      energy=0,
+                      name_weight='',
+                      name_branch='',
+                      name_ratio=''):
+        '内部调用函数'
+        # 读取weight信息
+        weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
+                                           name_weight,
+                                           energy)
+        with open(weight_file, 'rb') as infile:
+            weight = pickle.load(infile)
+        # 更改cut
+        self.cuts[weight['branchx']]['mass'] = 0.5 * (weight['xr'] + weight['xl'])
+        self.cuts[weight['branchx']]['range'] = 0.5 * (weight['xr'] - weight['xl'])
+        self.cuts[weight['branchx']]['inter'] = weight['xi']
+        # 添加tree[name]的weight数组branch
+        self.weights.append(name_branch)
+        self.trees[data] = htree.tree_addweight1d(self.trees[data],
+                                                  weight,
+                                                  name_branch=name_branch,
+                                                  name_ratio=name_ratio)
+
+    def get_weight(self,
+                   data='',
+                   energy=0,
+                   name_weight='',
+                   name_branch='',
+                   name_ratio='',
+                   dimension=2):
+        '''
+        data为字符，输入要进行weighting的tree的name\n
+        energy为浮点，输入要进行的weighting的能量点\n
+        name为字符，输入要进行weighting的method的名字\n
+        dimension为整形，输入要进行weighting的维度\n
+        ratio_name为字符，输入weighting数据中心代表要使用的阵列的key\n
+        作用1：给tree添加name的branch，数值为权重\n
+        作用2：将name添加进内部变量weights\n
+        Note:\n
+        weight信息请放置在massage['weight']/name_energy.pkl多的文件中\n
+        '''
+        if(dimension == 2):
+            self.get_weight_2d(data=data,
+                               energy=energy,
+                               name_weight=name_weight,
+                               name_branch=name_branch,
+                               name_ratio=name_ratio)
+        elif(dimension == 1):
+            self.get_weight_1d(data=data,
+                               energy=energy,
+                               name_weight=name_weight,
+                               name_branch=name_branch,
+                               name_ratio=name_ratio)
+        else:
+            print('error：维度输入错误')
