@@ -78,6 +78,12 @@ class SELECTER:
     def get_range(self):
         return self.left, self.right
 
+    def get_title(self):
+        value = 2 * self.show / self.inter
+        xtitle = self.title
+        ytitle = 'Events/%s(GeV/c^{2})' % (str(value))
+        return xtitle, ytitle
+
     # 方法：输出信息
     def get_massage(self):
         print('|{:^44}|'.format('Now print selection'))
@@ -94,7 +100,7 @@ class SELECTER:
         output['text'] = self.text
         return output
 
-# root读取类
+# root 读取类
 
 
 def root_dict(file_root='',
@@ -168,7 +174,7 @@ def dump(folder_root='',
                      '%s/%s.pkl' % (folder_root, name))
     hprint.pstar()
 
-# root写入类
+# root 写入类
 
 
 def hist1d(name_tfile='',
@@ -266,3 +272,58 @@ def tree1d(name_tfile='',
     tfile.Write()
     tfile.Close()
     return name_tfile, name_ttree
+
+# tree_numpy 处理类
+
+
+def ntree_cut(dict_tree,
+              dict_selecter,
+              branchs=[]):
+    '''
+    dict_tree: tree型字典\n
+    dict_selecter: selecter型字典\n
+    branchs: 进行选择的branch\n
+    \n
+    1: 对tree型字典进行cut\n
+    '''
+    num = 0
+    for i in branchs:
+        num = len(dict_tree[i])
+    list_bool = numpy.ones(num, dtype=bool)
+    for i in branchs:
+        list_bool = list_bool * dict_selecter[i].judge(dict_tree[i])
+    dict_tree_new = {}
+    for i in dict_tree:
+        dict_tree_new[i] = dict_tree[i][list_bool]
+    return dict_tree_new
+
+# 系统信息处理类
+
+
+def massage_read(file_read='massage.txt',
+                 print_text=''):
+    '''
+    file_read: 读取文件名\n
+    print_text: 如果不为空，则输出读取内容\n
+    \n
+    1：读取txt内信息，返回字典\n
+    '''
+    # 读取文件
+    with open(file_read, 'r') as infile:
+        lines = infile.readlines()
+    # 匹配字符
+    massage = {}
+    method = r'(.*):(.*) (endl|version)'
+    for line in lines:
+        check = re.match(method, line)
+        if(check):
+            if(check.group(3) == 'endl'):
+                massage[check.group(1)] = check.group(2)
+            if(check.group(3) == 'version'):
+                massage[check.group(1)] = check.group(2) + massage['version']
+    # 输出信息
+    if(print_text != ''):
+        hprint.pstar()
+        hprint.pline("Reading %s ......" % (file_read))
+        hprint.ppointbox(massage)
+    return massage
