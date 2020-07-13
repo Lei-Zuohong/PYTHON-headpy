@@ -17,6 +17,7 @@ This is a package document.
 # Public package
 # Private package
 import headpy.hbes.hconst as hconst
+import headpy.hbes.hnew as hnew
 
 
 class WINDOW:
@@ -25,7 +26,6 @@ class WINDOW:
     def __init__(self):
         self.left = 0
         self.right = 0
-
 
 
 def algroot():
@@ -219,4 +219,112 @@ def cut():
                            'range': 1,
                            'inter': 50,
                            'string': r'p_{#pi_{2}^{0}#pi_{3}^{0}}(GeV/c^{2})'}
+    return output
+
+
+def selecters():
+    l1 = 0.009274 * 2
+    l2 = 0.008766 * 2
+    l3 = 0.007139 * 2
+    r1 = 0.007873 * 2
+    r2 = 0.010412 * 2
+    r3 = 0.009957 * 2
+    output = {}
+    output['momega'] = hnew.SELECTER(center=hconst.pdg()['m_omega'],
+                                     width=hconst.pdg()['m_omega'],
+                                     show=0.15,
+                                     inter=60,
+                                     title=r'M_{#pi^{+}#pi^{-}#pi^{0}}(GeV/c^{2})')
+    output['mpip'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                   width=hconst.pdg()['m_pipm'],
+                                   show=0.045,
+                                   inter=90,
+                                   title=r'M_{#pi^{+}}(GeV/c^{2})')
+    output['mpim'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                   width=hconst.pdg()['m_pipm'],
+                                   show=0.045,
+                                   inter=90,
+                                   title=r'M_{#pi^{-}}(GeV/c^{2})')
+    output['mpi01'] = hnew.SELECTER(show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi_{1}^{0}}(GeV/c^{2})')
+    output['mpi02'] = hnew.SELECTER(show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi_{2}^{0}}(GeV/c^{2})')
+    output['mpi03'] = hnew.SELECTER(show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi_{3}^{0}}(GeV/c^{2})')
+    output['mpi01'].set_by_edge(hconst.pdg()['m_pi0'] - l1, hconst.pdg()['m_pi0'] + r1)
+    output['mpi02'].set_by_edge(hconst.pdg()['m_pi0'] - l2, hconst.pdg()['m_pi0'] + r2)
+    output['mpi03'].set_by_edge(hconst.pdg()['m_pi0'] - l3, hconst.pdg()['m_pi0'] + r3)
+    output['chisq'] = hnew.SELECTER(center=50,
+                                    width=50,
+                                    show=50,
+                                    inter=100,
+                                    title=r'#chi_{#pi^{+}#pi^{-}6#gamma}^{2}')
+    output['mpi02pi03'] = hnew.SELECTER(center=0.8,
+                                        width=0.8,
+                                        show=0.8,
+                                        inter=50,
+                                        title=r'M_{#pi_{2}^{0}#pi_{3}^{0}}(GeV/c^{2})')
+    output['momegapi02'] = hnew.SELECTER(center=1.5,
+                                         width=1.5,
+                                         show=0.8,
+                                         inter=160,
+                                         title=r'M_{#omega#pi_{2}^{0}}(GeV/c^{2})')
+    output['momegapi03'] = hnew.SELECTER(center=1.5,
+                                         width=1.5,
+                                         show=0.8,
+                                         inter=160,
+                                         title=r'M_{#omega#pi_{3}^{0}}(GeV/c^{2})')
+    # 角分布部分
+    output['aomega'] = hnew.SELECTER(center=0,
+                                     show=1,
+                                     inter=50,
+                                     title=r'#theta_{#pi^{+}#pi^{-}#pi^{0}}(GeV/c^{2})')
+    output['apip'] = hnew.SELECTER(center=0,
+                                   show=1,
+                                   inter=50,
+                                   title=r'#theta_{#pi^{+}}(GeV/c^{2})')
+    output['apim'] = hnew.SELECTER(center=0,
+                                   show=1,
+                                   inter=50,
+                                   title=r'#theta_{#pi^{-}}(GeV/c^{2})')
+    output['api01'] = hnew.SELECTER(center=0,
+                                    show=1,
+                                    inter=50,
+                                    title=r'#theta_{#pi_{1}^{0}}(GeV/c^{2})')
+    output['api02'] = hnew.SELECTER(center=0,
+                                    show=1,
+                                    inter=50,
+                                    title=r'#theta_{#pi_{2}^{0}}(GeV/c^{2})')
+    output['api03'] = hnew.SELECTER(center=0,
+                                    show=1,
+                                    inter=50,
+                                    title=r'#theta_{#pi_{3}^{0}}(GeV/c^{2})')
+    # 动量部分
+    output['pomega'] = hnew.SELECTER(center=1,
+                                     show=1,
+                                     inter=50,
+                                     title=r'p_{#pi^{+}#pi^{-}#pi^{0}}(GeV/c^{2})')
+    output['ppip'] = hnew.SELECTER(center=1,
+                                   show=1,
+                                   inter=50,
+                                   title=r'p_{#pi^{+}}(GeV/c^{2})')
+    output['ppim'] = hnew.SELECTER(center=1,
+                                   show=1,
+                                   inter=50,
+                                   title=r'p_{#pi^{-}}(GeV/c^{2})')
+    output['ppi01'] = hnew.SELECTER(center=1,
+                                    show=1,
+                                    inter=50,
+                                    title=r'p_{#pi_{1}^{0}}(GeV/c^{2})')
+    output['ppi02'] = hnew.SELECTER(center=1,
+                                    show=1,
+                                    inter=50,
+                                    title=r'p_{#pi_{2}^{0}}(GeV/c^{2})')
+    output['ppi03'] = hnew.SELECTER(center=1,
+                                    show=1,
+                                    inter=50,
+                                    title=r'p_{#pi_{3}^{0}}(GeV/c^{2})')
     return output
