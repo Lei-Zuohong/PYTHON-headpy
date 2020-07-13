@@ -120,12 +120,12 @@ def root_dict(file_root='',
     # 初始化输出字典
     output = {}
     for branch in branchs:
-        output[branch] = numpy.array([])
+        output[branch] = numpy.zeros(num)
     # 输入字典
     for entry in range(num):
         ttree.GetEntry(entry)
         for branch in branchs:
-            exec("numpy.append(output['%s'],ttree.%s)" % (branch, branch))
+            exec("output[branch][entry] = ttree.%s" % (branch))
     # 输出字典
     return output
 
@@ -171,7 +171,7 @@ def dump(folder_root='',
             root_pkl('%s/%s' % (folder_root, file),
                      tree,
                      branchs,
-                     '%s/%s.pkl' % (folder_root, name))
+                     '%s/%s_%s.pkl' % (folder_root, name, tree))
     hprint.pstar()
 
 # root 写入类
@@ -287,7 +287,7 @@ def ntree_cut(dict_tree,
     1: 对tree型字典进行cut\n
     '''
     num = 0
-    for i in branchs:
+    for i in dict_tree:
         num = len(dict_tree[i])
     list_bool = numpy.ones(num, dtype=bool)
     for i in branchs:
@@ -327,3 +327,31 @@ def massage_read(file_read='massage.txt',
         hprint.pline("Reading %s ......" % (file_read))
         hprint.ppointbox(massage)
     return massage
+
+
+def tree_read(energy=0,
+              tree='',
+              read=[]):
+    '''
+    energy: 文件名中的能量点\n
+    tree: 文件名中的tree名\n
+    read: 读取的method名组成的列表\n
+    \n
+    1：读取pkl文件内的tree，地址为massage中的指定文件夹，返回字典\n
+    '''
+    # 读取文件
+    massage = massage_read(print_text='yes')
+    # 建立项目名字
+    name = '%1.4f_%s.pkl' % (energy, tree)
+    # 建立文件路径
+    output = {}
+    hprint.pline('Reading tree objects from file ......')
+    for method in read:
+        hprint.pline('Reading tree object for %1.4f - %s - %s' % (energy,
+                                                                  tree,
+                                                                  method))
+        filename = '%s/%s' % (massage[method],
+                              name)
+        output[method] = hpickle.pkl_read(filename)
+    hprint.pstar()
+    return output
