@@ -38,10 +38,11 @@ def get_canvas(x=800, y=600, dx=1, dy=1):
 
 
 def get_legend(legendlist=[],
-               l=0.7,
-               r=0.93,
-               d=0.7,
-               u=0.93):
+               l=0.7, r=0.93, d=0.7, u=0.93,
+               fillcolor=0,
+               textfont=42,
+               textsize=0.035,
+               header=''):
     '''
     legendlist为列表，其中元素为[TObject,str,str]\n
     第一个元素为标注目标\n
@@ -53,8 +54,10 @@ def get_legend(legendlist=[],
     legend = ROOT.TLegend(l, d, u, r)
     for i in legendlist:
         legend.AddEntry(i[0], i[1], i[2])
-    legend.SetFillColor(0)
-    legend.SetTextFont(42)
+    legend.SetFillColor(fillcolor)
+    legend.SetTextFont(textfont)
+    legend.SetTextSize(textsize)
+    legend.SetHeader(header)
     return legend
 
 
