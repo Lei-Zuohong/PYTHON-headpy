@@ -20,14 +20,6 @@ import headpy.hbes.hconst as hconst
 import headpy.hbes.hnew as hnew
 
 
-class WINDOW:
-    'Cut质量窗'
-
-    def __init__(self):
-        self.left = 0
-        self.right = 0
-
-
 def algroot():
     '''
     作用: 返回进行opp分析的分析程序调用所需要的三个字符串\n
