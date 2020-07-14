@@ -47,7 +47,7 @@ class SELECTER:
             output = 1 - output
         return output
 
-    # 方法：改变变量
+    # 方法：改变选择变量
     def set_by_edge(self, left, right):
         self.left = left
         self.right = right
@@ -65,9 +65,15 @@ class SELECTER:
         self.left = self.center - self.width
         self.right = self.center + self.width
 
+    def scale(self, value):
+        self.width = self.width * value
+        self.left = self.center - self.width
+        self.right = self.center + self.width
+
     def set_text(self, text):
         self.text = text
 
+    # 方法：改变信息变量
     def set_inter(self, inter):
         self.inter = inter
 
@@ -82,11 +88,6 @@ class SELECTER:
         self.left = self.left + value
         self.right = self.right + value
         self.center = self.center + value
-
-    def scale(self, value):
-        self.width = self.width * value
-        self.left = self.center - self.width
-        self.right = self.center + self.width
 
     def reverse(self):
         self.reverse = 1 - self.reverse
@@ -109,13 +110,6 @@ class SELECTER:
         print('|{:^20}|=>|{:^20}|'.format('center', self.center))
         print('|{:^20}|=>|{:^20}|'.format('width', self.width))
         print('|{:^20}|=>|{:^20}|'.format('text', self.text))
-        output = {}
-        output['left'] = self.left
-        output['right'] = self.right
-        output['center'] = self.center
-        output['width'] = self.width
-        output['text'] = self.text
-        return output
 
     # 特殊方法
     def set_series(self, series):
@@ -703,7 +697,7 @@ class ALLDATA:
         doweight: 按列表进行weighting\n
         name为字符，提供文件名保证名称不重复\n
         \n
-        1：返回tfile的名字，thist的名字]\n
+        1：返回tfile的名字，thist的名字\n
         \n
         Note: 请在目录ftemp文件夹下建立root文件夹
         '''
@@ -721,3 +715,70 @@ class ALLDATA:
                                               doweight,
                                               name)
         return tfilename, histname
+
+    def tree(self,
+             data='',
+             branch='',
+             docuts=[],
+             name=''):
+        '''
+        data: 数据来源的tree\n
+        branch: 提取的数据的branch名\n
+        docuts: 进行筛选的branch名\n
+        name: 提供文件名保证名称不重复\n
+        \n
+        1：返回tfile的名字，ttree的名字\n
+        \n
+        Note: 请在目录ftemp文件夹下建立root文件夹\n
+        '''
+        # 输出信息
+        hprint.pline('Building TTree')
+        hprint.ppoint('Source', data)
+        hprint.ppoint('Branch', branch)
+        # 得到cut后的tree
+        ntree = tree_cut(self.trees[data], self.selecters, docuts)
+        # 新建root文件,tree对象
+        tfilename = 'ftemp/root/%s_%s_%s.root' % (data, branch, name)
+        ttreename = '%s_%s' % (data, branch)
+        tfilename, ttreename = tree1d(name_tfile=tfilename,
+                                      name_ttree=ttreename,
+                                      name_branch=branch,
+                                      data=ntree[branch])
+        return tfilename, ttreename
+
+    def statis(self,
+               data='',
+               docuts=[],
+               doweight=''):
+        '''
+        data: 进行统计的tree名\n
+        docuts: 进行cut的branch名\n
+        doweight: weight列表\n
+        \n
+        1：返回一个tree后的加权总数\n
+        '''
+        # 输出信息
+        hprint.pline('Getting entries of a tree')
+        hprint.ppoint('Source', data)
+        # 得到cut后的tree
+        ntree = tree_cut(self.trees[data], self.selecters, docuts)
+        # 初始化统计
+        output = 0
+        num = tree_len(ntree)
+        # 开始填入直方图
+        if (len(doweight) == 0):
+            hprint.ppoint('Weight', 'NO')
+        else:
+            hprint.ppoint('Weight', 'YES')
+        for i in range(num):
+            # 填入非weight数量
+            if (len(doweight) == 0):
+                output += 1
+            # 填入weight数量
+            else:
+                factor = 1
+                for name in doweight:
+                    factor = factor * ntree[name][i]
+                output += factor
+        hprint.pstar()
+        return float(output)

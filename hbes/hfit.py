@@ -19,8 +19,7 @@ import sys
 import ROOT
 import headpy.hscreen.hprint as hprint
 import headpy.hfile.hpickle as hpickle
-import headpy.hbes.htree as htree
-import headpy.hbes.hsci as hsci
+import headpy.hbes.hnew as hnew
 
 
 def fit_checkok(filename, do_print='yes'):
@@ -51,7 +50,7 @@ def fit_checkok(filename, do_print='yes'):
 def fit_dump(energy=0,
              tree='',
              read=[],
-             cuts=[],
+             selecters={},
              datar='real',
              datam='omeganpw',
              branch='momega',
@@ -63,7 +62,7 @@ def fit_dump(energy=0,
     read: 输入要读取名字列表\n
     datar: 在read中，对应真实数据的名字\n
     datam: 在read中，对应真实数据的名字\n
-    cuts: 变量参数数组\n
+    selecters: 变量参数数组\n
     branch: 横坐标变量\n
     docuts: 输入要进行cut的变量\n
     doweight：蒙卡是否加权
@@ -71,29 +70,31 @@ def fit_dump(energy=0,
     将对应能量点的数据，经过cut后，输出到temp文件夹，并返回查询信息\n
     格式为{'r':[file,name],'m':[file,name]}\n
     '''
-    trees = htree.tree_read(energy=energy,
+    massages = hnew.massage_read()
+    trees = hnew.trees_read(energy=energy,
                             tree=tree,
                             read=read)
-    massages = htree.massage_read()
-    alldata = hsci.ALLDATA(trees, cuts, massages)
+    alldata = hnew.ALLDATA(trees=trees,
+                           selecters=selecters,
+                           massages=massages)
     alldata.get_weight(data='omeganpw',
                        energy=energy,
                        name_weight='momegapi02_mpi02pi03',
                        name_branch='wpi02_pi02pi03',
                        name_ratio='ratio',
                        dimension=2)
-    histr = alldata.tree1d(data=datar,
-                           branch=branch,
-                           docuts=docuts,
-                           name='real')
-    histm = alldata.hist(data=datam,
-                         branchs=[branch],
-                         docuts=docuts,
-                         name='mc',
-                         doweight=doweight)
+    histr1, histr2 = alldata.tree(data=datar,
+                                  branch=branch,
+                                  docuts=docuts,
+                                  name='real')
+    histm1, histm2 = alldata.hist(data=datam,
+                                  branchs=[branch],
+                                  docuts=docuts,
+                                  name='mc',
+                                  doweight=['wpi02_pi02pi03'])
     hist = {}
-    hist['r'] = histr
-    hist['m'] = histm
+    hist['r'] = [histr1, histr2]
+    hist['m'] = [histm1, histm2]
     return hist
 
 
@@ -103,7 +104,7 @@ def dofit_method1(energy=0,
                   datasetpkl='',
                   backfunction='',
                   signfunction='',
-                  picture='',
+                  pictures=[],
                   picture_stop='',
                   result='',
                   toy_option='',
@@ -207,7 +208,7 @@ def dofit_method1(energy=0,
     output['nevent'] = parameter['npdf1'].getVal()
     output['enevent'] = parameter['npdf1'].getError()
     # 5.输出图片
-    if(picture != ''):
+    if(len(pictures) != 0):
         massframe = mass.frame()
         realpdf.plotOn(massframe)
         allpdf.plotOn(massframe)
@@ -243,7 +244,8 @@ def dofit_method1(energy=0,
         pt.Draw()
         if(picture_stop != ''):
             input()
-        cvs.Print(picture)
+        for i in pictures:
+            cvs.Print(i)
     del tfilem
     del tfiler
     del datar
@@ -257,7 +259,7 @@ def dofit_method1(energy=0,
 def dofit_sample(energy=0,
                  tree='',
                  read=[],
-                 cuts=[],
+                 selecters={},
                  datar='real',
                  datam='omeganpw',
                  branch='momega',
@@ -278,7 +280,7 @@ def dofit_sample(energy=0,
     hist = fit_dump(energy=energy,
                     tree=tree,
                     read=read,
-                    cuts=cuts,
+                    selecters=selecters,
                     datar=datar,
                     datam=datam,
                     branch=branch,
@@ -288,8 +290,8 @@ def dofit_sample(energy=0,
     # 1.3 输入坐标轴缓存文件
     dataset = {}
     dataset['name'] = branch
-    dataset['mass'] = cuts[branch]['mass']
-    dataset['cut'] = cuts[branch]['cut']
+    dataset['mass'] = selecters[branch].center
+    dataset['cut'] = selecters[branch].width
     hpickle.pkl_dump(datasetpkl, dataset)
     # 2. 开始进行多次拟合
     check = 0
