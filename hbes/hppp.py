@@ -6,7 +6,7 @@ def algroot():
     '''
     作用: 返回进行opp分析的分析程序调用所需要的三个字符串\n
     '''
-    return ['PPPALGROOT', 'jobOptions_PPP.txt', 'PPP']
+    return ['PPPMPZALGROOT', 'jobOptions_Pppmpz.txt', 'Pppmpz']
 
 def energy_list():
     '''
