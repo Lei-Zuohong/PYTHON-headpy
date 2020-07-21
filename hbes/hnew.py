@@ -30,7 +30,7 @@ class SELECTER:
         self.width = width
         self.text = text
         # 信息类变量
-        self.show = show
+        self.show = float(show)
         self.inter = inter
         self.title = title
         self.reverse = reverse
