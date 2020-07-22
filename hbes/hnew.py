@@ -13,6 +13,32 @@ import headpy.hscreen.hprint as hprint
 
 
 class SELECTER:
+    '''
+    变量：\n
+        center, width: 定义选择区间\n
+        left, right: 定义选择区间\n
+        text: 定义选择文本\n
+
+        show: 定义直方图显示范围\n
+        inter：定义直方图bin数\n
+        title: 定义变量名\n
+        unit: 定义单位名\n
+
+        reverse: 定义反向判断\n
+
+    方法：\n
+        set_by_center: 改变全部选择区间\n
+        set_by_edge: 改变全部选择区间\n
+        set_width: 改变选择区间宽度\n
+        set_scale: 缩放选择区间宽度\n
+        set_text: 改变选择文本\n
+
+        shift: 平移选择区间\n
+        reverse: 改变reverse方向\n
+
+        get_range: 返回直方图边界\n
+        get_title: 返回横纵坐标\n
+    '''
 
     def __init__(self,
                  center=0.5,
@@ -21,6 +47,7 @@ class SELECTER:
                  show=0,
                  inter=100,
                  title='',
+                 unit='',
                  reverse=0):
         '初始化'
         # 判断类变量
@@ -33,6 +60,8 @@ class SELECTER:
         self.show = float(show)
         self.inter = inter
         self.title = title
+        self.unit = unit
+        # 反向判断变量
         self.reverse = reverse
 
     # 方法：判断
@@ -65,23 +94,13 @@ class SELECTER:
         self.left = self.center - self.width
         self.right = self.center + self.width
 
-    def scale(self, value):
+    def set_scale(self, value):
         self.width = self.width * value
         self.left = self.center - self.width
         self.right = self.center + self.width
 
     def set_text(self, text):
         self.text = text
-
-    # 方法：改变信息变量
-    def set_inter(self, inter):
-        self.inter = inter
-
-    def set_show(self, show):
-        self.show = show
-
-    def set_title(self, title):
-        self.title = title
 
     # 方法：操作
     def shift(self, value):
@@ -99,7 +118,9 @@ class SELECTER:
     def get_title(self):
         value = 2 * self.show / self.inter
         xtitle = self.title
-        ytitle = 'Events/%s(GeV/c^{2})' % (str(value))
+        ytitle = r'Events/%s' % (str(value))
+        xtitle += self.unit
+        ytitle += self.unit
         return xtitle, ytitle
 
     # 方法：输出信息
@@ -322,95 +343,22 @@ def tree_cut(dict_tree,
     return dict_tree_new
 
 
-def bin_search(data, l, r, i, d):
-    '''
-    data: 数值\n
-    l, r: 左边界和右边界\n
-    i: 总bin数\n
-    d: 分bin间隔\n
-    \n
-    1：数组数值，输入坐标轴信息，返回所在bin\n
-    '''
-    output = int((data - l) / d)
-    if(output > i - 1 or output < 0):
-        output = 'empty'
-    return output
-
-
-def tree_addweight2d(in_tree={},
-                     weight={},
-                     name_branch='',
-                     name_ratio=''):
-    '''
-    in_tree: tree\n
-    weight: weight信息字典\n
-    name_branch: tree中存放权重的branch名\n
-    name_ratio: weight中存放权重矩阵的key名\n
-    \n
-    作用：输入weight信息字典，给tree添加权重的branch\n
-    '''
-    # 新tree初始化
-    out_tree = in_tree
-    num = 0
-    for i in in_tree:
-        num = len(in_tree[i])
-    out_tree[name_branch] = numpy.array([])
-    # 填入weight
-    for i in range(num):
-        bx = bin_search(in_tree[weight['branchx']][i],
-                        weight['xl'],
-                        weight['xr'],
-                        weight['xi'],
-                        weight['dx'])
-        by = bin_search(in_tree[weight['branchy']][i],
-                        weight['yl'],
-                        weight['yr'],
-                        weight['yi'],
-                        weight['dy'])
-        if(bx != 'empty' and by != 'empty'):
-            out_tree[name_branch] = numpy.append(out_tree[name_branch], weight[name_ratio][bx][by])
-        else:
-            out_tree[name_branch] = numpy.append(out_tree[name_branch], 0)
-    return out_tree
-
-
-def tree_addweight1d(in_tree={},
-                     weight={},
-                     name_branch='',
-                     name_ratio=''):
-    '''
-    in_tree: tree\n
-    weight: weight信息字典\n
-    name_branch: tree中存放权重的branch名\n
-    name_ratio: weight中存放权重矩阵的key名\n
-    \n
-    作用：输入weight信息字典，给tree添加权重的branch\n
-    '''
-    # 新tree初始化
-    out_tree = in_tree
-    num = 0
-    for i in in_tree:
-        num = len(in_tree[i])
-    out_tree[name_branch] = numpy.array([])
-    # 填入weight
-    for i in range(num):
-        bx = bin_search(in_tree[weight['branchx']][i],
-                        weight['xl'],
-                        weight['xr'],
-                        weight['xi'],
-                        weight['dx'])
-        if(bx != 'empty'):
-            out_tree[name_branch] = numpy.append(out_tree[name_branch], weight[name_ratio][bx])
-        else:
-            out_tree[name_branch] = numpy.append(out_tree[name_branch], 0)
-    return out_tree
-
-
 def tree_len(dict_tree):
     output = 0
     for i in dict_tree:
         output = len(dict_tree[i])
     return output
+
+
+def get_index(data, l, r, i):
+    '''
+    返回bin的位置
+    '''
+    output = int(i * (data - l) / (r - l))
+    if(output > i - 1 or output < 0):
+        output = 'empty'
+    return output
+
 
 # 系统信息处理类
 
@@ -495,8 +443,7 @@ class ALLDATA:
                       data='',
                       energy=0,
                       name_weight='',
-                      name_branch='',
-                      name_ratio=''):
+                      name_branch=''):
         '内部调用函数'
         # 读取weight信息
         weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
@@ -505,23 +452,34 @@ class ALLDATA:
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
         self.selecters[weight['branchx']].center = 0.5 * (weight['xr'] + weight['xl'])
-        self.selecters[weight['branchx']].set_show(0.5 * (weight['xr'] - weight['xl']))
-        self.selecters[weight['branchx']].set_inter(weight['xi'])
+        self.selecters[weight['branchx']].show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].inter = weight['xi']
         self.selecters[weight['branchy']].center = 0.5 * (weight['yr'] + weight['yl'])
-        self.selecters[weight['branchy']].set_show(0.5 * (weight['yr'] - weight['yl']))
-        self.selecters[weight['branchy']].set_inter(weight['yi'])
-        # 添加tree[weight_name]的weight数组branch
-        self.trees[data] = tree_addweight2d(self.trees[data],
-                                            weight,
-                                            name_branch=name_branch,
-                                            name_ratio=name_ratio)
+        self.selecters[weight['branchy']].show = 0.5 * (weight['yr'] - weight['yl'])
+        self.selecters[weight['branchy']].inter = weight['yi']
+        # 添加新的branch
+        new_branch = []
+        for i in range(tree_len(self.trees[data])):
+            xindex = get_index(self.trees[data][weight['branchx']][i],
+                               weight['xl'],
+                               weight['xr'],
+                               weight['xi'])
+            yindex = get_index(self.trees[data][weight['branchy']][i],
+                               weight['yl'],
+                               weight['yr'],
+                               weight['yi'])
+            if(xindex != 'empty'and yindex != 'empty'):
+                new_branch.append(weight['ratio'][xindex][yindex])
+            else:
+                new_branch.append(0)
+        new_branch = numpy.array(new_branch)
+        self.trees[data][name_branch] = new_branch
 
     def get_weight_1d(self,
                       data='',
                       energy=0,
                       name_weight='',
-                      name_branch='',
-                      name_ratio=''):
+                      name_branch=''):
         '内部调用函数'
         # 读取weight信息
         weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
@@ -529,49 +487,41 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selecters[weight['branchx']].center = 0.5 * (weight['xl'] + weight['xr'])
-        self.selecters[weight['branchx']].set_show(0.5 * (weight['xl'] - weight['xr']))
-        self.selecters[weight['branchx']].set_inter(weight['xi'])
-        # 添加tree[name]的weight数组branch
-        self.weights.append(name_branch)
-        self.trees[data] = tree_addweight1d(self.trees[data],
-                                            weight,
-                                            name_branch=name_branch,
-                                            name_ratio=name_ratio)
+        self.selecters[weight['branchx']].center = 0.5 * (weight['xr'] + weight['xl'])
+        self.selecters[weight['branchx']].show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].inter = weight['xi']
+        # 添加新的branch
+        new_branch = []
+        for i in range(tree_len(self.trees[data])):
+            xindex = get_index(self.trees[data][weight['branchx']][i],
+                               weight['xl'],
+                               weight['xr'],
+                               weight['xi'])
+            if(xindex != 'empty'):
+                new_branch.append(weight['ratio'][xindex])
+            else:
+                new_branch.append(0)
+        new_branch = numpy.array(new_branch)
+        self.trees[data][name_branch] = new_branch
 
     def get_weight(self,
                    data='',
                    energy=0,
                    name_weight='',
                    name_branch='',
-                   name_ratio='',
-                   dimension=2):
-        '''
-        data: 进行weighting的tree的name\n
-        energy: 进行weighting的能量点\n
-        name_weight: 进行weighting的method的名字\n
-        name_branch: 添加的branch的名字\n
-        name_ratio: weighting阵列的key\n
-        dimension: 进行weighting的维度\n
-        \n
-        1：给tree添加name_branch的branch，数值为权重\n
-        \n
-        Note: weight信息请放置在 massage['weight']/name_energy.pkl 的文件中\n
-        '''
+                   dimension=0):
         if(dimension == 2):
             self.get_weight_2d(data=data,
                                energy=energy,
                                name_weight=name_weight,
-                               name_branch=name_branch,
-                               name_ratio=name_ratio)
+                               name_branch=name_branch)
         elif(dimension == 1):
             self.get_weight_1d(data=data,
                                energy=energy,
                                name_weight=name_weight,
-                               name_branch=name_branch,
-                               name_ratio=name_ratio)
+                               name_branch=name_branch)
         else:
-            print('error：维度输入错误')
+            print('Error dimension!!!!')
 
     def hist1d(self,
                data='',
@@ -592,6 +542,7 @@ class ALLDATA:
         inter = self.selecters[branch].inter
         left, right = self.selecters[branch].get_range()
         num = len(ntree[branch])
+        hprint.ppoint('Entires', num)
         # 开始填入直方图
         if (len(doweight) == 0):
             hprint.ppoint('Weight', 'NO')

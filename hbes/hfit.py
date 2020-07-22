@@ -81,7 +81,6 @@ def fit_dump(energy=0,
                        energy=energy,
                        name_weight='momegapi02_mpi02pi03',
                        name_branch='wpi02_pi02pi03',
-                       name_ratio='ratio',
                        dimension=2)
     histr1, histr2 = alldata.tree(data=datar,
                                   branch=branch,
