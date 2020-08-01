@@ -17,7 +17,6 @@ class SELECTER:
     变量：\n
         center, width: 定义选择区间\n
         left, right: 定义选择区间\n
-        text: 定义选择文本\n
 
         show: 定义直方图显示范围\n
         inter：定义直方图bin数\n
@@ -31,7 +30,6 @@ class SELECTER:
         set_by_edge: 改变全部选择区间\n
         set_width: 改变选择区间宽度\n
         set_scale: 缩放选择区间宽度\n
-        set_text: 改变选择文本\n
 
         shift: 平移选择区间\n
         reverse: 改变reverse方向\n
@@ -43,7 +41,6 @@ class SELECTER:
     def __init__(self,
                  center=0.5,
                  width=0.5,
-                 text='',
                  show=0,
                  inter=100,
                  title='',
@@ -55,7 +52,6 @@ class SELECTER:
         self.right = center + width
         self.center = center
         self.width = width
-        self.text = text
         # 信息类变量
         self.show = float(show)
         self.inter = inter
@@ -66,14 +62,11 @@ class SELECTER:
 
     # 方法：判断
     def judge(self, input):
-        if(type(input) == type('')):
-            output = input == self.text
-        else:
-            a = input >= self.left
-            b = input <= self.right
-            output = a * b
+        a = input >= self.left
+        b = input <= self.right
+        output = a * b
         if(self.reverse != 0):
-            output = 1 - output
+            output = bool(1) ^ output
         return output
 
     # 方法：改变选择变量
@@ -98,9 +91,6 @@ class SELECTER:
         self.width = self.width * value
         self.left = self.center - self.width
         self.right = self.center + self.width
-
-    def set_text(self, text):
-        self.text = text
 
     # 方法：操作
     def shift(self, value):
@@ -132,16 +122,25 @@ class SELECTER:
         print('|{:^20}|=>|{:^20}|'.format('width', self.width))
         print('|{:^20}|=>|{:^20}|'.format('text', self.text))
 
-    # 特殊方法
-    def set_series(self, series):
-        self.series = series
 
-    def judge_by_series(self, input):
-        output = False
-        if(input in self.series()):
-            output = True
+class SELECTER_value:
+    '''
+    对value判断的selecter
+    '''
+
+    def __init__(self,
+                 values=[],
+                 reverse=0):
+        self.values = values
+        self.reverse = reverse
+
+    def judge(self, value):
+        for i in self.values:
+            bool1 = value >= i
+            bool2 = value <= i
+            output = bool1 * bool2
         if(self.reverse != 0):
-            output = 1 - output
+            output = bool(1) ^ output
         return output
 
 

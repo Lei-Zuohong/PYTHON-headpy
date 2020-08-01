@@ -1,16 +1,4 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
-
-    Environment version:
-
-        etc
-
-    Content:
-
-        @etc:
-            etc
-'''
 # Public package
 import os
 import re
@@ -29,50 +17,70 @@ def addfolder(name, path):
 def sim(txtfile='',
         decfile='',
         datfile='',
-        parent='',
+        parent='vpho',
+        usediy=0,
         runid=[0, 0],
         rtrawfile='',
         datalevel=0,
         events=0,
+        option_list=[],
         condor='0'):
     '生成MC joboption文件并运行'
     seed = random.randint(0, 99)
     line = []
-    line.append(
-        '#include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"')
-    line.append('#include "$BESEVTGENROOT/share/BesEvtGen.txt"')
-    line.append('#include "$BESSIMROOT/share/Bes_Gen.txt"')
-    line.append('#include "$BESSIMROOT/share/G4Svc_BesSim.txt"')
-    line.append('#include "$CALIBSVCROOT/share/calibConfig_sim.txt"')
-    line.append('#include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"')
-    # 添加随机数因子
-    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed))
+    line.append('//****************************************')
+    line.append('#include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"')
+    line.append('//****************************************')
+    # 添加Other line
+    for i in option_list:
+        line.append(i)
+    line.append('//****************************************')
     # 添加decay card
+    line.append('#include "$BESEVTGENROOT/share/BesEvtGen.txt"')
     if(decfile != ''):
         line.append('EvtDecay.userDecayTableName = "%s";' % (decfile))
+    line.append('//****************************************')
+    # 添加随机数因子
+    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed))
+    line.append('//****************************************')
+    # 添加其他类
+    line.append('#include "$BESSIMROOT/share/G4Svc_BesSim.txt"')
+    line.append('#include "$CALIBSVCROOT/share/calibConfig_sim.txt"')
+    # 添加run号
+    if(runid != [0, 0]):
+        line.append(
+            'RealizationSvc.RunIdList = {-%d, 0, -%d};' % (runid[1], runid[0]))
+    line.append('//****************************************')
+    # 添加输出文件
+    line.append('#include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"')
+    if(rtrawfile != ''):
+        line.append('RootCnvSvc.digiRootOutputFile = "%s";' % (rtrawfile))
+    line.append('//****************************************')
+    # 添加输出数据等级
+    if(datalevel != 0):
+        line.append('MessageSvc.OutputLevel  = %d;' % (datalevel))
+    # 添加输出数据量
+    if(events != 0):
+        line.append('ApplicationMgr.EvtMax = %d;' % (events))
+    line.append('//****************************************')
     # 添加dat文件
     if(datfile != ''):
         line.append('EvtDecay.FileForTrackGen = {"%s"};' % (datfile))
     # 添加母粒子
     if(parent != ''):
         line.append('EvtDecay.ParentParticle = "%s";' % (parent))
-    # 添加run号
-    if(runid != [0, 0]):
-        line.append(
-            'RealizationSvc.RunIdList = {-%d, 0, -%d};' % (runid[1], runid[0]))
-    # 添加输出文件
-    if(rtrawfile != ''):
-        line.append('RootCnvSvc.digiRootOutputFile = "%s";' % (rtrawfile))
-    # 添加输出数据等级
-    if(datalevel != 0):
-        line.append('MessageSvc.OutputLevel  = %d;' % (datalevel))
-    # 添加输出数据量
-    if(datalevel != 0):
-        line.append('ApplicationMgr.EvtMax = %d;' % (events))
+    line.append('//****************************************')
+    line.append('#include "$BESSIMROOT/share/Bes_Gen.txt"')
     # 特殊分波方法，选择性注释掉
     line.append('EvtDecay.statDecays = true;')
     line.append('EvtDecay.DecayTopology="EvtTop";')
     line.append('ApplicationMgr.DLLs += { "BesServices"};')
+    line.append('//****************************************')
+    # 添加DIY
+    if(usediy != 0):
+        line.append('EvtDecay.statDecays = true;')
+        line.append('EvtDecay.mDIY = true;')
+    line.append('//****************************************')
     # 整合line并输出
     output = ''
     for i in line:
@@ -87,12 +95,14 @@ def dosim(txtfolder='',
           decfolder='',
           datfolder='',
           rtrawfolder='',
-          datalevel=6,
-          energy_list=0,
           parent='vpho',
+          usediy=0,
+          energy_list=0,
+          energy=0,
+          datalevel=6,
           files=0,
           events=0,
-          energy=0,
+          option_list=[],
           condor='0'):
     # 输出数据
     hprint.pstar()
@@ -131,14 +141,16 @@ def dosim(txtfolder='',
                 rtrawfile = '%s/%1.4f_%02d.rtraw' % (rtrawfolder, energy, i1)
             else:
                 rtrawfile = ''
-            sim(txtfile,
+            sim(txtfile=txtfile,
                 decfile=decfile,
                 datfile=datfile,
                 parent=parent,
+                usediy=usediy,
                 runid=runid,
                 rtrawfile=rtrawfile,
                 datalevel=datalevel,
                 events=events,
+                option_list=option_list,
                 condor=condor)
     # 运行所有能量点
     elif(float(energy) == -1):
@@ -166,14 +178,16 @@ def dosim(txtfolder='',
                         rtrawfolder, energy, i1)
                 else:
                     rtrawfile = ''
-                sim(txtfile,
+                sim(txtfile=txtfile,
                     decfile=decfile,
                     datfile=datfile,
                     parent=parent,
+                    usediy=usediy,
                     runid=runid,
                     rtrawfile=rtrawfile,
                     datalevel=datalevel,
                     events=events,
+                    option_list=option_list,
                     condor=condor)
     else:
         print('能量点选项输入错误')
@@ -338,14 +352,21 @@ class WORKSPACE:
     dosima 提供ana过程\n
     '''
 
-    def __init__(self, version, name):
-        self.version = version
+    def __init__(self,
+                 path='',
+                 name='',
+                 method='',
+                 algroot=[],
+                 energy_list={}):
         self.name = name
+        self.method = method
+        self.algroot = algroot
+        self.energy_list = energy_list
         self.path = {}
-        # 初始化根目录地址
-        self.path['scratchfs'] = '/scratchfs/bes/leizh'
+        self.path['scratchfs'] = path
         self.path['work'] = '%s/%s' % (self.path['scratchfs'], self.name)
         self.path['data'] = '%s/%s_data' % (self.path['scratchfs'], self.name)
+        # 初始化根目录地址
         # 初始化工作区地址
         self.path['sima'] = '%s/1.sima' % (self.path['work'])
         self.path['reala'] = '%s/2.reala' % (self.path['work'])
@@ -360,12 +381,6 @@ class WORKSPACE:
         self.path['rtraw'] = '%s/rtraw' % (self.path['data'])
         self.path['dst'] = '%s/dst' % (self.path['data'])
         # 读取能量点和分析包数据
-        self.energy_list = {}
-        self.algroot = []
-        # 读取包文件数据
-        exec('import headpy.hbes.h%s as ana' % (name))
-        exec('self.energy_list = ana.energy_list()')
-        exec('self.algroot = ana.algroot()')
 
     def dodec(self, method, content=''):
         '用来在相应位置产生dec文件'
@@ -384,31 +399,41 @@ class WORKSPACE:
               dopw='',
               files=10,
               events=10000,
-              condor='0',
-              energy='-1'):
+              parent='vpho',
+              usediy=0,
+              energy='-1',
+              option_list=[],
+              condor='0'):
         '用来生成sim文件并运行'
         addfolder(method, self.path['sim'])
         addfolder(method, self.path['rtraw'])
-        self.energy_list[2.0000][1] = 41814
+        if(2.0000 in self.energy_list):
+            self.energy_list[2.0000][1] = 41814
         if(dopw == ''):
             dosim(txtfolder='%s/%s' % (self.path['sim'], method),
                   decfolder='%s/%s' % (self.path['dec'], method),
                   rtrawfolder='%s/%s' % (self.path['rtraw'], method),
+                  parent=parent,
+                  usediy=usediy,
                   energy_list=self.energy_list,
+                  energy=energy,
                   files=files,
                   events=events,
-                  condor=condor,
-                  energy=energy)
+                  option_list=option_list,
+                  condor=condor)
         else:
             dosim(txtfolder='%s/%s' % (self.path['sim'], method),
                   decfolder='%s/%s' % (self.path['dec'], method),
                   datfolder='%s/%s' % (self.path['dec'], method),
                   rtrawfolder='%s/%s' % (self.path['rtraw'], method),
+                  parent=parent,
+                  usediy=usediy,
                   energy_list=self.energy_list,
+                  energy=energy,
                   files=files,
                   events=events,
-                  condor=condor,
-                  energy=energy)
+                  option_list=option_list,
+                  condor=condor)
 
     def dorec(self, method,
               condor='0'):

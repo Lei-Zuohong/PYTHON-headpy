@@ -2,11 +2,13 @@
 import headpy.hbes.hconst as hconst
 import headpy.hbes.hnew as hnew
 
+
 def algroot():
     '''
     作用: 返回进行opp分析的分析程序调用所需要的三个字符串\n
     '''
     return ['PPPMPZALGROOT', 'jobOptions_Pppmpz.txt', 'Pppmpz']
+
 
 def energy_list():
     '''
@@ -39,3 +41,78 @@ def energy_list():
     for i1 in se_list:
         out_list[i1] = in_list[i1]
     return out_list
+
+
+def selecters():
+    output = {}
+    # Other
+    output['flag2'] = hnew.SELECTER_value(values=[8])
+    output['pid'] = hnew.SELECTER_value(values=[1])
+    output['chisq'] = hnew.SELECTER(center=40,
+                                    width=40,
+                                    show=40,
+                                    inter=80,
+                                    title=r'#chi^{2}')
+    output['chisq_4g'] = hnew.SELECTER(center=40,
+                                       width=40,
+                                       show=100,
+                                       reverse=1,
+                                       title=r'#chi_{4#gamma}^{2}')
+    output['chisq_1g'] = hnew.SELECTER(center=10,
+                                       width=10,
+                                       show=50,
+                                       reverse=1,
+                                       title=r'#chi_{1#gamma}^{2}')
+    output['chisq_0g'] = hnew.SELECTER(center=0.0001,
+                                       width=0.0001,
+                                       show=0.0001,
+                                       reverse=1,
+                                       title=r'#chi_{0#gamma}^{2}')
+    # 不变质量
+    output['mpip'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                   width=hconst.pdg()['m_pipm'],
+                                   show=0.0005,
+                                   inter=50,
+                                   title=r'M_{#pi^{+}}',
+                                   unit=r'(GeV/c^{2})')
+    output['mpim'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                   width=hconst.pdg()['m_pipm'],
+                                   show=0.0005,
+                                   inter=50,
+                                   title=r'M_{#pi^{-}}',
+                                   unit=r'(GeV/c^{2})')
+    output['mpiz'] = hnew.SELECTER(center=hconst.pdg()['m_pi0'],
+                                   width=0.045,
+                                   show=0.045,
+                                   inter=90,
+                                   title=r'M_{#pi^{0}}',
+                                   unit=r'(GeV/c^{2})')
+    output['mpipm'] = hnew.SELECTER(center=1.5,
+                                    show=1.5,
+                                    inter=100,
+                                    title=r'M_{#pi^{+}#pi^{-}}',
+                                    unit=r'(GeV/c^{2})')
+    output['mpipz'] = hnew.SELECTER(center=1.5,
+                                    show=1.5,
+                                    inter=100,
+                                    title=r'M_{#pi^{+}#pi^{0}}',
+                                    unit=r'(GeV/c^{2})')
+    output['mpimz'] = hnew.SELECTER(center=1.5,
+                                    show=1.5,
+                                    inter=100,
+                                    title=r'M_{#pi^{-}#pi^{0}}',
+                                    unit=r'(GeV/c^{2})')
+    # 动量
+    output['ppip'] = hnew.SELECTER(center=1,
+                                   show=1,
+                                   inter=50,
+                                   title=r'p_{#pi^{+}}',
+                                   unit=r'(GeV/c)')
+    output['ppim'] = hnew.SELECTER(center=1,
+                                   show=1,
+                                   inter=50,
+                                   title=r'p_{#pi^{-}}',
+                                   unit=r'(GeV/c)')
+    # 角分布
+
+    return output

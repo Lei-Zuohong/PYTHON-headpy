@@ -1,21 +1,4 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
-
-    Environment version:
-
-        python2
-        python3
-
-    Content:
-    
-        @algroot
-        @energy_list
-        @energy_list_pw
-        @cut
-'''
-# Public package
-# Private package
 import headpy.hbes.hconst as hconst
 import headpy.hbes.hnew as hnew
 
@@ -201,4 +184,9 @@ def selecters():
                                     inter=50,
                                     title=r'p_{#pi_{3}^{0}}',
                                     unit=r'(GeV/c)')
+    # 能量部分
+    output['epi01'] = hnew.SELECTER(center=0.5,
+                                    show=0.5,
+                                    title=r'Epi01',
+                                    unit=r'(GeV)')
     return output

@@ -178,12 +178,12 @@ def set_height(hist, multiple=1.5):
     hist.GetYaxis().SetRangeUser(0, multiple * height)
 
 
-def set_background(hist):
+def set_background(hist, Fillcolor=4, Linecolor=4, Linewidth=2, Fillstyle=3001):
     'Set hist of a background'
-    hist.SetLineColor(4)
-    hist.SetFillColor(4)
-    hist.SetLineWidth(2)
-    hist.SetFillStyle(3001)
+    hist.SetLineColor(Linecolor)
+    hist.SetFillColor(Fillcolor)
+    hist.SetLineWidth(Linewidth)
+    hist.SetFillStyle(Fillstyle)
 
 
 def set_background_alter(hist):
