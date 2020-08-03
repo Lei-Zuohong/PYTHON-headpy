@@ -46,8 +46,11 @@ def energy_list():
 def selecters():
     output = {}
     # Other
-    output['flag2'] = hnew.SELECTER_value(values=[8])
+    output['flag1'] = hnew.SELECTER_value(values=[0])
+    output['flag2'] = hnew.SELECTER_value(values=[0])
+    output['flag3'] = hnew.SELECTER_value(values=[0])
     output['pid'] = hnew.SELECTER_value(values=[1])
+    # kinematic fit
     output['chisq'] = hnew.SELECTER(center=40,
                                     width=40,
                                     show=40,
