@@ -536,7 +536,7 @@ class ALLDATA:
         # 得到cut后的tree
         ntree = tree_cut(self.trees[data], self.selecters, docuts)
         # 新建root文件,hist对象
-        tfilename = 'ftemp/root/%s_%s_%s.root' % (data, branch, name)
+        tfilename = '%s/%s_%s_%s.root' % (os.getenv("TEMPROOT"), data, branch, name)
         histname = '%s_%s' % (data, branch)
         inter = self.selecters[branch].inter
         left, right = self.selecters[branch].get_range()
@@ -585,10 +585,11 @@ class ALLDATA:
         # 得到cut后的tree
         ntree = tree_cut(self.trees[data], self.selecters, docuts)
         # 新建root文件,hist对象
-        tfilename = 'ftemp/root/%s_%s_%s_%s.root' % (data,
-                                                     branch1,
-                                                     branch2,
-                                                     name)
+        tfilename = '%s/%s_%s_%s_%s.root' % (os.getenv("TEMPROOT"),
+                                             data,
+                                             branch1,
+                                             branch2,
+                                             name)
         histname = '%s_%s_%s' % (data,
                                  branch1,
                                  branch2)
@@ -648,8 +649,6 @@ class ALLDATA:
         name为字符，提供文件名保证名称不重复\n
         \n
         1：返回tfile的名字，thist的名字\n
-        \n
-        Note: 请在目录ftemp文件夹下建立root文件夹
         '''
         if(len(branchs) == 1):
             tfilename, histname = self.hist1d(data,
@@ -678,8 +677,6 @@ class ALLDATA:
         name: 提供文件名保证名称不重复\n
         \n
         1：返回tfile的名字，ttree的名字\n
-        \n
-        Note: 请在目录ftemp文件夹下建立root文件夹\n
         '''
         # 输出信息
         hprint.pline('Building TTree')
@@ -688,7 +685,7 @@ class ALLDATA:
         # 得到cut后的tree
         ntree = tree_cut(self.trees[data], self.selecters, docuts)
         # 新建root文件,tree对象
-        tfilename = 'ftemp/root/%s_%s_%s.root' % (data, branch, name)
+        tfilename = '%s/%s_%s_%s.root' % (os.getenv("TEMPROOT"), data, branch, name)
         ttreename = '%s_%s' % (data, branch)
         tfilename, ttreename = tree1d(name_tfile=tfilename,
                                       name_ttree=ttreename,
