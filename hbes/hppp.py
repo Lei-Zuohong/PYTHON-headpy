@@ -50,6 +50,17 @@ def selecters():
     output['flag2'] = hnew.SELECTER_value(values=[0])
     output['flag3'] = hnew.SELECTER_value(values=[0])
     output['pid'] = hnew.SELECTER_value(values=[1])
+    # dimiu
+    output['bhabhae'] = hnew.SELECTER(center=0.5,
+                                      width=0.5,
+                                      show=0.5,
+                                      inter=50,
+                                      title='#e')
+    output['bhabhaa'] = hnew.SELECTER(center=5,
+                                      width=5,
+                                      show=90,
+                                      inter=90,
+                                      title='#theta')
     # kinematic fit
     output['chisq'] = hnew.SELECTER(center=40,
                                     width=40,
@@ -63,7 +74,7 @@ def selecters():
                                        title=r'#chi_{4#gamma}^{2}')
     output['chisq_1g'] = hnew.SELECTER(center=10,
                                        width=10,
-                                       show=50,
+                                       show=200,
                                        reverse=1,
                                        title=r'#chi_{1#gamma}^{2}')
     output['chisq_0g'] = hnew.SELECTER(center=0.0001,
