@@ -51,32 +51,78 @@ def selecters():
     output['flag3'] = hnew.SELECTER_value(values=[0])
     output['pid'] = hnew.SELECTER_value(values=[1])
     # dimiu
-    output['bhabhae'] = hnew.SELECTER(center=0.5,
-                                      width=0.5,
+    output['bhabhae'] = hnew.SELECTER(center=0.2,
+                                      width=0.1,
                                       show=0.5,
                                       inter=50,
-                                      title='#e')
+                                      reverse=1,
+                                      title='Energy deposited')
     output['bhabhaa'] = hnew.SELECTER(center=5,
                                       width=5,
                                       show=90,
                                       inter=90,
+                                      reverse=1,
                                       title='#theta')
+    # helicity
+    output['hgamma1'] = hnew.SELECTER(center=0,
+                                      width=0.8,
+                                      show=1,
+                                      inter=50,
+                                      title='Helicity angle',
+                                      unit='',
+                                      reverse=0)
+    output['hgamma2'] = hnew.SELECTER(center=0,
+                                      width=0.8,
+                                      show=1,
+                                      inter=50,
+                                      title='',
+                                      unit='',
+                                      reverse=0)
+    output['agamma'] = hnew.SELECTER(center=0,
+                                     width=1,
+                                     show=1,
+                                     inter=50,
+                                     title='',
+                                     reverse=0)
     # kinematic fit
     output['chisq'] = hnew.SELECTER(center=40,
                                     width=40,
                                     show=40,
                                     inter=80,
                                     title=r'#chi^{2}')
-    output['chisq_4g'] = hnew.SELECTER(center=40,
-                                       width=40,
+    if(1 == 0):
+        output['chisq'] = hnew.SELECTER(center=100,
+                                        width=100,
+                                        show=100,
+                                        inter=100,
+                                        title=r'#chi^{2}')
+    output['chisq_4g'] = hnew.SELECTER(center=10,
+                                       width=10,
                                        show=100,
                                        reverse=1,
                                        title=r'#chi_{4#gamma}^{2}')
+    if(1 == 0):
+        output['chisq_4g'] = hnew.SELECTER(center=100,
+                                           width=100,
+                                           show=100,
+                                           reverse=0,
+                                           title=r'#chi_{4#gamma}^{2}')
+    output['chisq_3g'] = hnew.SELECTER(center=100,
+                                       width=100,
+                                       show=100,
+                                       reverse=0,
+                                       title=r'#chi_{3#gamma}^{2}')
     output['chisq_1g'] = hnew.SELECTER(center=10,
                                        width=10,
                                        show=200,
                                        reverse=1,
                                        title=r'#chi_{1#gamma}^{2}')
+    if(1 == 0):
+        output['chisq_1g'] = hnew.SELECTER(center=100,
+                                           width=100,
+                                           show=100,
+                                           reverse=1,
+                                           title=r'#chi_{1#gamma}^{2}')
     output['chisq_0g'] = hnew.SELECTER(center=0.0001,
                                        width=0.0001,
                                        show=0.0001,
@@ -101,6 +147,13 @@ def selecters():
                                    inter=90,
                                    title=r'M_{#pi^{0}}',
                                    unit=r'(GeV/c^{2})')
+    if(1 == 0):
+        output['mpiz'] = hnew.SELECTER(center=0.8,
+                                       width=0.8,
+                                       show=0.8,
+                                       inter=160,
+                                       title=r'M_{#pi^{0}}',
+                                       unit=r'(GeV/c^{2})')
     output['mpipm'] = hnew.SELECTER(center=1.5,
                                     show=1.5,
                                     inter=100,
