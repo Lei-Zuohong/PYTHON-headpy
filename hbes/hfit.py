@@ -77,20 +77,34 @@ def fit_dump(energy=0,
     alldata = hnew.ALLDATA(trees=trees,
                            selecters=selecters,
                            massages=massages)
+    '''
     alldata.get_weight(data='omeganpw',
                        energy=energy,
                        name_weight='momegapi02_mpi02pi03',
                        name_branch='wpi02_pi02pi03',
                        dimension=2)
+    '''
+    alldata.get_weight(data='pppmpz',
+                       energy=energy,
+                       name_weight='pipm_m_pipz_m',
+                       name_branch='pipmpipz',
+                       dimension=2)
     histr1, histr2 = alldata.tree(data=datar,
                                   branch=branch,
                                   docuts=docuts,
-                                  name='real')
+                                  name='fit_real')
+    '''
     histm1, histm2 = alldata.hist(data=datam,
                                   branchs=[branch],
                                   docuts=docuts,
-                                  name='mc',
+                                  name='fit_mc',
                                   doweight=['wpi02_pi02pi03'])
+    '''
+    histm1, histm2 = alldata.hist(data=datam,
+                                  branchs=[branch],
+                                  docuts=docuts,
+                                  name='fit_mc',
+                                  doweight=['pipmpipz'])
     hist = {}
     hist['r'] = [histr1, histr2]
     hist['m'] = [histm1, histm2]

@@ -353,19 +353,17 @@ class WORKSPACE:
     '''
 
     def __init__(self,
-                 path='',
-                 name='',
+                 path_work='',
+                 path_data='',
                  method='',
                  algroot=[],
                  energy_list={}):
-        self.name = name
         self.method = method
         self.algroot = algroot
         self.energy_list = energy_list
         self.path = {}
-        self.path['scratchfs'] = path
-        self.path['work'] = '%s/%s' % (self.path['scratchfs'], self.name)
-        self.path['data'] = '%s/%s_data' % (self.path['scratchfs'], self.name)
+        self.path['work'] = path_work
+        self.path['data'] = path_data
         # 初始化根目录地址
         # 初始化工作区地址
         self.path['sima'] = '%s/1.sima' % (self.path['work'])

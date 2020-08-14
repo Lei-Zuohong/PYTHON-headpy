@@ -18,7 +18,9 @@ class SELECTER:
         center, width: 定义选择区间\n
         left, right: 定义选择区间\n
 
-        show: 定义直方图显示范围\n
+        center_show, width_show: 定义直方图显示范围\n
+        left_show, right_show: 定义直方图显示范围\n
+
         inter：定义直方图bin数\n
         title: 定义变量名\n
         unit: 定义单位名\n
@@ -31,7 +33,13 @@ class SELECTER:
         set_width: 改变选择区间宽度\n
         set_scale: 缩放选择区间宽度\n
 
+        set_by_center_show: 改变全部显示范围\n
+        set_by_edge_show: 改变全部显示范围\n
+        set_width_show: 改变显示范围宽度\n
+        set_scale_show: 缩放显示范围宽度\n
+
         shift: 平移选择区间\n
+        shift_show: 平移显示范围\n
         reverse: 改变reverse方向\n
 
         get_range: 返回直方图边界\n
@@ -41,7 +49,8 @@ class SELECTER:
     def __init__(self,
                  center=0.5,
                  width=0.5,
-                 show=0,
+                 center_show=0.5,
+                 width_show=0.5,
                  inter=100,
                  title='',
                  unit='',
@@ -53,7 +62,11 @@ class SELECTER:
         self.center = center
         self.width = width
         # 信息类变量
-        self.show = float(show)
+        self.left_show = center_show - width_show
+        self.right_show = center_show + width_show
+        self.center_show = center_show
+        self.width_show = width_show
+
         self.inter = inter
         self.title = title
         self.unit = unit
@@ -70,17 +83,17 @@ class SELECTER:
         return output
 
     # 方法：改变选择变量
-    def set_by_edge(self, left, right):
-        self.left = left
-        self.right = right
-        self.center = 0.5 * (left + right)
-        self.width = 0.5 * (right - left)
-
     def set_by_center(self, center, width):
         self.center = center
         self.width = width
         self.left = center - width
         self.right = center + width
+
+    def set_by_edge(self, left, right):
+        self.left = left
+        self.right = right
+        self.center = 0.5 * (left + right)
+        self.width = 0.5 * (right - left)
 
     def set_width(self, value):
         self.width = value
@@ -91,6 +104,29 @@ class SELECTER:
         self.width = self.width * value
         self.left = self.center - self.width
         self.right = self.center + self.width
+
+    # 方法：改变显示范围
+    def set_by_center_show(self, center_show, width_show):
+        self.center_show = center_show
+        self.width_show = width_show
+        self.left_show = center_show - width_show
+        self.right_show = center_show + width_show
+
+    def set_by_edge_show(self, left_show, right_show):
+        self.left_show = left_show
+        self.right_show = right_show
+        self.center_show = 0.5 * (left_show + right_show)
+        self.width_show = 0.5 * (right_show - left_show)
+
+    def set_width_show(self, value_show):
+        self.width_show = value_show
+        self.left_show = self.center_show - self.width_show
+        self.right_show = self.center_show + self.width_show
+
+    def set_scale_show(self, value_show):
+        self.width_show = self.width_show * value
+        self.left_show = self.center_show - self.width_show
+        self.right_show = self.center_show + self.width_show
 
     # 方法：操作
     def shift(self, value):
@@ -103,10 +139,10 @@ class SELECTER:
 
     # 方法：获取信息
     def get_range(self):
-        return self.center - self.show, self.center + self.show
+        return self.left_show, self.right_show
 
     def get_title(self):
-        value = 2 * self.show / self.inter
+        value = 2 * self.width_show / self.inter
         xtitle = self.title
         ytitle = r'Events/%s' % (str(value))
         xtitle += self.unit
@@ -450,11 +486,11 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selecters[weight['branchx']].center = 0.5 * (weight['xr'] + weight['xl'])
-        self.selecters[weight['branchx']].show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].center_show = 0.5 * (weight['xr'] + weight['xl'])
+        self.selecters[weight['branchx']].width_show = 0.5 * (weight['xr'] - weight['xl'])
         self.selecters[weight['branchx']].inter = weight['xi']
-        self.selecters[weight['branchy']].center = 0.5 * (weight['yr'] + weight['yl'])
-        self.selecters[weight['branchy']].show = 0.5 * (weight['yr'] - weight['yl'])
+        self.selecters[weight['branchy']].center_show = 0.5 * (weight['yr'] + weight['yl'])
+        self.selecters[weight['branchy']].width_show = 0.5 * (weight['yr'] - weight['yl'])
         self.selecters[weight['branchy']].inter = weight['yi']
         # 添加新的branch
         new_branch = []
@@ -486,8 +522,8 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selecters[weight['branchx']].center = 0.5 * (weight['xr'] + weight['xl'])
-        self.selecters[weight['branchx']].show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].center_show = 0.5 * (weight['xr'] + weight['xl'])
+        self.selecters[weight['branchx']].width_show = 0.5 * (weight['xr'] - weight['xl'])
         self.selecters[weight['branchx']].inter = weight['xi']
         # 添加新的branch
         new_branch = []

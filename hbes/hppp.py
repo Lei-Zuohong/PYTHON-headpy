@@ -45,6 +45,136 @@ def energy_list():
 
 def selecters():
     output = {}
+    #
+    output['chisq'] = hnew.SELECTER(center=25,
+                                    width=25,
+                                    center_show=50,
+                                    width_show=50,
+                                    inter=10,
+                                    title=r'#chi^{2}')
+    output['chisq_1g'] = hnew.SELECTER(center=5,
+                                       width=5,
+                                       reverse=1)
+    output['chisq_4g'] = hnew.SELECTER(center=5,
+                                       width=5,
+                                       reverse=1)
+    #
+    output['a_pippim'] = hnew.SELECTER(center=0,
+                                       width=0.95,
+                                       center_show=0,
+                                       width_show=1,
+                                       inter=20,
+                                       title=r'\<#pi^{+}\,#pi^{-}\>')
+    output['pip_ep'] = hnew.SELECTER(center=0.45,
+                                     width=0.45,
+                                     center_show=0.6,
+                                     width_show=0.6,
+                                     inter=60,
+                                     title=r'E/P ratio of #pi^{+}')
+    output['pim_ep'] = hnew.SELECTER(center=0.45,
+                                     width=0.45,
+                                     center_show=0.6,
+                                     width_show=0.6,
+                                     inter=60,
+                                     title=r'E/P ratio of #pi^{-}')
+    #
+    output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                    width=0.045,
+                                    center_show=hconst.pdg()['m_pipm'],
+                                    width_show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi^{+}}',
+                                    unit=r'(GeV/c^{2})')
+    output['pim_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                    width=0.045,
+                                    center_show=hconst.pdg()['m_pipm'],
+                                    width_show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi^{-}}',
+                                    unit=r'(GeV/c^{2})')
+    output['piz_m'] = hnew.SELECTER(center=hconst.pdg()['m_pi0'],
+                                    width=0.045,
+                                    center_show=hconst.pdg()['m_pi0'],
+                                    width_show=0.045,
+                                    inter=90,
+                                    title=r'M_{#gamma#gamma}',
+                                    unit=r'(GeV/c^{2})')
+    output['pipm_m'] = hnew.SELECTER(center=1.5,
+                                     width=1.5,
+                                     center_show=1.5,
+                                     width_show=1.5,
+                                     inter=120,
+                                     title=r'M_{#pi^{+}#pi^{-}}',
+                                     unit=r'(GeV/c^{2})')
+    output['pipz_m'] = hnew.SELECTER(center=1.5,
+                                     width=1.5,
+                                     center_show=1.5,
+                                     width_show=1.5,
+                                     inter=120,
+                                     title=r'M_{#pi^{+}#pi^{-}}',
+                                     unit=r'(GeV/c^{2})')
+    output['pimz_m'] = hnew.SELECTER(center=1.5,
+                                     width=1.5,
+                                     center_show=1.5,
+                                     width_show=1.5,
+                                     inter=120,
+                                     title=r'M_{#pi^{+}#pi^{-}}',
+                                     unit=r'(GeV/c^{2})')
+    #
+    output['pip_p'] = hnew.SELECTER(inter=50,
+                                    title=r'p_{#pi^{+}}/p_{beam}')
+    output['pim_p'] = hnew.SELECTER(inter=50,
+                                    title=r'p_{#pi^{+}}/p_{beam}')
+    output['gamma1_p'] = hnew.SELECTER(inter=50,
+                                       title=r'p_{#gamma}/p_{beam}')
+    output['gamma2_p'] = hnew.SELECTER(inter=50,
+                                       title=r'p_{#gamma}/p_{beam}')
+    output['piz_p'] = hnew.SELECTER(inter=50,
+                                    title=r'p_{#gamma#gamma}/p_{beam}')
+    output['pipm_p'] = hnew.SELECTER(inter=50,
+                                     title=r'p_{#pi^{+}#pi^{-}}/p_{beam}')
+    output['pipz_p'] = hnew.SELECTER(inter=50,
+                                     title=r'p_{#pi^{+}#gamma#gamma}/p_{beam}')
+    output['pimc_p'] = hnew.SELECTER(inter=50,
+                                     title=r'p_{#pi^{-}#gamma#gamma}/p_{beam}')
+    #
+    output['pip_a'] = hnew.SELECTER(center_show=0,
+                                    width_show=1,
+                                    inter=40,
+                                    title=r'Cos#theta_{#pi^{+}}')
+    output['pim_a'] = hnew.SELECTER(center_show=0,
+                                    width_show=1,
+                                    inter=40,
+                                    title=r'Cos#theta_{#pi^{-}}')
+    output['gamma1_a'] = hnew.SELECTER(center_show=0,
+                                       width_show=1,
+                                       inter=40,
+                                       title=r'Cos#theta_{#gamma}')
+    output['gamma2_a'] = hnew.SELECTER(center_show=0,
+                                       width_show=1,
+                                       inter=40,
+                                       title=r'Cos#theta_{#gamma}')
+    output['piz_a'] = hnew.SELECTER(center_show=0,
+                                    width_show=1,
+                                    inter=40,
+                                    title=r'Cos#theta_{#gamma#gamma}')
+    output['pipm_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1,
+                                     inter=40,
+                                     title=r'Cos#theta_{#pi^{+}#pi^{-}}')
+    output['pipz_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1,
+                                     inter=40,
+                                     title=r'Cos#theta_{#pi^{+}#gamma#gamma}')
+    output['pimz_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1,
+                                     inter=40,
+                                     title=r'Cos#theta_{#pi^{-}#gamma#gamma}')
+    return output
+
+
+def selecters_backup():
+    output = {}
     # Other
     output['flag1'] = hnew.SELECTER_value(values=[0])
     output['flag2'] = hnew.SELECTER_value(values=[0])
