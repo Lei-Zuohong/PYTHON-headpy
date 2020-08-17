@@ -28,6 +28,7 @@ def weight2d(data, xl, xr, xi, yl, yr, yi, backlist=[]):
         for point in method:
             xindex = get_index(point[0], xl, xr, xi)
             yindex = get_index(point[1], yl, yr, yi)
+            if(xindex < 0 or xindex >= xi or yindex < 0 or yindex >= yi): continue
             numsec[xindex, yindex] -= 1.0 / len(backlist)
             numall -= 1.0 / len(backlist)
     numsec = numsec / numall
