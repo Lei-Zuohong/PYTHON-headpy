@@ -50,43 +50,60 @@ def selecters():
                                     width=25,
                                     center_show=50,
                                     width_show=50,
-                                    inter=10,
+                                    inter=50,
                                     title=r'#chi^{2}')
     output['chisq_1g'] = hnew.SELECTER(center=5,
                                        width=5,
+                                       center_show=50,
+                                       width_show=50,
+                                       inter=50,
+                                       title=r'#chi^{2}_{#gamma}',
+                                       reverse=1)
+    output['chisq_3g'] = hnew.SELECTER(center=5,
+                                       width=5,
+                                       center_show=50,
+                                       width_show=50,
+                                       inter=50,
+                                       title=r'#chi^{2}_{#gamma#gamma#gamma}',
                                        reverse=1)
     output['chisq_4g'] = hnew.SELECTER(center=5,
                                        width=5,
+                                       center_show=50,
+                                       width_show=50,
+                                       inter=50,
+                                       title=r'#chi^{2}_{#gamma#gamma#gamma#gamma}',
                                        reverse=1)
     #
     output['a_pippim'] = hnew.SELECTER(center=0,
                                        width=0.95,
                                        center_show=0,
-                                       width_show=1,
-                                       inter=20,
-                                       title=r'\<#pi^{+}\,#pi^{-}\>')
+                                       width_show=1.,
+                                       inter=40,
+                                       title=r'Cos<#pi^{+},#pi^{-}>')
     output['pip_ep'] = hnew.SELECTER(center=0.45,
                                      width=0.45,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
-                                     title=r'E/P ratio of #pi^{+}')
+                                     title=r'E/P ratio of #pi^{+-}')
     output['pim_ep'] = hnew.SELECTER(center=0.45,
                                      width=0.45,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
-                                     title=r'E/P ratio of #pi^{-}')
+                                     title=r'E/P ratio of #pi^{+-}')
     output['gamma1_heli'] = hnew.SELECTER(center=0,
                                           width=0.8,
                                           center_show=0,
-                                          width_show=1,
-                                          inter=40)
+                                          width_show=1.,
+                                          inter=40,
+                                          title=r'Helicity angle of #pi^{0}')
     output['gamma2_heli'] = hnew.SELECTER(center=0,
                                           width=0.8,
                                           center_show=0,
-                                          width_show=1,
-                                          inter=40)
+                                          width_show=1.,
+                                          inter=40,
+                                          title=r'Helicity angle of #pi^{0}')
     #
     output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
                                     width=0.045,
@@ -149,35 +166,35 @@ def selecters():
                                      title=r'p_{#pi^{-}#gamma#gamma}/p_{beam}')
     #
     output['pip_a'] = hnew.SELECTER(center_show=0,
-                                    width_show=1,
+                                    width_show=1.,
                                     inter=40,
                                     title=r'Cos#theta_{#pi^{+}}')
     output['pim_a'] = hnew.SELECTER(center_show=0,
-                                    width_show=1,
+                                    width_show=1.,
                                     inter=40,
                                     title=r'Cos#theta_{#pi^{-}}')
     output['gamma1_a'] = hnew.SELECTER(center_show=0,
-                                       width_show=1,
+                                       width_show=1.,
                                        inter=40,
                                        title=r'Cos#theta_{#gamma}')
     output['gamma2_a'] = hnew.SELECTER(center_show=0,
-                                       width_show=1,
+                                       width_show=1.,
                                        inter=40,
                                        title=r'Cos#theta_{#gamma}')
     output['piz_a'] = hnew.SELECTER(center_show=0,
-                                    width_show=1,
+                                    width_show=1.,
                                     inter=40,
                                     title=r'Cos#theta_{#gamma#gamma}')
     output['pipm_a'] = hnew.SELECTER(center_show=0,
-                                     width_show=1,
+                                     width_show=1.,
                                      inter=40,
                                      title=r'Cos#theta_{#pi^{+}#pi^{-}}')
     output['pipz_a'] = hnew.SELECTER(center_show=0,
-                                     width_show=1,
+                                     width_show=1.,
                                      inter=40,
                                      title=r'Cos#theta_{#pi^{+}#gamma#gamma}')
     output['pimz_a'] = hnew.SELECTER(center_show=0,
-                                     width_show=1,
+                                     width_show=1.,
                                      inter=40,
                                      title=r'Cos#theta_{#pi^{-}#gamma#gamma}')
     return output
