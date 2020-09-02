@@ -73,120 +73,155 @@ def selecters():
     output = {}
     output['chisq'] = hnew.SELECTER(center=50,
                                     width=50,
-                                    show=50,
+                                    center_show=100,
+                                    width_show=100,
                                     inter=100,
                                     title=r'#chi_{#pi^{+}#pi^{-}6#gamma}^{2}')
     # 不变质量部分
-    output['momega'] = hnew.SELECTER(center=hconst.pdg()['m_omega'],
-                                     width=hconst.pdg()['m_omega'],
-                                     show=0.15,
-                                     inter=60,
-                                     title=r'M_{#pi^{+}#pi^{-}#pi^{0}}',
+    output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                    width=hconst.pdg()['m_pipm'],
+                                    center_show=hconst.pdg()['m_pipm'],
+                                    width_show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi^{+}}',
+                                    unit=r'(GeV/c^{2})')
+    output['pim_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
+                                    width=hconst.pdg()['m_pipm'],
+                                    center_show=hconst.pdg()['m_pipm'],
+                                    width_show=0.045,
+                                    inter=90,
+                                    title=r'M_{#pi^{-}}',
+                                    unit=r'(GeV/c^{2})')
+    output['pi01_m'] = hnew.SELECTER(center_show=hconst.pdg()['m_pi0'],
+                                     width_show=0.05,
+                                     inter=100,
+                                     title=r'M_{#pi_{1}^{0}}',
                                      unit=r'(GeV/c^{2})')
-    output['mpip'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
-                                   width=hconst.pdg()['m_pipm'],
-                                   show=0.045,
-                                   inter=90,
-                                   title=r'M_{#pi^{+}}',
-                                   unit=r'(GeV/c^{2})')
-    output['mpim'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
-                                   width=hconst.pdg()['m_pipm'],
-                                   show=0.045,
-                                   inter=90,
-                                   title=r'M_{#pi^{-}}',
-                                   unit=r'(GeV/c^{2})')
-    output['mpi01'] = hnew.SELECTER(show=0.045,
-                                    inter=90,
-                                    title=r'M_{#pi_{1}^{0}}',
-                                    unit=r'(GeV/c^{2})')
-    output['mpi02'] = hnew.SELECTER(show=0.045,
-                                    inter=90,
-                                    title=r'M_{#pi_{2}^{0}}',
-                                    unit=r'(GeV/c^{2})')
-    output['mpi03'] = hnew.SELECTER(show=0.045,
-                                    inter=90,
-                                    title=r'M_{#pi_{3}^{0}}',
-                                    unit=r'(GeV/c^{2})')
-    output['mpi01'].set_by_edge(hconst.pdg()['m_pi0'] - l1, hconst.pdg()['m_pi0'] + r1)
-    output['mpi02'].set_by_edge(hconst.pdg()['m_pi0'] - l2, hconst.pdg()['m_pi0'] + r2)
-    output['mpi03'].set_by_edge(hconst.pdg()['m_pi0'] - l3, hconst.pdg()['m_pi0'] + r3)
-    output['mpi02pi03'] = hnew.SELECTER(center=0.8,
-                                        width=0.8,
-                                        show=0.8,
-                                        inter=50,
-                                        title=r'M_{#pi_{2}^{0}#pi_{3}^{0}}',
-                                        unit=r'(GeV/c^{2})')
-    output['momegapi02'] = hnew.SELECTER(center=1.5,
-                                         width=1.5,
-                                         show=1.5,
-                                         inter=160,
-                                         title=r'M_{#omega#pi_{2}^{0}}',
+    output['pi02_m'] = hnew.SELECTER(center_show=hconst.pdg()['m_pi0'],
+                                     width_show=0.05,
+                                     inter=100,
+                                     title=r'M_{#pi_{2}^{0}}',
+                                     unit=r'(GeV/c^{2})')
+    output['pi03_m'] = hnew.SELECTER(center_show=hconst.pdg()['m_pi0'],
+                                     width_show=0.05,
+                                     inter=100,
+                                     title=r'M_{#pi_{3}^{0}}',
+                                     unit=r'(GeV/c^{2})')
+    output['pi01_m'].set_by_edge(hconst.pdg()['m_pi0'] - l1, hconst.pdg()['m_pi0'] + r1)
+    output['pi02_m'].set_by_edge(hconst.pdg()['m_pi0'] - l2, hconst.pdg()['m_pi0'] + r2)
+    output['pi03_m'].set_by_edge(hconst.pdg()['m_pi0'] - l3, hconst.pdg()['m_pi0'] + r3)
+    output['omega_m'] = hnew.SELECTER(center=hconst.pdg()['m_omega'],
+                                      width=hconst.pdg()['m_omega'],
+                                      center_show=hconst.pdg()['m_omega'],
+                                      width_show=0.15,
+                                      inter=60,
+                                      title=r'M_{#pi^{+}#pi^{-}#pi^{0}_{1}}',
+                                      unit=r'(GeV/c^{2})')
+    output['pi02pi03_m'] = hnew.SELECTER(center_show=0.8,
+                                         width_show=0.8,
+                                         inter=100,
+                                         title=r'M_{#pi_{2}^{0}#pi_{3}^{0}}',
                                          unit=r'(GeV/c^{2})')
-    output['momegapi03'] = hnew.SELECTER(center=1.5,
-                                         width=1.5,
-                                         show=1.5,
-                                         inter=160,
-                                         title=r'M_{#omega#pi_{3}^{0}}',
-                                         unit=r'(GeV/c^{2})')
+    output['omegapi02_m'] = hnew.SELECTER(center_show=1.5,
+                                          width_show=1.5,
+                                          inter=100,
+                                          title=r'M_{#omega#pi_{2}^{0}}',
+                                          unit=r'(GeV/c^{2})')
+    output['omegapi03_m'] = hnew.SELECTER(center_show=1.5,
+                                          width_show=1.5,
+                                          inter=100,
+                                          title=r'M_{#omega#pi_{3}^{0}}',
+                                          unit=r'(GeV/c^{2})')
     # 角分布部分
-    output['aomega'] = hnew.SELECTER(center=0,
-                                     show=1,
+    output['pip_a'] = hnew.SELECTER(center_show=0,
+                                    width_show=1.,
+                                    inter=50,
+                                    title=r'Cos#theta_{#pi^{+}}')
+    output['pim_a'] = hnew.SELECTER(center_show=0,
+                                    width_show=1.,
+                                    inter=50,
+                                    title=r'Cos#theta_{#pi^{-}}')
+    output['pi01_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1.,
                                      inter=50,
-                                     title=r'#theta_{#pi^{+}#pi^{-}#pi^{0}}')
-    output['apip'] = hnew.SELECTER(center=0,
-                                   show=1,
-                                   inter=50,
-                                   title=r'#theta_{#pi^{+}}')
-    output['apim'] = hnew.SELECTER(center=0,
-                                   show=1,
-                                   inter=50,
-                                   title=r'#theta_{#pi^{-}}')
-    output['api01'] = hnew.SELECTER(center=0,
-                                    show=1,
-                                    inter=50,
-                                    title=r'#theta_{#pi_{1}^{0}}')
-    output['api02'] = hnew.SELECTER(center=0,
-                                    show=1,
-                                    inter=50,
-                                    title=r'#theta_{#pi_{2}^{0}}')
-    output['api03'] = hnew.SELECTER(center=0,
-                                    show=1,
-                                    inter=50,
-                                    title=r'#theta_{#pi_{3}^{0}}')
+                                     title=r'Cos#theta_{#pi_{1}^{0}}')
+    output['pi02_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1.,
+                                     inter=50,
+                                     title=r'Cos#theta_{#pi_{2}^{0}}')
+    output['pi03_a'] = hnew.SELECTER(center_show=0,
+                                     width_show=1.,
+                                     inter=50,
+                                     title=r'Cos#theta_{#pi_{3}^{0}}')
+    output['omega_a'] = hnew.SELECTER(center_show=0,
+                                      width_show=1.,
+                                      inter=50,
+                                      title=r'Cos#theta_{#pi^{+}#pi^{-}#pi^{0}}')
     # 动量部分
-    output['pomega'] = hnew.SELECTER(center=1,
-                                     show=1,
+    output['pip_p'] = hnew.SELECTER(center_show=0.5,
+                                    width_show=0.5,
+                                    inter=50,
+                                    title=r'p_{#pi^{+}}/p_{beam}',
+                                    unit=r'(GeV/c)')
+    output['pim_p'] = hnew.SELECTER(center_show=0.5,
+                                    width_show=0.5,
+                                    inter=50,
+                                    title=r'p_{#pi^{-}}/p_{beam}',
+                                    unit=r'(GeV/c)')
+    output['pi01_p'] = hnew.SELECTER(center_show=0.5,
+                                     width_show=0.5,
                                      inter=50,
-                                     title=r'p_{#pi^{+}#pi^{-}#pi^{0}}',
+                                     title=r'p_{#pi_{1}^{0}}/p_{beam}',
                                      unit=r'(GeV/c)')
-    output['ppip'] = hnew.SELECTER(center=1,
-                                   show=1,
-                                   inter=50,
-                                   title=r'p_{#pi^{+}}',
-                                   unit=r'(GeV/c)')
-    output['ppim'] = hnew.SELECTER(center=1,
-                                   show=1,
-                                   inter=50,
-                                   title=r'p_{#pi^{-}}',
-                                   unit=r'(GeV/c)')
-    output['ppi01'] = hnew.SELECTER(center=1,
-                                    show=1,
-                                    inter=50,
-                                    title=r'p_{#pi_{1}^{0}}',
-                                    unit=r'(GeV/c)')
-    output['ppi02'] = hnew.SELECTER(center=1,
-                                    show=1,
-                                    inter=50,
-                                    title=r'p_{#pi_{2}^{0}}',
-                                    unit=r'(GeV/c)')
-    output['ppi03'] = hnew.SELECTER(center=1,
-                                    show=1,
-                                    inter=50,
-                                    title=r'p_{#pi_{3}^{0}}',
-                                    unit=r'(GeV/c)')
-    # 能量部分
-    output['epi01'] = hnew.SELECTER(center=0.5,
-                                    show=0.5,
-                                    title=r'Epi01',
-                                    unit=r'(GeV)')
+    output['pi02_p'] = hnew.SELECTER(center_show=0.5,
+                                     width_show=0.5,
+                                     inter=50,
+                                     title=r'p_{#pi_{2}^{0}}/p_{beam}',
+                                     unit=r'(GeV/c)')
+    output['pi03_p'] = hnew.SELECTER(center_show=0.5,
+                                     width_show=0.5,
+                                     inter=50,
+                                     title=r'p_{#pi_{3}^{0}}/p_{beam}',
+                                     unit=r'(GeV/c)')
+    output['omega_p'] = hnew.SELECTER(center_show=0.5,
+                                      width_show=0.5,
+                                      inter=50,
+                                      title=r'p_{#pi^{+}#pi^{-}#pi^{0}}/p_{beam}',
+                                      unit=r'(GeV/c)')
+    # 其它
+    output['dalitz_s'] = hnew.SELECTER(center=2,
+                                       width=2,
+                                       center_show=0.3,
+                                       width_show=0.3,
+                                       inter=100,
+                                       title=r'M^{2}_{#pi^{+}#pi^{-}}',
+                                       unit=r'(GeV^{2}/c^{4})')
+    output['dalitz_t'] = hnew.SELECTER(center=2,
+                                       width=2,
+                                       center_show=0.3,
+                                       width_show=0.3,
+                                       inter=100,
+                                       title=r'M^{2}_{#pi^{-}#pi^{0}}',
+                                       unit=r'(GeV^{2}/c^{4})')
+    output['dalitz_u'] = hnew.SELECTER(center=2,
+                                       width=2,
+                                       center_show=0.3,
+                                       width_show=0.3,
+                                       inter=100,
+                                       title=r'M^{2}_{#pi^{+}#pi^{0}}',
+                                       unit=r'(GeV^{2}/c^{4})')
+    output['dalitz_x1'] = hnew.SELECTER(center=0,
+                                        width=1,
+                                        center_show=0,
+                                        width_show=1,
+                                        inter=40,
+                                        title='X')
+    output['dalitz_y1'] = hnew.SELECTER(center=0,
+                                        width=1,
+                                        center_show=0.1,
+                                        width_show=1.1,
+                                        inter=40,
+                                        title='Y')
+    output['dalitz_x2'] = output['dalitz_x1']
+    output['dalitz_y2'] = output['dalitz_y1']
     return output

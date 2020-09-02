@@ -455,3 +455,43 @@ class WORKSPACE:
               '%s/%s' % (self.path['simr'], method),
               option_list,
               condor)
+
+
+def cutrun_real(energy_list={},
+                algroot=[],
+                folder_txt='',
+                folder_root='',
+                energy=0,
+                num=1,
+                option=[],
+                dstlist=[],
+                condor=0):
+    '''
+    适用于dstlist格式为[文件名，绝对路径，run号，文件编号，年，月，日]\n
+    '''
+    # 构造option
+    option_list = option + ['%s.Energy = %1.4f' % (algroot[2], energy)]
+    # 按照run number填入list
+    rundstlist = []
+    for i in dstlist:
+        if(int(i[2]) >= energy_list[energy][0] and int(i[2]) <= energy_list[energy][1]):
+            rundstlist.append(i)
+    dstlong = len(rundstlist)
+    # 按照分块填入list
+    for i1 in range(num):
+        output = []
+        nleft = dstlong * i1 / num
+        nright = dstlong * (i1 + 1) / num
+        for i3, i2 in enumerate(rundstlist):
+            if(i3 >= nleft and i3 < nright):
+                output.append(i2[1])
+        if(len(output) >= 1):
+            alg(algroot,
+                '%s/%1.4f_%03d.txt' % (folder_txt, energy, i1),
+                output,
+                '%s/%1.4f_%03d.root' % (folder_root, energy, i1),
+                option_list,
+                condor)
+            print('已处理%1.4f的%03d, 数据长度%03d\r' % (energy, i1, len(output)))
+        else:
+            print('已处理%1.4f的%03d, 没有数据\r' % (energy, i1))

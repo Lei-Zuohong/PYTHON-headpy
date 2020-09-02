@@ -165,9 +165,9 @@ def set_axis(hist, xname, yname):
     hist.GetYaxis().CenterTitle()
 
 
-def set_marker(hist):
+def set_marker(hist, Markerstyle=20):
     '设定一个要绘制误差棒的图像的样式'
-    hist.SetMarkerStyle(20)
+    hist.SetMarkerStyle(Markerstyle)
     hist.SetMarkerSize(1.2)
     hist.SetLineWidth(2)
 

@@ -124,7 +124,7 @@ class SELECTER:
         self.right_show = self.center_show + self.width_show
 
     def set_scale_show(self, value_show):
-        self.width_show = self.width_show * value
+        self.width_show = self.width_show * value_show
         self.left_show = self.center_show - self.width_show
         self.right_show = self.center_show + self.width_show
 
@@ -171,10 +171,10 @@ class SELECTER_value:
         self.reverse = reverse
 
     def judge(self, value):
+        output = bool(0)
         for i in self.values:
-            bool1 = value >= i
-            bool2 = value <= i
-            output = bool1 * bool2
+            check = (value >= i) * (value <= i)
+            output += check
         if(self.reverse != 0):
             output = bool(1) ^ output
         return output
@@ -486,11 +486,9 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selecters[weight['branchx']].center_show = 0.5 * (weight['xr'] + weight['xl'])
-        self.selecters[weight['branchx']].width_show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].set_by_edge_show(weight['xl'], weight['xr'])
         self.selecters[weight['branchx']].inter = weight['xi']
-        self.selecters[weight['branchy']].center_show = 0.5 * (weight['yr'] + weight['yl'])
-        self.selecters[weight['branchy']].width_show = 0.5 * (weight['yr'] - weight['yl'])
+        self.selecters[weight['branchy']].set_by_edge_show(weight['yl'], weight['yr'])
         self.selecters[weight['branchy']].inter = weight['yi']
         # 添加新的branch
         new_branch = []
@@ -522,8 +520,7 @@ class ALLDATA:
                                            energy)
         weight = hpickle.pkl_read(weight_file)
         # 更改cut
-        self.selecters[weight['branchx']].center_show = 0.5 * (weight['xr'] + weight['xl'])
-        self.selecters[weight['branchx']].width_show = 0.5 * (weight['xr'] - weight['xl'])
+        self.selecters[weight['branchx']].set_by_edge_show(weight['xl'], weight['xr'])
         self.selecters[weight['branchx']].inter = weight['xi']
         # 添加新的branch
         new_branch = []
@@ -636,6 +633,7 @@ class ALLDATA:
         data1 = ntree[branch1]
         data2 = ntree[branch2]
         num = len(data1)
+        hprint.ppoint('Entires', num)
         # 开始填入直方图
         if (len(doweight) == 0):
             hprint.ppoint('Weight', 'NO')
@@ -718,6 +716,7 @@ class ALLDATA:
         hprint.pline('Building TTree')
         hprint.ppoint('Source', data)
         hprint.ppoint('Branch', branch)
+        hprint.pstar()
         # 得到cut后的tree
         ntree = tree_cut(self.trees[data], self.selecters, docuts)
         # 新建root文件,tree对象

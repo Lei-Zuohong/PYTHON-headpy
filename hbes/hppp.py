@@ -73,6 +73,27 @@ def selecters():
                                        inter=50,
                                        title=r'#chi^{2}_{#gamma#gamma#gamma#gamma}',
                                        reverse=1)
+    output['chisq_m'] = hnew.SELECTER(center=5,
+                                      width=5,
+                                      center_show=50,
+                                      width_show=50,
+                                      inter=50,
+                                      title=r'#chi^{2}_{#mu#mu}',
+                                      reverse=1)
+    output['chisq_e'] = hnew.SELECTER(center=5,
+                                      width=5,
+                                      center_show=50,
+                                      width_show=50,
+                                      inter=50,
+                                      title=r'#chi^{2}_{ee}',
+                                      reverse=1)
+    output['chisq_k'] = hnew.SELECTER(center=5,
+                                      width=5,
+                                      center_show=50,
+                                      width_show=50,
+                                      inter=50,
+                                      title=r'#chi^{2}_{KK}',
+                                      reverse=1)
     #
     output['a_pippim'] = hnew.SELECTER(center=0,
                                        width=0.95,
