@@ -96,23 +96,26 @@ def selecters():
                                       reverse=1)
     #
     output['a_pippim'] = hnew.SELECTER(center=0,
-                                       width=0.95,
-                                       center_show=0,
-                                       width_show=1.,
-                                       inter=40,
+                                       width=1,
+                                       center_show=-0.99,
+                                       width_show=0.01,
+                                       inter=20,
                                        title=r'Cos<#pi^{+},#pi^{-}>')
-    output['pip_ep'] = hnew.SELECTER(center=0.45,
-                                     width=0.45,
+    output['a_pippim'].set_by_edge(-0.99, 1)
+    output['pip_ep'] = hnew.SELECTER(center=0.4,
+                                     width=0.4,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
                                      title=r'E/P ratio of #pi^{+-}')
-    output['pim_ep'] = hnew.SELECTER(center=0.45,
-                                     width=0.45,
+    output['pim_ep'] = hnew.SELECTER(center=0.4,
+                                     width=0.4,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
                                      title=r'E/P ratio of #pi^{+-}')
+    output['pip_ep'].set_by_edge(0, 0.85)
+    output['pim_ep'].set_by_edge(0, 0.85)
     output['gamma1_heli'] = hnew.SELECTER(center=0,
                                           width=0.8,
                                           center_show=0,
