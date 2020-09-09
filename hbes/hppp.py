@@ -162,14 +162,14 @@ def selecters():
                                      center_show=1.5,
                                      width_show=1.5,
                                      inter=120,
-                                     title=r'M_{#pi^{+}#pi^{-}}',
+                                     title=r'M_{#pi^{+}#pi^{0}}',
                                      unit=r'(GeV/c^{2})')
     output['pimz_m'] = hnew.SELECTER(center=1.5,
                                      width=1.5,
                                      center_show=1.5,
                                      width_show=1.5,
                                      inter=120,
-                                     title=r'M_{#pi^{+}#pi^{-}}',
+                                     title=r'M_{#pi^{-}#pi^{0}}',
                                      unit=r'(GeV/c^{2})')
     #
     output['pip_p'] = hnew.SELECTER(inter=50,
@@ -221,4 +221,20 @@ def selecters():
                                      width_show=1.,
                                      inter=40,
                                      title=r'Cos#theta_{#pi^{-}#gamma#gamma}')
+    #
+    output['dalitz_pm'] = hnew.SELECTER(center_show=2,
+                                        width_show=2,
+                                        inter=50,
+                                        title=r'M^{2}_{#pi^{+}#pi^{-}}',
+                                        unit=r'(GeV^{2}/c^{4})')
+    output['dalitz_pz'] = hnew.SELECTER(center_show=2,
+                                        width_show=2,
+                                        inter=50,
+                                        title=r'M^{2}_{#pi^{+}#pi^{0}}',
+                                        unit=r'(GeV^{2}/c^{4})')
+    output['dalitz_mz'] = hnew.SELECTER(center_show=2,
+                                        width_show=2,
+                                        inter=50,
+                                        title=r'M^{2}_{#pi^{-}#pi^{0}}',
+                                        unit=r'(GeV^{2}/c^{4})')
     return output
