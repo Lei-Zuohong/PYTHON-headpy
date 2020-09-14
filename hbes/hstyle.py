@@ -1,82 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Public package
-# Private package
 import ROOT
-
-
-def get_canvas(x=800, y=600, dx=1, dy=1):
-    '''
-    x为浮点，输入画布横向长度\n
-    y为浮点，输入画布纵向长度\n
-    dx为分区，输入画布横向分区\n
-    dy为分区，输入画布纵向分区\n
-    作用1：返回一个TCanvas对象\n
-    '''
-    canvas = ROOT.TCanvas('canvas', '', x, y)
-    canvas.Divide(dx, dy)
-    return canvas
-
-
-def get_legend(legendlist=[],
-               l=0.6, r=0.93, d=0.7, u=0.93,
-               Fillcolor=0,
-               Textfont=42,
-               Textsize=0.035,
-               header=''):
-    '''
-    legendlist为列表，其中元素为[TObject,str,str]\n
-    第一个元素为标注目标\n
-    第二个元素为标注字符\n
-    第三个元素为标注选项\n
-    l,r,d,u为浮点，输入标注占画布比例\n
-    作用1：返回一个TLegend对象\n
-    '''
-    legend = ROOT.TLegend(l, d, u, r)
-    for i in legendlist:
-        legend.AddEntry(i[0], i[1], i[2])
-    legend.SetFillColor(Fillcolor)
-    legend.SetTextFont(Textfont)
-    legend.SetTextSize(Textsize)
-    legend.SetHeader(header)
-    return legend
-
-
-def add_arrow(drawlist,
-              x0, y0, x1, y1,
-              Linecolor=2,
-              Linewidth=3):
-    '''
-    drawlist为列表，输入初始列表\n
-    x0,y0,x1,y1为浮点，输入箭头的开始和初始位置\n
-    Linecolor为整形，输入箭头的颜色\n
-    width为整形，输入箭头的粗细\n
-    作用1：添加一个TArrow对象到drawlist\n
-    '''
-    in_drawlist = drawlist
-    newarrow = ROOT.TArrow(x0, y0, x1, y1, 0.05, '|>')
-    newarrow.SetLineColor(Linecolor)
-    newarrow.SetLineWidth(Linewidth)
-    in_drawlist.append(newarrow)
-    return in_drawlist
-
-
-def add_box(drawlist,
-            l, r, d, u,
-            Linecolor=2,
-            Linewidth=3):
-    '''
-    drawlist为列表，输入初始列表\n
-    l,r,d,u为浮点，输入方框的边位置\n
-    Linecolor为整形，输入方框的颜色\n
-    width为整形，输入方框的粗细\n
-    作用1：添加一系列TArrow对象到drawlist，形成方框\n
-    '''
-    in_drawlist = drawlist
-    in_drawlist = add_arrow(in_drawlist, l, d, l, u, Linecolor, Linewidth)
-    in_drawlist = add_arrow(in_drawlist, l, u, r, u, Linecolor, Linewidth)
-    in_drawlist = add_arrow(in_drawlist, r, u, r, d, Linecolor, Linewidth)
-    in_drawlist = add_arrow(in_drawlist, r, d, l, d, Linecolor, Linewidth)
-    return in_drawlist
 
 
 def set_style():
@@ -116,11 +39,75 @@ def set_style():
     ROOT.gStyle.SetOptTitle(0)
 
 
+def get_canvas(x=800, y=600, dx=1, dy=1):
+    '''
+    x, y 为画布大小\n
+    dx, dy 为画布分区\n
+    作用1：返回一个TCanvas对象\n
+    '''
+    canvas = ROOT.TCanvas('canvas', '', x, y)
+    canvas.Divide(dx, dy)
+    return canvas
+
+
+def get_legend(legendlist=[],
+               l=0.6, r=0.93, d=0.7, u=0.93,
+               Fillcolor=0,
+               Textfont=42,
+               Textsize=0.035,
+               header=''):
+    '''
+    legendlist 为列表，其中元素为[TObject,str,str]\n
+    第一个元素为TObject\n
+    第二个元素为标注内容\n
+    第三个元素为标注标志('F','lp')\n
+    l,r,d,u 为注释占画布比例\n
+    作用1：返回一个TLegend对象\n
+    '''
+    legend = ROOT.TLegend(l, d, u, r)
+    for i in legendlist:
+        legend.AddEntry(i[0], i[1], i[2])
+    legend.SetFillColor(Fillcolor)
+    legend.SetTextFont(Textfont)
+    legend.SetTextSize(Textsize)
+    legend.SetHeader(header)
+    return legend
+
+
+def add_arrow(drawlist,
+              x0, y0, x1, y1,
+              Linecolor=2,
+              Linewidth=3):
+    '''
+    x0,y0,x1,y1 为箭头起始结束位置坐标\n
+    作用1：添加一个TArrow对象到drawlist\n
+    '''
+    in_drawlist = drawlist
+    newarrow = ROOT.TArrow(x0, y0, x1, y1, 0.05, '|>')
+    newarrow.SetLineColor(Linecolor)
+    newarrow.SetLineWidth(Linewidth)
+    in_drawlist.append(newarrow)
+    return in_drawlist
+
+
+def add_box(drawlist,
+            l, r, d, u,
+            Linecolor=2,
+            Linewidth=3):
+    '''
+    l,r,d,u 为方框的边位置\n
+    作用1：添加一系列TArrow对象到drawlist，形成方框\n
+    '''
+    in_drawlist = drawlist
+    in_drawlist = add_arrow(in_drawlist, l, d, l, u, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, l, u, r, u, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, r, u, r, d, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, r, d, l, d, Linecolor, Linewidth)
+    return in_drawlist
+
+
 def set_axis(hist, xname, yname):
     '''
-    hist为TH1，输入要改变坐标的TObject\n
-    xname为字符，输入横坐标字符\n
-    yname为字符，输入纵坐标字符\n
     作用1：设定BESIII合作组要求的坐标轴样式\n
     '''
     hist.GetXaxis().SetTitle(xname)
@@ -145,21 +132,27 @@ def set_axis(hist, xname, yname):
     hist.GetYaxis().CenterTitle()
 
 
-def set_marker(hist, Markerstyle=20):
-    '设定一个要绘制误差棒的图像的样式'
+def set_marker(hist, Markerstyle=20, Markersize=1.2, Linewidth=2):
+    '''
+    作用1：设定一个误差棒的样式\n
+    '''
     hist.SetMarkerStyle(Markerstyle)
-    hist.SetMarkerSize(1.2)
-    hist.SetLineWidth(2)
+    hist.SetMarkerSize(Markersize)
+    hist.SetLineWidth(Linewidth)
 
 
 def set_height(hist, multiple=1.5):
-    '设定一个要绘制的图像的高度为几倍其最大值'
+    '''
+    作用1：设定一个要绘制的图像的高度为几倍其最大值\n
+    '''
     height = hist.GetMaximum()
     hist.GetYaxis().SetRangeUser(0, multiple * height)
 
 
 def set_background(hist, Fillcolor=4, Linecolor=4, Linewidth=2, Fillstyle=3001):
-    'Set hist of a background'
+    '''
+    作用1：设定直方图样式
+    '''
     hist.SetLineColor(Linecolor)
     hist.SetFillColor(Fillcolor)
     hist.SetLineWidth(Linewidth)
