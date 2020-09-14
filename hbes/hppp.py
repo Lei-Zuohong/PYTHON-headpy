@@ -1,19 +1,14 @@
 # -*- coding: UTF-8 -*-
+import math
 import headpy.hbes.hconst as hconst
 import headpy.hbes.hnew as hnew
 
 
 def algroot():
-    '''
-    作用: 返回进行opp分析的分析程序调用所需要的三个字符串\n
-    '''
     return ['PPPMPZALGROOT', 'jobOptions_Pppmpz.txt', 'Pppmpz']
 
 
 def energy_list():
-    '''
-    作用: 返回能够进行opp相空间分析的19个能量点\n
-    '''
     in_list = hconst.energy_list()
     se_list = [2.0000,
                2.0500,
@@ -52,56 +47,11 @@ def selecters():
                                     width_show=50,
                                     inter=50,
                                     title=r'#chi^{2}')
-    output['chisq_1g'] = hnew.SELECTER(center=5,
-                                       width=5,
-                                       center_show=50,
-                                       width_show=50,
-                                       inter=50,
-                                       title=r'#chi^{2}_{#gamma}',
-                                       reverse=1)
-    output['chisq_3g'] = hnew.SELECTER(center=5,
-                                       width=5,
-                                       center_show=50,
-                                       width_show=50,
-                                       inter=50,
-                                       title=r'#chi^{2}_{#gamma#gamma#gamma}',
-                                       reverse=1)
-    output['chisq_4g'] = hnew.SELECTER(center=5,
-                                       width=5,
-                                       center_show=50,
-                                       width_show=50,
-                                       inter=50,
-                                       title=r'#chi^{2}_{#gamma#gamma#gamma#gamma}',
-                                       reverse=1)
-    output['chisq_m'] = hnew.SELECTER(center=5,
-                                      width=5,
-                                      center_show=50,
-                                      width_show=50,
-                                      inter=50,
-                                      title=r'#chi^{2}_{#mu#mu}',
-                                      reverse=1)
-    output['chisq_e'] = hnew.SELECTER(center=5,
-                                      width=5,
-                                      center_show=50,
-                                      width_show=50,
-                                      inter=50,
-                                      title=r'#chi^{2}_{ee}',
-                                      reverse=1)
-    output['chisq_k'] = hnew.SELECTER(center=5,
-                                      width=5,
-                                      center_show=50,
-                                      width_show=50,
-                                      inter=50,
-                                      title=r'#chi^{2}_{KK}',
-                                      reverse=1)
     #
-    output['a_pippim'] = hnew.SELECTER(center=0,
-                                       width=1,
-                                       center_show=-0.99,
-                                       width_show=0.01,
-                                       inter=20,
-                                       title=r'Cos<#pi^{+},#pi^{-}>')
-    output['a_pippim'].set_by_edge(-0.99, 1)
+    output['a_pippim'] = hnew.SELECTER(title=r'Cos<#pi^{+},#pi^{-}>')
+    output['a_pippim'].set_by_edge(0, 2 * math.pi)
+    output['a_pippim'].set_by_edge_show(0, 2 * math.pi)
+    output['a_pippim'].inter = 100
     output['pip_ep'] = hnew.SELECTER(center=0.4,
                                      width=0.4,
                                      center_show=0.6,
