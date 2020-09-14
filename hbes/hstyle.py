@@ -1,24 +1,4 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
-
-    Environment version:
-
-        python2
-        请在python2环境下运行程序
-
-    Content:
-    
-        @get_canvas():
-	    @get_legend()：
-        @add_arrow():
-        @add_box():
-        @set_style():
-        @set_axis():
-        @set_marker():
-        @set_height():
-        @set_background():
-'''
 # Public package
 # Private package
 import ROOT
@@ -39,9 +19,9 @@ def get_canvas(x=800, y=600, dx=1, dy=1):
 
 def get_legend(legendlist=[],
                l=0.6, r=0.93, d=0.7, u=0.93,
-               fillcolor=0,
-               textfont=42,
-               textsize=0.035,
+               Fillcolor=0,
+               Textfont=42,
+               Textsize=0.035,
                header=''):
     '''
     legendlist为列表，其中元素为[TObject,str,str]\n
@@ -54,48 +34,48 @@ def get_legend(legendlist=[],
     legend = ROOT.TLegend(l, d, u, r)
     for i in legendlist:
         legend.AddEntry(i[0], i[1], i[2])
-    legend.SetFillColor(fillcolor)
-    legend.SetTextFont(textfont)
-    legend.SetTextSize(textsize)
+    legend.SetFillColor(Fillcolor)
+    legend.SetTextFont(Textfont)
+    legend.SetTextSize(Textsize)
     legend.SetHeader(header)
     return legend
 
 
 def add_arrow(drawlist,
               x0, y0, x1, y1,
-              colornumber=2,
-              width=3):
+              Linecolor=2,
+              Linewidth=3):
     '''
     drawlist为列表，输入初始列表\n
     x0,y0,x1,y1为浮点，输入箭头的开始和初始位置\n
-    colornumber为整形，输入箭头的颜色\n
+    Linecolor为整形，输入箭头的颜色\n
     width为整形，输入箭头的粗细\n
     作用1：添加一个TArrow对象到drawlist\n
     '''
     in_drawlist = drawlist
     newarrow = ROOT.TArrow(x0, y0, x1, y1, 0.05, '|>')
-    newarrow.SetLineColor(colornumber)
-    newarrow.SetLineWidth(width)
+    newarrow.SetLineColor(Linecolor)
+    newarrow.SetLineWidth(Linewidth)
     in_drawlist.append(newarrow)
     return in_drawlist
 
 
 def add_box(drawlist,
             l, r, d, u,
-            colornumber=2,
-            width=3):
+            Linecolor=2,
+            Linewidth=3):
     '''
     drawlist为列表，输入初始列表\n
     l,r,d,u为浮点，输入方框的边位置\n
-    colornumber为整形，输入方框的颜色\n
+    Linecolor为整形，输入方框的颜色\n
     width为整形，输入方框的粗细\n
     作用1：添加一系列TArrow对象到drawlist，形成方框\n
     '''
     in_drawlist = drawlist
-    in_drawlist = add_arrow(in_drawlist, l, d, l, u, colornumber, width)
-    in_drawlist = add_arrow(in_drawlist, l, u, r, u, colornumber, width)
-    in_drawlist = add_arrow(in_drawlist, r, u, r, d, colornumber, width)
-    in_drawlist = add_arrow(in_drawlist, r, d, l, d, colornumber, width)
+    in_drawlist = add_arrow(in_drawlist, l, d, l, u, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, l, u, r, u, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, r, u, r, d, Linecolor, Linewidth)
+    in_drawlist = add_arrow(in_drawlist, r, d, l, d, Linecolor, Linewidth)
     return in_drawlist
 
 
@@ -180,22 +160,6 @@ def set_height(hist, multiple=1.5):
 
 def set_background(hist, Fillcolor=4, Linecolor=4, Linewidth=2, Fillstyle=3001):
     'Set hist of a background'
-    hist.SetLineColor(Linecolor)
-    hist.SetFillColor(Fillcolor)
-    hist.SetLineWidth(Linewidth)
-    hist.SetFillStyle(Fillstyle)
-
-
-def set_background_alter(hist):
-    'Set hist of another background'
-    hist.SetLineColor(2)
-    hist.SetFillColor(2)
-    hist.SetLineWidth(2)
-    hist.SetFillStyle(3001)
-
-
-def set_background_stack(hist, Fillcolor=2, Linecolor=2, Linewidth=0, Fillstyle=3001):
-    'Set hist of a sideband'
     hist.SetLineColor(Linecolor)
     hist.SetFillColor(Fillcolor)
     hist.SetLineWidth(Linewidth)
