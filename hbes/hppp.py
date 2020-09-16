@@ -48,9 +48,9 @@ def selecters():
                                     inter=50,
                                     title=r'#chi^{2}')
     #
-    output['a_pippim'] = hnew.SELECTER(title=r'Cos<#pi^{+},#pi^{-}>')
-    output['a_pippim'].set_by_edge(0, 2 * math.pi)
-    output['a_pippim'].set_by_edge_show(0, 2 * math.pi)
+    output['a_pippim'] = hnew.SELECTER(title=r'<#pi^{+},#pi^{-}>')
+    output['a_pippim'].set_by_edge(0, 2.85)
+    output['a_pippim'].set_by_edge_show(0, math.pi)
     output['a_pippim'].inter = 100
     output['pip_ep'] = hnew.SELECTER(center=0.4,
                                      width=0.4,

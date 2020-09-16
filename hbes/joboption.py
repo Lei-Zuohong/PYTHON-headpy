@@ -6,6 +6,8 @@ import random
 # Private package
 import headpy.hscreen.hprint as hprint
 
+# MC 产生重建类函数
+
 
 def addfolder(name, path):
     '查看某绝对路径下是否存在某名字的文件夹，没有则创建'
@@ -270,8 +272,8 @@ def dorec(txtfolder='',
 
 def alg(algroot=[],
         txtfile='',
-        dst_list=[],
         rootfile='',
+        dst_list=[],
         option_list=[],
         condor='0'):
     'Analysis a dst file'
@@ -456,42 +458,296 @@ class WORKSPACE:
               option_list,
               condor)
 
+# Dst文件分析类函数
 
-def cutrun_real(energy_list={},
-                algroot=[],
-                folder_txt='',
-                folder_root='',
-                energy=0,
-                num=1,
-                option=[],
-                dstlist=[],
-                condor=0):
-    '''
-    适用于dstlist格式为[文件名，绝对路径，run号，文件编号，年，月，日]\n
-    '''
-    # 构造option
-    option_list = option + ['%s.Energy = %1.4f' % (algroot[2], energy)]
-    # 按照run number填入list
-    rundstlist = []
-    for i in dstlist:
-        if(int(i[2]) >= energy_list[energy][0] and int(i[2]) <= energy_list[energy][1]):
-            rundstlist.append(i)
-    dstlong = len(rundstlist)
-    # 按照分块填入list
-    for i1 in range(num):
-        output = []
-        nleft = dstlong * i1 / num
-        nright = dstlong * (i1 + 1) / num
-        for i3, i2 in enumerate(rundstlist):
-            if(i3 >= nleft and i3 < nright):
-                output.append(i2[1])
-        if(len(output) >= 1):
-            alg(algroot,
-                '%s/%1.4f_%03d.txt' % (folder_txt, energy, i1),
-                output,
-                '%s/%1.4f_%03d.root' % (folder_root, energy, i1),
-                option_list,
-                condor)
-            print('已处理%1.4f的%03d, 数据长度%03d\r' % (energy, i1, len(output)))
+
+def dst_list_rscan():
+    # Initial
+    output = []
+    # Path-1
+    path_run = '/bes3fs/offline/data/665p01/rscan/dst'
+    for file1 in os.listdir(path_run):
+        checkfolder = 0
+        if(re.match(r'(\d\d)(\d\d)(\d\d)', file1)):
+            checkfolder = 1
+        if(1 - checkfolder):
+            continue
+        for file2 in os.listdir('%s/%s' % (path_run, file1)):
+            method1 = r'(\d\d)(\d\d)(\d\d)'
+            method2 = r'run_00(\d\d\d\d\d)_All_file(\d\d\d)_SFO-(1|2).dst'
+            check1 = re.match(method1, file1)
+            check2 = re.match(method2, file2)
+            if(check1 and check2):
+                output.append({'file_name': file2,
+                               'file_path': '%s/%s/%s' % (path_run, file1, file2),
+                               'run_number': int(check2.group(1)),
+                               'run_id': check2.group(2),
+                               'run_year': check1.group(1),
+                               'run_month': check1.group(1),
+                               'run_day': check1.group(1),
+                               'option': []})
+    # Path-2
+    path_run = '/bes3fs/offline/data/665p01/2175/dst'
+    for file1 in os.listdir(path_run):
+        checkfolder = 0
+        if(re.match(r'(\d\d)(\d\d)(\d\d)', file1)):
+            checkfolder = 1
+        if(1 - checkfolder):
+            continue
+        for file2 in os.listdir('%s/%s' % (path_run, file1)):
+            method1 = r'(\d\d)(\d\d)(\d\d)'
+            method2 = r'run_00(\d\d\d\d\d)_All_file(\d\d\d)_SFO-(1|2).dst'
+            check1 = re.match(method1, file1)
+            check2 = re.match(method2, file2)
+            if(check1 and check2):
+                output.append({'file_name': file2,
+                               'file_path': '%s/%s/%s' % (path_run, file1, file2),
+                               'run_number': int(check2.group(1)),
+                               'run_id': check2.group(2),
+                               'run_year': check1.group(1),
+                               'run_month': check1.group(1),
+                               'run_day': check1.group(1),
+                               'option': []})
+    # Print result
+    return output
+
+
+def dst_list_jpsi():
+    # Initial
+    output = []
+    # Path-1
+    path_run = '/besfs4/offline/data/705-1/jpsi/round02/dst'
+    for file1 in os.listdir(path_run):
+        checkfolder = 0
+        if(re.match(r'(\d\d)(\d\d)(\d\d)', file1)):
+            checkfolder = 1
+        if(1 - checkfolder):
+            continue
+        for file2 in os.listdir('%s/%s' % (path_run, file1)):
+            method1 = r'(\d\d)(\d\d)(\d\d)'
+            method2 = r'run_00(\d\d\d\d\d)_All_file(\d\d\d)_SFO-(1|2).dst'
+            check1 = re.match(method1, file1)
+            check2 = re.match(method2, file2)
+            if(check1 and check2):
+                output.append({'file_name': file2,
+                               'file_path': '%s/%s/%s' % (path_run, file1, file2),
+                               'run_number': int(check2.group(1)),
+                               'run_id': check2.group(2),
+                               'run_year': check1.group(1),
+                               'run_month': check1.group(1),
+                               'run_day': check1.group(1),
+                               'option': []})
+    # Print result
+    return output
+
+
+def select_runnumber(datain, run_left, run_right):
+    dataout = []
+    for i in datain:
+        if(i['run_number'] >= run_left and i['run_number'] <= run_right):
+            dataout.append(i)
+    return dataout
+
+
+def select_energy(datain, energy):
+    dataout = []
+    for i in datain:
+        if(i['energy'] == energy):
+            dataout.append(i)
+    return dataout
+
+
+def cut_length(datain, num):
+    dataout = []
+    i = 0
+    j = 0
+    for data in datain:
+        if(j >= num):
+            i += 1
+            j = 0
+        if(j == 0):
+            dataout.append([])
+            dataout[i].append(data)
         else:
-            print('已处理%1.4f的%03d, 没有数据\r' % (energy, i1))
+            dataout[i].append(data)
+        j += 1
+    return dataout
+
+
+def cut_group(datain, num):
+    length = int(float(len(datain)) / float(num)) + 1
+    dataout = cut_length(datain, length)
+    return dataout
+
+
+def cut_run(folder_txt='',
+            folder_root='',
+            algroot=[],
+            dst_list=[],
+            option_list=[],
+            do_select_energy=0,
+            energy=0,
+            do_select_runnumber=0,
+            run_number=[0, 0],
+            num_group=0,
+            num_length=0,
+            condor=0):
+    '''
+    '''
+    # 初始化dst序列
+    in_dst_list = []
+    for i in dst_list:
+        in_dst_list.append(i)
+    # 选择dst序列
+    if(do_select_energy != 0):
+        in_dst_list = select_energy(in_dst_list, energy)
+    if(do_select_runnumber != 0):
+        in_dst_list = select_runnumber(in_dst_list, run_number[0], run_number[1])
+    # 重构建dst二维序列
+    if(num_group != 0):
+        out_list = cut_group(in_dst_list, num_group)
+    if(num_length != 0):
+        out_list = cut_length(in_dst_list, num_length)
+    # 构建option
+    in_option_list = option_list + ['%s.Energy = %1.4f' % (algroot[2], energy)]
+    # 运行作业
+    for count1, i1 in enumerate(out_list):
+        dst_list_use = []
+        option_list_use = in_option_list
+        for count2, i2 in enumerate(out_list[count1]):
+            dst_list_use.append(i2['file_path'])
+            need_option = 0
+            if('option' in i2):
+                need_option = 1
+            if(need_option != 0):
+                for option in i2['option']:
+                    if(i2['option'] in option_list_use):
+                        continue
+                    else:
+                        option_list_use += [option]
+        alg(algroot=algroot,
+            txtfile='%s/%1.4f_%03d.txt' % (folder_txt, energy, count1),
+            dst_list=dst_list_use,
+            rootfile='%s/%1.4f_%03d.root' % (folder_root, energy, count1),
+            option_list=option_list_use,
+            condor=condor)
+        print('Submitting -> |{:^20}|{:^20}|{:^20}|\r'.format('能量点:%.4f' % (energy),
+                                                              '作业数:%d' % (count1),
+                                                              'Dst长度:%d' % (len(i1))))
+
+
+def cut_run_number(folder_txt='',
+                   folder_root='',
+                   algroot=[],
+                   dst_list=[],
+                   option_list=[],
+                   do_select_energy=0,
+                   energy=0,
+                   do_select_runnumber=0,
+                   run_numbers=[],
+                   num_group=0,
+                   num_length=0,
+                   condor=0):
+    '''
+    '''
+    for run_number in run_numbers:
+        # 初始化dst序列
+        in_dst_list = []
+        for i in dst_list:
+            in_dst_list.append(i)
+        # 选择dst序列
+        if(do_select_energy != 0):
+            in_dst_list = select_energy(in_dst_list, energy)
+        if(do_select_runnumber != 0):
+            in_dst_list = select_runnumber(in_dst_list, run_number[0], run_number[1])
+        # 重构建dst二维序列
+        if(num_group != 0):
+            out_list = cut_group(in_dst_list, num_group)
+        if(num_length != 0):
+            out_list = cut_length(in_dst_list, num_length)
+        # 构建option
+        in_option_list = option_list + ['%s.Energy = %1.4f' % (algroot[2], energy)]
+        # 运行作业
+        for count1, i1 in enumerate(out_list):
+            dst_list_use = []
+            option_list_use = in_option_list
+            for count2, i2 in enumerate(out_list[count1]):
+                dst_list_use.append(i2['file_path'])
+                need_option = 0
+                if('option' in i2):
+                    need_option = 1
+                if(need_option != 0):
+                    for option in i2['option']:
+                        if(option in option_list_use):
+                            continue
+                        else:
+                            option_list_use += [option]
+            alg(algroot=algroot,
+                txtfile='%s/%1.4f_%03d_%05d_%05d.txt' % (folder_txt, energy, count1, run_number[0], run_number[1]),
+                dst_list=dst_list_use,
+                rootfile='%s/%1.4f_%03d_%05d_%05d.root' % (folder_root, energy, count1, run_number[0], run_number[1]),
+                option_list=option_list_use,
+                condor=condor)
+            print('Submitting -> |{:^20}|{:^20}|{:^20}|{:^20}|{:^20}|\r'.format('能量点:%.4f' % (energy),
+                                                                                '作业数:%d' % (count1),
+                                                                                'Dst长度:%d' % (len(i1)),
+                                                                                'Run_N left:%d' % (run_number[0]),
+                                                                                'Run_N right:%d' % (run_number[1])))
+
+
+# 统计纠错类函数
+def finish_script(filename):
+    '检查一个分析code的log文件是否显示完成，返回bool型'
+    with open(filename, 'r') as infile:
+        lines = infile.readlines()
+    check = 0
+    for i in lines:
+        if(re.match(r'Finish script', i)):
+            check = 1
+    return check
+
+
+def check_num_script(folder_script=''):
+    '检查一个文件夹中的log文件不同能量点的处理事例数，返回字典'
+    filelist = os.listdir(folder_script)
+    num = len(filelist) / 3
+    num_pass = 0
+    output = {}
+    for file in filelist:
+        print('%d/%d get number\r' % (num_pass, num)),
+        method = r'(.*)_(.*).txt.bosslog'
+        check = re.match(method, file)
+        if(check):
+            num_pass += 1
+            energy = float(check.group(1))
+            with open('%s/%s' % (folder_script, file), 'r') as infile:
+                lines = infile.readlines()
+            for line in lines:
+                checkline = re.search(r'total number:(.*)\n', line)
+                if(checkline):
+                    number = float(checkline.group(1))
+                    if(energy in output):
+                        output[energy] += number
+                    else:
+                        output[energy] = number
+    return output
+
+
+def check_state_script(folder_script=''):
+    '检查一个文件夹中所有.txt文件是否有对应完成的.txt.bosslog文件，否则放入返回数组中'
+    error = []
+    filelist = os.listdir(folder_script)
+    num = len(filelist)
+    for count, filename in enumerate(filelist):
+        print('\rProcess: %d/%d' % (count, num)),
+        check = re.match(r'(.*).txt$', filename)
+        if(check):
+            name = check.group(1)
+            name = name + '.txt.bosslog'
+            if(name in filelist):
+                check_finish = finish_script('script/%s' % (name))
+                if(check_finish != 1):
+                    error.append(filename)
+            else:
+                error.append(filename)
+    return error

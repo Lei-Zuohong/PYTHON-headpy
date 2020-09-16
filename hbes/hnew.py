@@ -353,6 +353,28 @@ def tree1d(name_tfile='',
     tfile.Close()
     return name_tfile, name_ttree
 
+
+def treend(name_tfile='',
+           name_ttree='',
+           branchs=[]):
+    tfile = ROOT.TFile(name_tfile, 'RECREATE')
+    ttree = ROOT.TTree(name_ttree, '')
+    num = 0
+    for branch in branchs:
+        num = len(branchs[branch])
+    tarray = {}
+    for branch in branchs:
+        tarray[branch] = array('f', [0])
+        ttree.Branch(branch, tarray[branch], '%s/F' % (branch))
+    for i in range(num):
+        for branch in branchs:
+            tarray[branch][0] = branchs[branch][i]
+        ttree.Fill()
+    tfile.Write()
+    tfile.Close()
+    return name_tfile, name_ttree
+
+
 # tree_numpy 处理类
 
 
@@ -501,7 +523,7 @@ class ALLDATA:
                                weight['yl'],
                                weight['yr'],
                                weight['yi'])
-            if(xindex != 'empty'and yindex != 'empty'):
+            if(xindex != 'empty' and yindex != 'empty'):
                 new_branch.append(weight['ratio'][xindex][yindex])
             else:
                 new_branch.append(0)
@@ -702,6 +724,7 @@ class ALLDATA:
     def tree(self,
              data='',
              branch='',
+             change_name='',
              docuts=[],
              name=''):
         '''
@@ -722,6 +745,7 @@ class ALLDATA:
         # 新建root文件,tree对象
         tfilename = '%s/%s_%s_%s.root' % (os.getenv("TEMPROOT"), data, branch, name)
         ttreename = '%s_%s' % (data, branch)
+        if(change_name != ''): branch = change_name
         tfilename, ttreename = tree1d(name_tfile=tfilename,
                                       name_ttree=ttreename,
                                       name_branch=branch,
