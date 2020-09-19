@@ -16,13 +16,13 @@ def addfolder(name, path):
         os.system('mkdir %s/%s' % (path, name))
 
 
-def sim(txtfile='',
-        decfile='',
-        datfile='',
+def sim(txt_file='',
+        dec_file='',
+        dat_file='',
         parent='vpho',
         usediy=0,
         runid=[0, 0],
-        rtrawfile='',
+        rtraw_file='',
         datalevel=0,
         events=0,
         option_list=[],
@@ -39,8 +39,8 @@ def sim(txtfile='',
     line.append('//****************************************')
     # 添加decay card
     line.append('#include "$BESEVTGENROOT/share/BesEvtGen.txt"')
-    if(decfile != ''):
-        line.append('EvtDecay.userDecayTableName = "%s";' % (decfile))
+    if(dec_file != ''):
+        line.append('EvtDecay.userDecayTableName = "%s";' % (dec_file))
     line.append('//****************************************')
     # 添加随机数因子
     line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed))
@@ -55,8 +55,8 @@ def sim(txtfile='',
     line.append('//****************************************')
     # 添加输出文件
     line.append('#include "$ROOTIOROOT/share/jobOptions_Digi2Root.txt"')
-    if(rtrawfile != ''):
-        line.append('RootCnvSvc.digiRootOutputFile = "%s";' % (rtrawfile))
+    if(rtraw_file != ''):
+        line.append('RootCnvSvc.digiRootOutputFile = "%s";' % (rtraw_file))
     line.append('//****************************************')
     # 添加输出数据等级
     if(datalevel != 0):
@@ -66,8 +66,8 @@ def sim(txtfile='',
         line.append('ApplicationMgr.EvtMax = %d;' % (events))
     line.append('//****************************************')
     # 添加dat文件
-    if(datfile != ''):
-        line.append('EvtDecay.FileForTrackGen = {"%s"};' % (datfile))
+    if(dat_file != ''):
+        line.append('EvtDecay.FileForTrackGen = {"%s"};' % (dat_file))
     # 添加母粒子
     if(parent != ''):
         line.append('EvtDecay.ParentParticle = "%s";' % (parent))
@@ -87,16 +87,16 @@ def sim(txtfile='',
     output = ''
     for i in line:
         output += i + '\n'
-    with open(txtfile, 'w') as outfile:
+    with open(txt_file, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
-        os.system('boss.condor %s' % (txtfile))
+        os.system('boss.condor %s' % (txt_file))
 
 
-def dosim(txtfolder='',
-          decfolder='',
-          datfolder='',
-          rtrawfolder='',
+def dosim(txt_folder='',
+          dec_folder='',
+          dat_folder='',
+          rtraw_folder='',
           parent='vpho',
           usediy=0,
           energy_list=0,
@@ -108,10 +108,10 @@ def dosim(txtfolder='',
           condor='0'):
     # 输出数据
     hprint.pstar()
-    hprint.ppoint('txt folder', txtfolder)
-    hprint.ppoint('dec folder', decfolder)
-    hprint.ppoint('dat folder', datfolder)
-    hprint.ppoint('rtraw folder', rtrawfolder)
+    hprint.ppoint('txt folder', txt_folder)
+    hprint.ppoint('dec folder', dec_folder)
+    hprint.ppoint('dat folder', dat_folder)
+    hprint.ppoint('rtraw folder', rtraw_folder)
     hprint.ppoint('number of files', files)
     hprint.ppoint('number of events', events)
     if(condor == '1'):
@@ -124,32 +124,32 @@ def dosim(txtfolder='',
         hprint.ppoint('energy', '%1.4f' % (energy))
         hprint.pstar()
         for i1 in range(files):
-            # 填充txtfile
-            txtfile = '%s/%1.4f_%02d.txt' % (txtfolder, energy, i1)
-            # 填充decfile
-            if(decfolder != ''):
-                decfile = '%s/%1.4f.dec' % (decfolder, energy)
+            # 填充txt_file
+            txt_file = '%s/%1.4f_%02d.txt' % (txt_folder, energy, i1)
+            # 填充dec_file
+            if(dec_folder != ''):
+                dec_file = '%s/%1.4f.dec' % (dec_folder, energy)
             else:
-                decfile = ''
-            # 填充datfile
-            if(datfolder != ''):
-                datfile = '%s/%05d.dat' % (datfolder, 10000 * energy)
+                dec_file = ''
+            # 填充dat_file
+            if(dat_folder != ''):
+                dat_file = '%s/%05d.dat' % (dat_folder, 10000 * energy)
             else:
-                datfile = ''
+                dat_file = ''
             # 填充runid
             runid = [energy_list[energy][0], energy_list[energy][1]]
-            # 填充rtrawfile
-            if(rtrawfolder != ''):
-                rtrawfile = '%s/%1.4f_%02d.rtraw' % (rtrawfolder, energy, i1)
+            # 填充rtraw_file
+            if(rtraw_folder != ''):
+                rtraw_file = '%s/%1.4f_%02d.rtraw' % (rtraw_folder, energy, i1)
             else:
-                rtrawfile = ''
-            sim(txtfile=txtfile,
-                decfile=decfile,
-                datfile=datfile,
+                rtraw_file = ''
+            sim(txt_file=txt_file,
+                dec_file=dec_file,
+                dat_file=dat_file,
                 parent=parent,
                 usediy=usediy,
                 runid=runid,
-                rtrawfile=rtrawfile,
+                rtraw_file=rtraw_file,
                 datalevel=datalevel,
                 events=events,
                 option_list=option_list,
@@ -160,33 +160,33 @@ def dosim(txtfolder='',
         hprint.pstar()
         for energy in energy_list:
             for i1 in range(files):
-                # 填充txtfile
-                txtfile = '%s/%1.4f_%02d.txt' % (txtfolder, energy, i1)
-                # 填充decfile
-                if(decfolder != ''):
-                    decfile = '%s/%1.4f.dec' % (decfolder, energy)
+                # 填充txt_file
+                txt_file = '%s/%1.4f_%02d.txt' % (txt_folder, energy, i1)
+                # 填充dec_file
+                if(dec_folder != ''):
+                    dec_file = '%s/%1.4f.dec' % (dec_folder, energy)
                 else:
-                    decfile = ''
+                    dec_file = ''
                 # 填充datfile
-                if(datfolder != ''):
-                    datfile = '%s/%05d.dat' % (datfolder, 10000 * energy)
+                if(dat_folder != ''):
+                    dat_file = '%s/%05d.dat' % (dat_folder, 10000 * energy)
                 else:
-                    datfile = ''
+                    dat_file = ''
                 # 填充runid
                 runid = [energy_list[energy][0], energy_list[energy][1]]
                 # 填充rtrawfile
-                if(rtrawfolder != ''):
+                if(rtraw_folder != ''):
                     rtrawfile = '%s/%1.4f_%02d.rtraw' % (
-                        rtrawfolder, energy, i1)
+                        rtraw_folder, energy, i1)
                 else:
                     rtrawfile = ''
-                sim(txtfile=txtfile,
-                    decfile=decfile,
-                    datfile=datfile,
+                sim(txt_file=txt_file,
+                    dec_file=dec_file,
+                    dat_file=dat_file,
                     parent=parent,
                     usediy=usediy,
                     runid=runid,
-                    rtrawfile=rtrawfile,
+                    rtraw_file=rtraw_file,
                     datalevel=datalevel,
                     events=events,
                     option_list=option_list,
@@ -195,9 +195,9 @@ def dosim(txtfolder='',
         print('能量点选项输入错误')
 
 
-def rec(txtfile='',
-        rtrawfile='',
-        dstfile='',
+def rec(txt_file='',
+        rtraw_file='',
+        dst_file='',
         condor='0'):
     'Reconstruct a rtraw file'
     seed = random.randint(0, 99)
@@ -228,27 +228,27 @@ def rec(txtfile='',
     line.append('#include "$CALIBSVCROOT/share/calibConfig_rec_mc.txt"')
     line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed + 100))
     line.append('MessageSvc.OutputLevel = 6;')
-    line.append('EventCnvSvc.digiRootInputFile = {"%s"};' % (rtrawfile))
-    line.append('EventCnvSvc.digiRootOutputFile ="%s";' % (dstfile))
+    line.append('EventCnvSvc.digiRootInputFile = {"%s"};' % (rtraw_file))
+    line.append('EventCnvSvc.digiRootOutputFile ="%s";' % (dst_file))
     line.append('ApplicationMgr.EvtMax = -1;')
     output = ''
     for i in line:
         output += i + '\n'
-    with open(txtfile, 'w') as outfile:
+    with open(txt_file, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
-        os.system('boss.condor %s' % (txtfile))
+        os.system('boss.condor %s' % (txt_file))
 
 
-def dorec(txtfolder='',
-          rtrawfolder='',
-          dstfolder='',
+def dorec(txt_folder='',
+          rtraw_folder='',
+          dst_folder='',
           condor='0'):
     'Reconstruct all rtraw files'
     hprint.pstar()
-    hprint.ppoint('Location of .txt', txtfolder)
-    hprint.ppoint('Location of .rtraw', rtrawfolder)
-    hprint.ppoint('Location of .dst', dstfolder)
+    hprint.ppoint('Location of .txt', txt_folder)
+    hprint.ppoint('Location of .rtraw', rtraw_folder)
+    hprint.ppoint('Location of .dst', dst_folder)
     hprint.pstar()
     if(condor == '1'):
         hprint.ppoint('Submit job', 'Yes')
@@ -256,7 +256,7 @@ def dorec(txtfolder='',
     else:
         hprint.ppoint('Submit job', 'No')
         hprint.pstar()
-    rtrawlist = os.listdir(rtrawfolder)
+    rtrawlist = os.listdir(rtraw_folder)
     num = len(rtrawlist)
     hprint.ppoint('Number of jobs', num)
     hprint.pstar()
@@ -264,15 +264,15 @@ def dorec(txtfolder='',
         method = r'(.*).rtraw'
         match = re.match(method, i)
         filename = match.group(1)
-        rec('%s/%s.txt' % (txtfolder, filename),
-            '%s/%s' % (rtrawfolder, i),
-            '%s/%s.dst' % (dstfolder, filename),
-            condor)
+        rec(txt_file='%s/%s.txt' % (txt_folder, filename),
+            rtraw_file='%s/%s' % (rtraw_folder, i),
+            dst_file='%s/%s.dst' % (dst_folder, filename),
+            condor=condor)
 
 
 def alg(algroot=[],
-        txtfile='',
-        rootfile='',
+        txt_file='',
+        root_file='',
         dst_list=[],
         option_list=[],
         condor='0'):
@@ -298,27 +298,27 @@ def alg(algroot=[],
     line.append('ApplicationMgr.EvtMax = -1;')
     line.append('ApplicationMgr.HistogramPersistency = "ROOT";')
     line.append(
-        'NTupleSvc.Output = { "FILE1 DATAFILE=\'%s\' OPT=\'NEW\' TYP=\'ROOT\'"};' % (rootfile))
+        'NTupleSvc.Output = { "FILE1 DATAFILE=\'%s\' OPT=\'NEW\' TYP=\'ROOT\'"};' % (root_file))
     output = ''
     for i in line:
         output += i + '\n'
-    with open(txtfile, 'w') as outfile:
+    with open(txt_file, 'w') as outfile:
         outfile.write(output)
     if(condor == '1'):
-        os.system('boss.condor %s' % (txtfile))
+        os.system('boss.condor %s' % (txt_file))
 
 
 def doalg(algroot=[],
-          txtfolder='',
-          dstfolder='',
-          rootfolder='',
+          txt_folder='',
+          dst_folder='',
+          root_folder='',
           options=[],
           condor='0'):
     'Analysis all dst files'
     hprint.pstar()
-    hprint.ppoint('Location of .txt', txtfolder)
-    hprint.ppoint('Location of .dst', dstfolder)
-    hprint.ppoint('Location of .root', rootfolder)
+    hprint.ppoint('Location of .txt', txt_folder)
+    hprint.ppoint('Location of .dst', dst_folder)
+    hprint.ppoint('Location of .root', root_folder)
     hprint.pstar()
     if(condor == '1'):
         hprint.ppoint('Submit job', 'Yes')
@@ -326,7 +326,7 @@ def doalg(algroot=[],
     else:
         hprint.ppoint('Submit job', 'No')
         hprint.pstar()
-    dstlist = os.listdir(dstfolder)
+    dstlist = os.listdir(dst_folder)
     num = len(dstlist)
     hprint.ppoint('Number of jobs', num)
     hprint.pstar()
@@ -337,12 +337,12 @@ def doalg(algroot=[],
         filename = match.group(1) + '_' + match.group(2)
         option_list = options + ['%s.Energy = %s' %
                                  (algroot[2], match.group(1))]
-        alg(algroot,
-            '%s/%s.txt' % (txtfolder, filename),
-            ['%s/%s' % (dstfolder, i)],
-            '%s/%s.root' % (rootfolder, filename),
-            option_list,
-            condor)
+        alg(algroot=algroot,
+            txt_file='%s/%s.txt' % (txt_folder, filename),
+            root_file='%s/%s.root' % (root_folder, filename),
+            dst_list=['%s/%s' % (dst_folder, i)],
+            option_list=option_list,
+            condor=condor)
 
 
 class WORKSPACE:
@@ -410,9 +410,9 @@ class WORKSPACE:
         if(2.0000 in self.energy_list):
             self.energy_list[2.0000][1] = 41814
         if(dopw == ''):
-            dosim(txtfolder='%s/%s' % (self.path['sim'], method),
-                  decfolder='%s/%s' % (self.path['dec'], method),
-                  rtrawfolder='%s/%s' % (self.path['rtraw'], method),
+            dosim(txt_folder='%s/%s' % (self.path['sim'], method),
+                  dec_folder='%s/%s' % (self.path['dec'], method),
+                  rtraw_folder='%s/%s' % (self.path['rtraw'], method),
                   parent=parent,
                   usediy=usediy,
                   energy_list=self.energy_list,
@@ -422,9 +422,9 @@ class WORKSPACE:
                   option_list=option_list,
                   condor=condor)
         else:
-            dosim(txtfolder='%s/%s' % (self.path['sim'], method),
-                  decfolder='%s/%s' % (self.path['dec'], method),
-                  datfolder='%s/%s' % (self.path['dec'], method),
+            dosim(txt_folder='%s/%s' % (self.path['sim'], method),
+                  dec_folder='%s/%s' % (self.path['dec'], method),
+                  dat_folder='%s/%s' % (self.path['dec'], method),
                   rtrawfolder='%s/%s' % (self.path['rtraw'], method),
                   parent=parent,
                   usediy=usediy,
@@ -440,9 +440,9 @@ class WORKSPACE:
         '用来生成rec文件并运行'
         addfolder(method, self.path['rec'])
         addfolder(method, self.path['dst'])
-        dorec('%s/%s' % (self.path['rec'], method),
-              '%s/%s' % (self.path['rtraw'], method),
-              '%s/%s' % (self.path['dst'], method),
+        dorec(txt_folder='%s/%s' % (self.path['rec'], method),
+              rtraw_folder='%s/%s' % (self.path['rtraw'], method),
+              dst_folder='%s/%s' % (self.path['dst'], method),
               condor=condor)
 
     def dosima(self, method,
@@ -451,12 +451,12 @@ class WORKSPACE:
         '用来生成ana文件并运行'
         addfolder(method, self.path['sima'])
         addfolder(method, self.path['simr'])
-        doalg(self.algroot,
-              '%s/%s' % (self.path['sima'], method),
-              '%s/%s' % (self.path['dst'], method),
-              '%s/%s' % (self.path['simr'], method),
-              option_list,
-              condor)
+        doalg(algroot=self.algroot,
+              txt_folder='%s/%s' % (self.path['sima'], method),
+              root_folder='%s/%s' % (self.path['simr'], method),
+              dst_folder='%s/%s' % (self.path['dst'], method),
+              options=option_list,
+              condor=condor)
 
 # Dst文件分析类函数
 
@@ -626,9 +626,9 @@ def cut_run(folder_txt='',
                     else:
                         option_list_use += [option]
         alg(algroot=algroot,
-            txtfile='%s/%1.4f_%03d.txt' % (folder_txt, energy, count1),
+            txt_file='%s/%1.4f_%03d.txt' % (folder_txt, energy, count1),
+            root_file='%s/%1.4f_%03d.root' % (folder_root, energy, count1),
             dst_list=dst_list_use,
-            rootfile='%s/%1.4f_%03d.root' % (folder_root, energy, count1),
             option_list=option_list_use,
             condor=condor)
         print('Submitting -> |{:^20}|{:^20}|{:^20}|\r'.format('能量点:%.4f' % (energy),
@@ -683,9 +683,9 @@ def cut_run_number(folder_txt='',
                         else:
                             option_list_use += [option]
             alg(algroot=algroot,
-                txtfile='%s/%1.4f_%03d_%05d_%05d.txt' % (folder_txt, energy, count1, run_number[0], run_number[1]),
+                txt_file='%s/%1.4f_%03d_%05d_%05d.txt' % (folder_txt, energy, count1, run_number[0], run_number[1]),
+                root_file='%s/%1.4f_%03d_%05d_%05d.root' % (folder_root, energy, count1, run_number[0], run_number[1]),
                 dst_list=dst_list_use,
-                rootfile='%s/%1.4f_%03d_%05d_%05d.root' % (folder_root, energy, count1, run_number[0], run_number[1]),
                 option_list=option_list_use,
                 condor=condor)
             print('Submitting -> |{:^20}|{:^20}|{:^20}|{:^20}|{:^20}|\r'.format('能量点:%.4f' % (energy),
