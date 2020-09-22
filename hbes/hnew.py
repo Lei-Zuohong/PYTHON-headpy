@@ -745,11 +745,16 @@ class ALLDATA:
         # 新建root文件,tree对象
         tfilename = '%s/%s_%s_%s.root' % (os.getenv("TEMPROOT"), data, branch, name)
         ttreename = '%s_%s' % (data, branch)
-        if(change_name != ''): branch = change_name
-        tfilename, ttreename = tree1d(name_tfile=tfilename,
-                                      name_ttree=ttreename,
-                                      name_branch=branch,
-                                      data=ntree[branch])
+        if(change_name != ''):
+            tfilename, ttreename = tree1d(name_tfile=tfilename,
+                                          name_ttree=ttreename,
+                                          name_branch=change_name,
+                                          data=ntree[branch])
+        else:
+            tfilename, ttreename = tree1d(name_tfile=tfilename,
+                                          name_ttree=ttreename,
+                                          name_branch=branch,
+                                          data=ntree[branch])
         return tfilename, ttreename
 
     def statis(self,

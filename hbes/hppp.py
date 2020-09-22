@@ -48,22 +48,22 @@ def selecters():
                                     inter=50,
                                     title=r'#chi^{2}')
     #
-    output['a_pippim'] = hnew.SELECTER(title=r'<#pi^{+},#pi^{-}>')
-    output['a_pippim'].set_by_edge(0, 2.85)
-    output['a_pippim'].set_by_edge_show(0, math.pi)
-    output['a_pippim'].inter = 100
+    output['a_pippim'] = hnew.SELECTER(title=r'#theta(Track^{+},Track^{-})')
+    output['a_pippim'].set_by_edge(0, 165)
+    output['a_pippim'].set_by_edge_show(0, 180)
+    output['a_pippim'].inter = 90
     output['pip_ep'] = hnew.SELECTER(center=0.4,
                                      width=0.4,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
-                                     title=r'E/P ratio of #pi^{+-}')
+                                     title=r'E/p(#pi^{+-})')
     output['pim_ep'] = hnew.SELECTER(center=0.4,
                                      width=0.4,
                                      center_show=0.6,
                                      width_show=0.6,
                                      inter=60,
-                                     title=r'E/P ratio of #pi^{+-}')
+                                     title=r'E/p(#pi^{+-})')
     output['pip_ep'].set_by_edge(0, 0.85)
     output['pim_ep'].set_by_edge(0, 0.85)
     output['gamma1_heli'] = hnew.SELECTER(center=0,
@@ -71,13 +71,13 @@ def selecters():
                                           center_show=0,
                                           width_show=1.,
                                           inter=40,
-                                          title=r'Helicity angle of #pi^{0}')
+                                          title=r'Cos(#theta_{helicity})')
     output['gamma2_heli'] = hnew.SELECTER(center=0,
                                           width=0.8,
                                           center_show=0,
                                           width_show=1.,
                                           inter=40,
-                                          title=r'Helicity angle of #pi^{0}')
+                                          title=r'Cos(#theta_{helicity})')
     #
     output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
                                     width=0.045,
@@ -125,7 +125,7 @@ def selecters():
     output['pip_p'] = hnew.SELECTER(inter=50,
                                     title=r'p_{#pi^{+}}/p_{beam}')
     output['pim_p'] = hnew.SELECTER(inter=50,
-                                    title=r'p_{#pi^{+}}/p_{beam}')
+                                    title=r'p_{#pi^{-}}/p_{beam}')
     output['gamma1_p'] = hnew.SELECTER(inter=50,
                                        title=r'p_{#gamma}/p_{beam}')
     output['gamma2_p'] = hnew.SELECTER(inter=50,
@@ -136,7 +136,7 @@ def selecters():
                                      title=r'p_{#pi^{+}#pi^{-}}/p_{beam}')
     output['pipz_p'] = hnew.SELECTER(inter=50,
                                      title=r'p_{#pi^{+}#gamma#gamma}/p_{beam}')
-    output['pimc_p'] = hnew.SELECTER(inter=50,
+    output['pimz_p'] = hnew.SELECTER(inter=50,
                                      title=r'p_{#pi^{-}#gamma#gamma}/p_{beam}')
     #
     output['pip_a'] = hnew.SELECTER(center_show=0,

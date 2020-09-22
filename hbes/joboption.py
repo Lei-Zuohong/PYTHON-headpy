@@ -176,10 +176,10 @@ def dosim(txt_folder='',
                 runid = [energy_list[energy][0], energy_list[energy][1]]
                 # 填充rtrawfile
                 if(rtraw_folder != ''):
-                    rtrawfile = '%s/%1.4f_%02d.rtraw' % (
+                    rtraw_file = '%s/%1.4f_%02d.rtraw' % (
                         rtraw_folder, energy, i1)
                 else:
-                    rtrawfile = ''
+                    rtraw_file = ''
                 sim(txt_file=txt_file,
                     dec_file=dec_file,
                     dat_file=dat_file,
