@@ -71,13 +71,13 @@ def selecters():
                                           center_show=0,
                                           width_show=1.,
                                           inter=40,
-                                          title=r'Cos(#theta_{helicity})')
+                                          title=r'cos(#theta_{helicity})')
     output['gamma2_heli'] = hnew.SELECTER(center=0,
                                           width=0.8,
                                           center_show=0,
                                           width_show=1.,
                                           inter=40,
-                                          title=r'Cos(#theta_{helicity})')
+                                          title=r'cos(#theta_{helicity})')
     #
     output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
                                     width=0.045,

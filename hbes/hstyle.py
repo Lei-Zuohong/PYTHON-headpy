@@ -149,7 +149,11 @@ def set_height(hist, multiple=1.5):
     hist.GetYaxis().SetRangeUser(0, multiple * height)
 
 
-def set_background(hist, Fillcolor=4, Linecolor=4, Linewidth=2, Fillstyle=3001):
+def set_background(hist,
+                   Fillcolor=4,
+                   Linecolor=4,
+                   Linewidth=2,
+                   Fillstyle=3001):
     '''
     作用1：设定直方图样式
     '''
