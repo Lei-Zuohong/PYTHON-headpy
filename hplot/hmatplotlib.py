@@ -11,6 +11,7 @@ def plt_scatter_errorbar(plt,
                          markersize=10,
                          linestyle='',
                          label=''):
+    '绘制一个带有横纵误差棒的数据点'
     output = {}
     output['v'], = plt.plot([x, x], [y - yr, y + yr], color, linestyle=linestyle, label=label)
     output['h'], = plt.plot([x - xl, x + xr], [y, y], color, linestyle=linestyle, label=label)
