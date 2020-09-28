@@ -64,7 +64,7 @@ def get_legend(legendlist=[],
     l,r,d,u 为注释占画布比例\n
     作用1：返回一个TLegend对象\n
     '''
-    legend = ROOT.TLegend(l, d, u, r)
+    legend = ROOT.TLegend(l, d, r, u)
     for i in legendlist:
         legend.AddEntry(i[0], i[1], i[2])
     legend.SetFillColor(Fillcolor)
@@ -115,7 +115,7 @@ def set_axis(hist, xname, yname):
     hist.GetXaxis().SetLabelFont(42)
     hist.GetXaxis().SetLabelSize(0.06)
     hist.GetXaxis().SetLabelOffset(0.01)
-    hist.GetXaxis().SetNdivisions(510)
+    hist.GetXaxis().SetNdivisions(505)
     hist.GetXaxis().SetTitleFont(42)
     hist.GetXaxis().SetTitleColor(1)
     hist.GetXaxis().SetTitleSize(0.07)
@@ -124,7 +124,7 @@ def set_axis(hist, xname, yname):
     hist.GetYaxis().SetLabelFont(42)
     hist.GetYaxis().SetLabelSize(0.06)
     hist.GetYaxis().SetLabelOffset(0.01)
-    hist.GetYaxis().SetNdivisions(510)
+    hist.GetYaxis().SetNdivisions(505)
     hist.GetYaxis().SetTitleFont(42)
     hist.GetYaxis().SetTitleColor(1)
     hist.GetYaxis().SetTitleSize(0.07)

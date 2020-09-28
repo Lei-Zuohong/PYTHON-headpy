@@ -38,6 +38,13 @@ def energy_list():
     return out_list
 
 
+def energy_sort():
+    in_energy_list = energy_list()
+    out_energy_list = in_energy_list.keys()
+    out_energy_list.sort()
+    return out_energy_list
+
+
 def selecters():
     output = {}
     #

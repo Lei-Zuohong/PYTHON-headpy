@@ -4,6 +4,7 @@ import os
 import re
 import random
 # Private package
+import ROOT
 import headpy.hscreen.hprint as hprint
 
 # MC 产生重建类函数
@@ -27,7 +28,7 @@ def sim(txt_file='',
         events=0,
         option_list=[],
         condor='0'):
-    '生成MC joboption文件并运行'
+    '生成 sim 文件并运行'
     seed = random.randint(0, 99)
     line = []
     line.append('//****************************************')
@@ -93,6 +94,89 @@ def sim(txt_file='',
         os.system('boss.condor %s' % (txt_file))
 
 
+def rec(txt_file='',
+        rtraw_file='',
+        dst_file='',
+        condor='0'):
+    '生成 rec 文件并运行'
+    seed = random.randint(0, 99)
+    line = []
+    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRoot.txt"')
+    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRoot.txt"')
+    line.append(
+        '#include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"')
+    line.append(
+        '#include "$BESEVENTMIXERROOT/share/jobOptions_EventMixer_rec.txt"')
+    line.append('#include "$CALIBSVCROOT/share/job-CalibData.txt"')
+    line.append('#include "$MAGNETICFIELDROOT/share/MagneticField.txt"')
+    line.append('#include "$ESTIMEALGROOT/share/job_EsTimeAlg.txt"')
+    line.append('#include "$MDCXRECOROOT/share/jobOptions_MdcPatTsfRec.txt"')
+    line.append('#include "$KALFITALGROOT/share/job_kalfit_numf_data.txt"')
+    line.append('#include "$MDCDEDXALGROOT/share/job_dedx_all.txt"')
+    line.append('#include "$TRKEXTALGROOT/share/TrkExtAlgOption.txt"')
+    line.append('#include "$TOFRECROOT/share/jobOptions_TofRec.txt"')
+    line.append('#include "$TOFENERGYRECROOT/share/TofEnergyRecOptions_MC.txt"')
+    line.append('#include "$EMCRECROOT/share/EmcRecOptions.txt"')
+    line.append('#include "$MUCRECALGROOT/share/jobOptions_MucRec.txt"')
+    line.append('#include "$EVENTASSEMBLYROOT/share/EventAssembly.txt"')
+    line.append('#include "$PRIMARYVERTEXALGROOT/share/jobOptions_kalman.txt"')
+    line.append('#include "$VEEVERTEXALGROOT/share/jobOptions_veeVertex.txt"')
+    line.append('#include "$HLTMAKERALGROOT/share/jobOptions_HltMakerAlg.txt"')
+    line.append('#include "$EVENTNAVIGATORROOT/share/EventNavigator.txt"')
+    line.append('#include "$ROOTIOROOT/share/jobOptions_Dst2Root.txt"')
+    line.append('#include "$CALIBSVCROOT/share/calibConfig_rec_mc.txt"')
+    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed + 100))
+    line.append('MessageSvc.OutputLevel = 6;')
+    line.append('EventCnvSvc.digiRootInputFile = {"%s"};' % (rtraw_file))
+    line.append('EventCnvSvc.digiRootOutputFile ="%s";' % (dst_file))
+    line.append('ApplicationMgr.EvtMax = -1;')
+    output = ''
+    for i in line:
+        output += i + '\n'
+    with open(txt_file, 'w') as outfile:
+        outfile.write(output)
+    if(condor == '1'):
+        os.system('boss.condor %s' % (txt_file))
+
+
+def alg(algroot=[],
+        txt_file='',
+        root_file='',
+        dst_list=[],
+        option_list=[],
+        condor='0'):
+    '生成 ana 文件并运行'
+    line = []
+    # deal with head file
+    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRec.txt"')
+    line.append('#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt"')
+    line.append('#include "$MAGNETICFIELDROOT/share/MagneticField.txt"')
+    line.append('#include "$ABSCORROOT/share/jobOptions_AbsCor.txt"')
+    line.append('#include "$%s/share/%s"' % (algroot[0], algroot[1]))
+    # deal with option_list
+    for i in option_list:
+        line.append('%s;' % (i))
+    # deal with dst_list
+    dstfile = ''
+    for i in dst_list:
+        dstfile = dstfile + '"%s"' % (i) + ',' + '\n'
+    dstfile = dstfile[:-2]
+    line.append('EventCnvSvc.digiRootInputFile = {%s};' % (dstfile))
+    # deal with other
+    line.append('MessageSvc.OutputLevel = 6;')
+    line.append('ApplicationMgr.EvtMax = -1;')
+    line.append('ApplicationMgr.HistogramPersistency = "ROOT";')
+    line.append(
+        'NTupleSvc.Output = { "FILE1 DATAFILE=\'%s\' OPT=\'NEW\' TYP=\'ROOT\'"};' % (root_file))
+    output = ''
+    for i in line:
+        output += i + '\n'
+    with open(txt_file, 'w') as outfile:
+        outfile.write(output)
+    if(condor == '1'):
+        os.system('boss.condor %s' % (txt_file))
+
+
 def dosim(txt_folder='',
           dec_folder='',
           dat_folder='',
@@ -106,6 +190,7 @@ def dosim(txt_folder='',
           events=0,
           option_list=[],
           condor='0'):
+    '批量生成 sim 文件并运行'
     # 输出数据
     hprint.pstar()
     hprint.ppoint('txt folder', txt_folder)
@@ -195,56 +280,11 @@ def dosim(txt_folder='',
         print('能量点选项输入错误')
 
 
-def rec(txt_file='',
-        rtraw_file='',
-        dst_file='',
-        condor='0'):
-    'Reconstruct a rtraw file'
-    seed = random.randint(0, 99)
-    line = []
-    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRoot.txt"')
-    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRoot.txt"')
-    line.append(
-        '#include "$OFFLINEEVENTLOOPMGRROOT/share/OfflineEventLoopMgr_Option.txt"')
-    line.append(
-        '#include "$BESEVENTMIXERROOT/share/jobOptions_EventMixer_rec.txt"')
-    line.append('#include "$CALIBSVCROOT/share/job-CalibData.txt"')
-    line.append('#include "$MAGNETICFIELDROOT/share/MagneticField.txt"')
-    line.append('#include "$ESTIMEALGROOT/share/job_EsTimeAlg.txt"')
-    line.append('#include "$MDCXRECOROOT/share/jobOptions_MdcPatTsfRec.txt"')
-    line.append('#include "$KALFITALGROOT/share/job_kalfit_numf_data.txt"')
-    line.append('#include "$MDCDEDXALGROOT/share/job_dedx_all.txt"')
-    line.append('#include "$TRKEXTALGROOT/share/TrkExtAlgOption.txt"')
-    line.append('#include "$TOFRECROOT/share/jobOptions_TofRec.txt"')
-    line.append('#include "$TOFENERGYRECROOT/share/TofEnergyRecOptions_MC.txt"')
-    line.append('#include "$EMCRECROOT/share/EmcRecOptions.txt"')
-    line.append('#include "$MUCRECALGROOT/share/jobOptions_MucRec.txt"')
-    line.append('#include "$EVENTASSEMBLYROOT/share/EventAssembly.txt"')
-    line.append('#include "$PRIMARYVERTEXALGROOT/share/jobOptions_kalman.txt"')
-    line.append('#include "$VEEVERTEXALGROOT/share/jobOptions_veeVertex.txt"')
-    line.append('#include "$HLTMAKERALGROOT/share/jobOptions_HltMakerAlg.txt"')
-    line.append('#include "$EVENTNAVIGATORROOT/share/EventNavigator.txt"')
-    line.append('#include "$ROOTIOROOT/share/jobOptions_Dst2Root.txt"')
-    line.append('#include "$CALIBSVCROOT/share/calibConfig_rec_mc.txt"')
-    line.append('BesRndmGenSvc.RndmSeed = %d;' % (seed + 100))
-    line.append('MessageSvc.OutputLevel = 6;')
-    line.append('EventCnvSvc.digiRootInputFile = {"%s"};' % (rtraw_file))
-    line.append('EventCnvSvc.digiRootOutputFile ="%s";' % (dst_file))
-    line.append('ApplicationMgr.EvtMax = -1;')
-    output = ''
-    for i in line:
-        output += i + '\n'
-    with open(txt_file, 'w') as outfile:
-        outfile.write(output)
-    if(condor == '1'):
-        os.system('boss.condor %s' % (txt_file))
-
-
 def dorec(txt_folder='',
           rtraw_folder='',
           dst_folder='',
           condor='0'):
-    'Reconstruct all rtraw files'
+    '批量生成 rec 文件并运行'
     hprint.pstar()
     hprint.ppoint('Location of .txt', txt_folder)
     hprint.ppoint('Location of .rtraw', rtraw_folder)
@@ -270,51 +310,13 @@ def dorec(txt_folder='',
             condor=condor)
 
 
-def alg(algroot=[],
-        txt_file='',
-        root_file='',
-        dst_list=[],
-        option_list=[],
-        condor='0'):
-    'Analysis a dst file'
-    line = []
-    # deal with head file
-    line.append('#include "$ROOTIOROOT/share/jobOptions_ReadRec.txt"')
-    line.append('#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt"')
-    line.append('#include "$MAGNETICFIELDROOT/share/MagneticField.txt"')
-    line.append('#include "$ABSCORROOT/share/jobOptions_AbsCor.txt"')
-    line.append('#include "$%s/share/%s"' % (algroot[0], algroot[1]))
-    # deal with option_list
-    for i in option_list:
-        line.append('%s;' % (i))
-    # deal with dst_list
-    dstfile = ''
-    for i in dst_list:
-        dstfile = dstfile + '"%s"' % (i) + ',' + '\n'
-    dstfile = dstfile[:-2]
-    line.append('EventCnvSvc.digiRootInputFile = {%s};' % (dstfile))
-    # deal with other
-    line.append('MessageSvc.OutputLevel = 6;')
-    line.append('ApplicationMgr.EvtMax = -1;')
-    line.append('ApplicationMgr.HistogramPersistency = "ROOT";')
-    line.append(
-        'NTupleSvc.Output = { "FILE1 DATAFILE=\'%s\' OPT=\'NEW\' TYP=\'ROOT\'"};' % (root_file))
-    output = ''
-    for i in line:
-        output += i + '\n'
-    with open(txt_file, 'w') as outfile:
-        outfile.write(output)
-    if(condor == '1'):
-        os.system('boss.condor %s' % (txt_file))
-
-
 def doalg(algroot=[],
           txt_folder='',
           dst_folder='',
           root_folder='',
           options=[],
           condor='0'):
-    'Analysis all dst files'
+    '批量生成 ana 文件并运行'
     hprint.pstar()
     hprint.ppoint('Location of .txt', txt_folder)
     hprint.ppoint('Location of .dst', dst_folder)
@@ -348,10 +350,10 @@ def doalg(algroot=[],
 class WORKSPACE:
     '''
     整合数据信息，操作工作函数\n
-    dodec 提供衰变卡输入\n
-    dosim 提供sim过程\n
-    dorec 提供rec过程\n
-    dosima 提供ana过程\n
+    dodec 提供 deccard 批量生成\n
+    dosim 提供 sim 批量生成\n
+    dorec 提供 rec 批量生成\n
+    dosima 提供 ana 批量生成\n
     '''
 
     def __init__(self,
@@ -462,6 +464,15 @@ class WORKSPACE:
 
 
 def dst_list_rscan():
+    '''
+    生成 rscan 数据列表，数据包括：\n
+    file_name\n
+    file_path\n
+    run_number\n
+    option\n
+    events\n
+    process\n
+    '''
     # Initial
     output = []
     # Path-1
@@ -478,14 +489,15 @@ def dst_list_rscan():
             check1 = re.match(method1, file1)
             check2 = re.match(method2, file2)
             if(check1 and check2):
+                events = get_events_dst('%s/%s/%s' % (path_run, file1, file2))
                 output.append({'file_name': file2,
                                'file_path': '%s/%s/%s' % (path_run, file1, file2),
                                'run_number': int(check2.group(1)),
-                               'run_id': check2.group(2),
-                               'run_year': check1.group(1),
-                               'run_month': check1.group(1),
-                               'run_day': check1.group(1),
-                               'option': []})
+                               'option': [],
+                               'events': events,
+                               'process': 'rscan'})
+                print('| run_number:{:^10}| num_events{:^10}|'.format(int(check2.group(1)),
+                                                                      events))
     # Path-2
     path_run = '/bes3fs/offline/data/665p01/2175/dst'
     for file1 in os.listdir(path_run):
@@ -500,19 +512,29 @@ def dst_list_rscan():
             check1 = re.match(method1, file1)
             check2 = re.match(method2, file2)
             if(check1 and check2):
+                events = get_events_dst('%s/%s/%s' % (path_run, file1, file2))
                 output.append({'file_name': file2,
                                'file_path': '%s/%s/%s' % (path_run, file1, file2),
                                'run_number': int(check2.group(1)),
-                               'run_id': check2.group(2),
-                               'run_year': check1.group(1),
-                               'run_month': check1.group(1),
-                               'run_day': check1.group(1),
-                               'option': []})
+                               'option': [],
+                               'events': events,
+                               'process': 'rscan'})
+                print('| run_number:{:^10}| num_events{:^10}|'.format(int(check2.group(1)),
+                                                                      events))
     # Print result
     return output
 
 
 def dst_list_jpsi():
+    '''
+    生成 jpsi 数据列表，数据包括：\n
+    file_name\n
+    file_path\n
+    run_number\n
+    option\n
+    events\n
+    process\n
+    '''
     # Initial
     output = []
     # Path-1
@@ -529,19 +551,21 @@ def dst_list_jpsi():
             check1 = re.match(method1, file1)
             check2 = re.match(method2, file2)
             if(check1 and check2):
+                events = get_events_dst('%s/%s/%s' % (path_run, file1, file2))
                 output.append({'file_name': file2,
                                'file_path': '%s/%s/%s' % (path_run, file1, file2),
                                'run_number': int(check2.group(1)),
-                               'run_id': check2.group(2),
-                               'run_year': check1.group(1),
-                               'run_month': check1.group(1),
-                               'run_day': check1.group(1),
-                               'option': []})
+                               'option': [],
+                               'events': events,
+                               'process': 'jpsi'})
+                print('| run_number:{:^10}| num_events{:^10}|'.format(int(check2.group(1)),
+                                                                      events))
     # Print result
     return output
 
 
 def select_runnumber(datain, run_left, run_right):
+    '将数据列表按照 run_number 进行筛选'
     dataout = []
     for i in datain:
         if(i['run_number'] >= run_left and i['run_number'] <= run_right):
@@ -550,6 +574,7 @@ def select_runnumber(datain, run_left, run_right):
 
 
 def select_energy(datain, energy):
+    '将数据列表按照 energy 进行筛选'
     dataout = []
     for i in datain:
         if(i['energy'] == energy):
@@ -557,7 +582,17 @@ def select_energy(datain, energy):
     return dataout
 
 
+def select_process(datain, process):
+    '将数据列表按照 process 进行筛选'
+    dataout = []
+    for i in datain:
+        if(i['process'] == process):
+            dataout.append(i)
+    return dataout
+
+
 def cut_length(datain, num):
+    '将数据列表按照 单组长度 进行分割'
     dataout = []
     i = 0
     j = 0
@@ -575,6 +610,7 @@ def cut_length(datain, num):
 
 
 def cut_group(datain, num):
+    '将数据列表按照 总组数 进行分割'
     length = int(float(len(datain)) / float(num)) + 1
     dataout = cut_length(datain, length)
     return dataout
@@ -589,11 +625,12 @@ def cut_run(folder_txt='',
             energy=0,
             do_select_runnumber=0,
             run_number=[0, 0],
+            do_select_process=0,
+            process='',
             num_group=0,
             num_length=0,
             condor=0):
-    '''
-    '''
+    '按照设定的 run_number 区间进行分作业提交'
     # 初始化dst序列
     in_dst_list = []
     for i in dst_list:
@@ -603,6 +640,8 @@ def cut_run(folder_txt='',
         in_dst_list = select_energy(in_dst_list, energy)
     if(do_select_runnumber != 0):
         in_dst_list = select_runnumber(in_dst_list, run_number[0], run_number[1])
+    if(do_select_process != 0):
+        in_dst_list = select_process(in_dst_list, process)
     # 重构建dst二维序列
     if(num_group != 0):
         out_list = cut_group(in_dst_list, num_group)
@@ -648,8 +687,7 @@ def cut_run_number(folder_txt='',
                    num_group=0,
                    num_length=0,
                    condor=0):
-    '''
-    '''
+    '按照多个设定的 run_number 区间列表进行分作业提交，并记录入文件名中'
     for run_number in run_numbers:
         # 初始化dst序列
         in_dst_list = []
@@ -696,9 +734,33 @@ def cut_run_number(folder_txt='',
 
 
 # 统计纠错类函数
-def finish_script(filename):
+
+
+def get_events_dst(file_root):
+    '获得一个 dst 文件的事例数'
+    tfile = ROOT.TFile(file_root)
+    thist = tfile.Get('Event')
+    num = thist.GetEntries()
+    tfile.Close()
+    return num
+
+
+def get_events_log(file_log):
+    '返回一个 log 文件的事例数'
+    with open(file_log, 'r') as infile:
+        lines = infile.readlines()
+    num = 0
+    method = r'total number:      (.*)'
+    for line in lines:
+        check = re.match(method, line)
+        if(check):
+            num = check.group(1)
+    return int(num)
+
+
+def finish_script(file_log):
     '检查一个分析code的log文件是否显示完成，返回bool型'
-    with open(filename, 'r') as infile:
+    with open(file_log, 'r') as infile:
         lines = infile.readlines()
     check = 0
     for i in lines:
@@ -734,7 +796,7 @@ def check_num_script(folder_script=''):
 
 
 def check_state_script(folder_script=''):
-    '检查一个文件夹中所有.txt文件是否有对应完成的.txt.bosslog文件，否则放入返回数组中'
+    '检查一个文件夹中所有.txt文件是否有对应完成的.txt.bosslog文件，否则.txt文件放入返回数组中'
     error = []
     filelist = os.listdir(folder_script)
     num = len(filelist)

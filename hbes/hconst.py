@@ -65,3 +65,10 @@ def energy_list():
                 3.0800: [39355, 39618, 126.21, '126$\pm$1', 522838948, 23.4594, 9.15560]
                 }
     return out_list
+
+def energy_sort():
+    in_energy_list = energy_list()
+    out_energy_list = in_energy_list.keys()
+    out_energy_list.sort()
+    return out_energy_list
+    

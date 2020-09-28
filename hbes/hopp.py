@@ -63,6 +63,13 @@ def energy_list_pw():
     return out_list
 
 
+def energy_sort():
+    in_energy_list = energy_list()
+    out_energy_list = in_energy_list.keys()
+    out_energy_list.sort()
+    return out_energy_list
+
+
 def selecters():
     l1 = 0.009609 * 3
     l2 = 0.009231 * 3
@@ -136,27 +143,27 @@ def selecters():
     output['pip_a'] = hnew.SELECTER(center_show=0,
                                     width_show=1.,
                                     inter=50,
-                                    title=r'Cos#theta_{#pi^{+}}')
+                                    title=r'cos#theta_{#pi^{+}}')
     output['pim_a'] = hnew.SELECTER(center_show=0,
                                     width_show=1.,
                                     inter=50,
-                                    title=r'Cos#theta_{#pi^{-}}')
+                                    title=r'cos#theta_{#pi^{-}}')
     output['pi01_a'] = hnew.SELECTER(center_show=0,
                                      width_show=1.,
                                      inter=50,
-                                     title=r'Cos#theta_{#pi_{1}^{0}}')
+                                     title=r'cos#theta_{#pi_{1}^{0}}')
     output['pi02_a'] = hnew.SELECTER(center_show=0,
                                      width_show=1.,
                                      inter=50,
-                                     title=r'Cos#theta_{#pi_{2}^{0}}')
+                                     title=r'cos#theta_{#pi_{2}^{0}}')
     output['pi03_a'] = hnew.SELECTER(center_show=0,
                                      width_show=1.,
                                      inter=50,
-                                     title=r'Cos#theta_{#pi_{3}^{0}}')
+                                     title=r'cos#theta_{#pi_{3}^{0}}')
     output['omega_a'] = hnew.SELECTER(center_show=0,
                                       width_show=1.,
                                       inter=50,
-                                      title=r'Cos#theta_{#pi^{+}#pi^{-}#pi^{0}}')
+                                      title=r'cos#theta_{#pi^{+}#pi^{-}#pi^{0}}')
     # 动量部分
     output['pip_p'] = hnew.SELECTER(center_show=0.5,
                                     width_show=0.5,
