@@ -48,6 +48,45 @@ def energy_sort():
 def selecters():
     output = {}
     #
+    output['pip_ep'] = hnew.SELECTER(center=0.4,
+                                     width=0.4,
+                                     center_show=0.6,
+                                     width_show=0.6,
+                                     inter=60,
+                                     title=r'E/p(#pi^{+-})')
+    output['pim_ep'] = output['pip_ep']
+    output['pip_ep'].set_by_edge(0, 0.9)
+    output['pim_ep'].set_by_edge(0, 0.9)
+    output['pip_pid_pi'] = hnew.SELECTER(center=0.00005,
+                                         width=0.00005,
+                                         center_show=0.0005,
+                                         width_show=0.0005,
+                                         inter=10,
+                                         title=r'Prob(#pi^{+-})',
+                                         reverse=1)
+    output['pim_pid_pi'] = output['pip_pid_pi']
+    output['pip_pid_mu'] = hnew.SELECTER(center=1,
+                                         width=1,
+                                         center_show=1,
+                                         width_show=1,
+                                         inter=100,
+                                         title=r'Prob(#mu^{+-})/Prob(#pi^{+-})')
+    output['pim_pid_mu'] = output['pip_pid_mu']
+    output['pip_pid_e'] = hnew.SELECTER(center=1,
+                                        width=1,
+                                        center_show=1,
+                                        width_show=1,
+                                        inter=100,
+                                        title=r'Prob(#e^{+-})/Prob(#pi^{+-})')
+    output['pim_pid_e'] = output['pip_pid_e']
+    #
+    output['vertex'] = hnew.SELECTER(center=50,
+                                     width=50,
+                                     center_show=50,
+                                     width_show=50,
+                                     inter=50,
+                                     title=r'#chi^{2}_{Vertex}')
+    #
     output['chisq'] = hnew.SELECTER(center=25,
                                     width=25,
                                     center_show=50,
@@ -56,35 +95,17 @@ def selecters():
                                     title=r'#chi^{2}')
     #
     output['a_pippim'] = hnew.SELECTER(title=r'#theta(Track^{+},Track^{-})')
-    output['a_pippim'].set_by_edge(0, 165)
-    output['a_pippim'].set_by_edge_show(0, 180)
-    output['a_pippim'].inter = 90
-    output['pip_ep'] = hnew.SELECTER(center=0.4,
-                                     width=0.4,
-                                     center_show=0.6,
-                                     width_show=0.6,
-                                     inter=60,
-                                     title=r'E/p(#pi^{+-})')
-    output['pim_ep'] = hnew.SELECTER(center=0.4,
-                                     width=0.4,
-                                     center_show=0.6,
-                                     width_show=0.6,
-                                     inter=60,
-                                     title=r'E/p(#pi^{+-})')
-    output['pip_ep'].set_by_edge(0, 0.85)
-    output['pim_ep'].set_by_edge(0, 0.85)
-    output['gamma1_heli'] = hnew.SELECTER(center=0,
-                                          width=0.8,
-                                          center_show=0,
+    output['a_pippim'].set_by_edge(0, 170)
+    output['a_pippim'].set_by_edge_show(100, 180)
+    output['a_pippim'].inter = 80
+    output['b_pippim'] = output['a_pippim']
+    output['gamma1_heli'] = hnew.SELECTER(center=0.,
+                                          width=0.85,
+                                          center_show=0.,
                                           width_show=1.,
                                           inter=40,
                                           title=r'cos(#theta_{helicity})')
-    output['gamma2_heli'] = hnew.SELECTER(center=0,
-                                          width=0.8,
-                                          center_show=0,
-                                          width_show=1.,
-                                          inter=40,
-                                          title=r'cos(#theta_{helicity})')
+    output['gamma2_heli'] = output['gamma1_heli']
     #
     output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],
                                     width=0.045,

@@ -179,6 +179,32 @@ class SELECTER_value:
             output = bool(1) ^ output
         return output
 
+# 计算函数
+
+
+def significance(value=[],
+                 num_parameter=1,
+                 method='chisq'):
+    # method
+    if(method == 'chisq'):
+        factor = 1
+    elif(method == 'likelyhood'):
+        factor = 2
+    else:
+        print('Error: Wrong significance method!')
+    # value
+    if(len(value) == 1):
+        delta = value
+    elif(len(value) == 2):
+        delta = abs(value[1] - value[0])
+    else:
+        print('Error: Wrong significance value input!')
+    # calculate
+    probability = ROOT.TMath.Prob(factor * delta, num_parameter)
+    significance = ROOT.RooStats.PValueToSignificance(0.5 * probability)
+    # return
+    return significance
+
 
 # root 读取类
 
