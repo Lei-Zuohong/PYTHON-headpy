@@ -12,8 +12,6 @@ This is a package document.
         @pdg:
         @energy_list:
 '''
-# Public package
-# Private package
 
 
 def pdg():
