@@ -122,10 +122,10 @@ def selecters():
                                     title=r'M_{#pi^{-}}',
                                     unit=r'(GeV/c^{2})')
     output['piz_m'] = hnew.SELECTER(center=hconst.pdg()['m_pi0'],
-                                    width=0.045,
+                                    width=0.060,
                                     center_show=hconst.pdg()['m_pi0'],
-                                    width_show=0.045,
-                                    inter=90,
+                                    width_show=0.060,
+                                    inter=120,
                                     title=r'M_{#gamma#gamma}',
                                     unit=r'(GeV/c^{2})')
     output['pipm_m'] = hnew.SELECTER(center=1.5,
