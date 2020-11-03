@@ -2,6 +2,7 @@
 # Public package
 import os
 import re
+import sys
 # Private package
 import headpy.hfile.hstring as hstring
 import headpy.hfile.hoperate as hoperate
@@ -49,27 +50,30 @@ def write_parameter(file_name, dict_option):
 
 def read_parameter(file_name):
     output = {}
-    lines = hstring.readlines(file_name)
+    lines = hstring.txt_readlines(file_name)
     for line in lines:
-        method = r'(.*)=(.*) (.*) (.*) (.*)'
+        method = r'(\S*)\s*=\s*(\S*)\s*(\S*)\s*(\S*)\s*(\S*)'
         check = re.match(method, line)
         if(check):
-            name = check.group(1)
-            value = float(check.group(2))
-            error = float(check.group(3))
-            limitl = float(check.group(4))
-            limitr = float(check.group(5))
-            output[name] = {}
-            output[name]['value'] = value
-            output[name]['error'] = error
-            output[name]['limitl'] = limitl
-            output[name]['limitr'] = limitr
+            try:
+                name = check.group(1)
+                value = float(check.group(2))
+                error = float(check.group(3))
+                limitl = float(check.group(4))
+                limitr = float(check.group(5))
+                output[name] = {}
+                output[name]['value'] = value
+                output[name]['error'] = error
+                output[name]['limitl'] = limitl
+                output[name]['limitr'] = limitr
+            except:
+                pass
     return output
 
 
 def read_likelyhood(file_name):
     output = 0
-    lines = hstring.readlines(file_name)
+    lines = hstring.txt_readlines(file_name)
     for line in lines:
         method = r'Best Likelihood:(.*)'
         check = re.match(method, line)
@@ -82,12 +86,10 @@ class MYDATA():
     def __init__(self):
         self.option_value = {}
         self.option_string = {}
-
         self.input_parameter = {}
         self.input_constant = {}
         self.output_parameter = {}
         self.output_constant = {}
-
         self.least_likelyhood = 0
 
 
@@ -104,6 +106,7 @@ def dopwa(project_source_path='',
           input_parameter={},
           file_execute=''):
     '进行一次拟合操作，返回结果类'
+    origin_path = os.getcwd()
     mydata = MYDATA()
     # 拷贝资料文件
     hoperate.copy_folder(source_path=project_source_path,
@@ -136,32 +139,183 @@ def dopwa(project_source_path='',
     copy_dict(mydata.output_constant, read_parameter('output_constant.txt'))
     copy_dict(mydata.output_parameter, read_parameter('output_parameter.txt'))
     mydata.least_likelyhood = read_likelyhood('output_fitresult.txt')
-    # 返回
+    # 结束
+    os.chdir(origin_path)
     return mydata
+
+
+class MYWAVE():
+    def __init__(self, wave_possible=[], wave_nomial=[], wave_save=[]):
+        self.wave_possible = []
+        self.wave_nomial = []
+        self.wave_save = []
+        copy_list(self.wave_possible, wave_possible)
+        copy_list(self.wave_nomial, wave_nomial)
+        copy_list(self.wave_save, wave_save)
+
+    def get_nomial_option(self, input_option_value):
+        output = {}
+        copy_dict(output, input_option_value)
+        for wave in self.wave_possible:
+            if(wave in self.wave_nomial):
+                output['add_%s' % (wave)] = 1
+            else:
+                output['add_%s' % (wave)] = 0
+        return output
+
+    def get_check_option(self, input_option_value, wave_check):
+        output = {}
+        copy_dict(output, input_option_value)
+        for wave in self.wave_possible:
+            if(wave in self.wave_nomial):
+                output['add_%s' % (wave)] = 1
+            else:
+                output['add_%s' % (wave)] = 0
+        if(wave_check in self.wave_possible):
+            output['add_%s' % (wave_check)] = 1 - output['add_%s' % (wave_check)]
+        return output
 
 
 class MYPWA():
 
-    self.path = ''
-    self.root_input = ''
-    self.root_output = ''
-    self.program_source = ''
-    self.program_execute = ''
-    self.energy = 0
-    self.path_data = ''
-    self.path_mc = ''
-
-    def __init__(self, energy):
+    def __init__(self, project):
         # 输入folder
         self.path = os.getcwd()
-        self.root_input = '%s/root_input' % (self.path)
-        self.root_output = '%s/root_output' % (self.path)
-        self.program_source = '%s/program_source' % (self.path)
-        self.program_execute = '%s/program_execute' % (self.path)
-        # 输入root file
-        if('%1.4f_data.root' % (energy) in os.listdir(self.root_input) and
-           '%1.4f_mc.root' % (energy) in os.listdir(self.root_input)):
-            self.path_data = '%s/%1.4f_data.root' % (self.root_input, energy)
-            self.path_mc = '%s/%1.4f_mc.root' % (self.root_input, energy)
+        self.path_program_source = self.path + '/program_source'
+        self.path_program_execute = self.path + '/program_execute'
+        self.path_root_input = self.path + '/root_input'
+        self.path_root_output = self.path + '/root_output'
+        self.path_txt_input = self.path + '/txt_input'
+        self.path_txt_output = self.path + '/txt_output'
+        self.project = project
+
+    # Setting
+    def set_energy_root(self, energy):
+        # 根据energy设定root文件
+        self.energy = energy
+        if('%1.4f_data.root' % (energy) in os.listdir(self.path_root_input) and
+           '%1.4f_mc.root' % (energy) in os.listdir(self.path_root_input)):
+            self.root_data = '%1.4f_data.root' % (energy)
+            self.root_mc = '%1.4f_mc.root' % (energy)
         else:
             print('Error: Missing root input file!')
+            sys.exit()
+
+    def set_option_value(self, input_option_value):
+        self.input_option_value = {}
+        copy_dict(self.input_option_value, input_option_value)
+
+    def set_option_string(self, input_option_string):
+        self.input_option_string = {}
+        copy_dict(self.input_option_string, input_option_string)
+
+    def set_parameter(self, input_parameter):
+        self.input_parameter = {}
+        copy_dict(self.input_parameter, input_parameter)
+
+    def set_constant(self, input_constant):
+        self.input_constant = {}
+        copy_dict(self.input_constant, input_constant)
+
+    def set_waves(self, wave_possible=[], wave_nomial=[], wave_save=[]):
+        self.mywave = MYWAVE(wave_possible=wave_possible, wave_nomial=wave_nomial, wave_save=wave_save)
+
+    def set_output_step(self, file_name):
+        self.output_step = '%s/%s' % (self.path, file_name)
+        with open(self.output_step, 'w') as outfile:
+            outfile.write('Fitting start:\n\n')
+
+    # Fitting
+    def get_fit_nomial(self):
+        output = dopwa(project_source_path=self.path_program_source,
+                       project_source_name=self.project,
+                       project_path=self.path_program_execute,
+                       project_name='%1.4f_nomial' % (self.energy),
+                       root_path=self.path_root_input,
+                       root_name_data=self.root_data,
+                       root_name_mc=self.root_mc,
+                       input_option_string=self.input_option_string,
+                       input_option_value=self.mywave.get_nomial_option(self.input_option_value),
+                       input_constant=self.input_constant,
+                       input_parameter=self.input_parameter,
+                       file_execute=self.project)
+        return output
+
+    def get_test_significance(self):
+        data_nomial = self.get_fit_nomial()
+        self.significance = {}
+        for wave in self.mywave.wave_possible:
+            data_check = dopwa(project_source_path=self.path_program_source,
+                               project_source_name=self.project,
+                               project_path=self.path_program_execute,
+                               project_name='%1.4f_%s' % (self.energy, wave),
+                               root_path=self.path_root_input,
+                               root_name_data=self.root_data,
+                               root_name_mc=self.root_mc,
+                               input_option_string=self.input_option_string,
+                               input_option_value=self.mywave.get_check_option(self.input_option_value, wave),
+                               input_constant=self.input_constant,
+                               input_parameter=self.input_parameter,
+                               file_execute=self.project)
+            self.significance[wave] = data_nomial.least_likelyhood - data_check.least_likelyhood
+        if(hasattr(self, 'output_step')):
+            with open(self.output_step, 'a') as outfile:
+                outfile.write('Check significance:\n')
+                for wave in self.significance:
+                    outfile.write('{:<25} {:<15}\n'.format(wave, self.significance[wave]))
+                outfile.write('\n')
+
+    # Processing
+    def check_significance(self):
+        check_minus = 1
+        check_plus = 1
+        for wave in self.significance:
+            if(wave in self.mywave.wave_save): continue
+            if(self.significance[wave] < 0 and self.significance[wave] > -14.372):
+                check_minus = 0
+            if(self.significance[wave] > 0 and self.significance[wave] > 14.372):
+                check_plus = 0
+        check = check_minus * check_plus
+        return check
+
+    def adjust_significance(self):
+        # 得到检测结果
+        check_minus = 1
+        check_plus = 1
+        for wave in self.significance:
+            if(wave in self.mywave.wave_save): continue
+            if(self.significance[wave] < 0 and self.significance[wave] > -14.372):
+                check_minus = 0
+            if(self.significance[wave] > 0 and self.significance[wave] > 14.372):
+                check_plus = 0
+        # 先考虑减去波
+        if(check_minus == 0):
+            save_key = ''
+            save_value = -9999
+            for wave in self.significance:
+                if(wave in self.mywave.wave_save): continue
+                if(self.significance[wave] > 0): continue
+                if (self.significance[wave] > save_value):
+                    save_key = wave
+                    save_value = self.significance[wave]
+            new_nomial = []
+            for wave in self.mywave.wave_nomial:
+                if(wave != save_key):
+                    new_nomial.append(wave)
+            self.mywave.wave_nomial = new_nomial
+        # 再考虑加上波
+        elif(check_plus == 0):
+            save_key = ''
+            save_value = 0
+            for wave in self.significance:
+                if(wave in self.mywave.wave_save): continue
+                if (self.significance[wave] > save_value):
+                    save_key = wave
+                    save_value = self.significance[wave]
+            self.mywave.wave_nomial.append(save_key)
+        if(hasattr(self, 'output_step')):
+            with open(self.output_step, 'a') as outfile:
+                outfile.write('Adjust nomial waves:\n')
+                for wave in self.mywave.wave_nomial:
+                    outfile.write('{:<25}\n'.format(wave))
+                outfile.write('\n')
