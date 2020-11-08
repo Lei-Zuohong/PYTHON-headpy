@@ -3,19 +3,11 @@
 import os
 import re
 import sys
+import copy
 # Private package
 import headpy.hfile.hstring as hstring
 import headpy.hfile.hoperate as hoperate
 
-
-def copy_list(empty_list, input_list):
-    for i in input_list:
-        empty_list.append(i)
-
-
-def copy_dict(empty_dict, input_dict):
-    for i in input_dict:
-        empty_dict[i] = input_dict[i]
 
 
 def write_option(file_name, dict_option):
@@ -129,16 +121,16 @@ def dopwa(project_source_path='',
     write_option(file_name='input_option_value.txt', dict_option=input_option_value)
     write_parameter(file_name='input_constant.txt', dict_option=input_constant)
     write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
-    copy_dict(mydata.option_string, input_option_string)
-    copy_dict(mydata.option_value, input_option_value)
-    copy_dict(mydata.input_constant, input_constant)
-    copy_dict(mydata.input_parameter, input_parameter)
+    mydata.option_string = copy.deepcopy(input_option_string)
+    mydata.option_value = copy.deepcopy(input_option_value)
+    mydata.input_constant = copy.deepcopy(input_constant)
+    mydata.input_parameter = copy.deepcopy(input_parameter)
     # 开始执行
     os.system('./%s | tee log.txt' % (file_execute))
     # 读取末值文件
-    copy_dict(mydata.output_constant, read_parameter('output_constant.txt'))
-    copy_dict(mydata.output_parameter, read_parameter('output_parameter.txt'))
-    mydata.least_likelyhood = read_likelyhood('output_fitresult.txt')
+    mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
+    mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
+    mydata.least_likelyhood = copy.deepcopy(read_likelyhood('output_fitresult.txt'))
     # 结束
     os.chdir(origin_path)
     return mydata
@@ -146,16 +138,12 @@ def dopwa(project_source_path='',
 
 class MYWAVE():
     def __init__(self, wave_possible=[], wave_nomial=[], wave_save=[]):
-        self.wave_possible = []
-        self.wave_nomial = []
-        self.wave_save = []
-        copy_list(self.wave_possible, wave_possible)
-        copy_list(self.wave_nomial, wave_nomial)
-        copy_list(self.wave_save, wave_save)
+        self.wave_possible = copy.deepcopy(wave_possible)
+        self.wave_nomial = copy.deepcopy(wave_nomial)
+        self.wave_save = copy.deepcopy(wave_save)
 
     def get_nomial_option(self, input_option_value):
-        output = {}
-        copy_dict(output, input_option_value)
+        output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nomial):
                 output['add_%s' % (wave)] = 1
@@ -164,8 +152,7 @@ class MYWAVE():
         return output
 
     def get_check_option(self, input_option_value, wave_check):
-        output = {}
-        copy_dict(output, input_option_value)
+        output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nomial):
                 output['add_%s' % (wave)] = 1
@@ -202,20 +189,16 @@ class MYPWA():
             sys.exit()
 
     def set_option_value(self, input_option_value):
-        self.input_option_value = {}
-        copy_dict(self.input_option_value, input_option_value)
+        self.input_option_value = copy.deepcopy(input_option_value)
 
     def set_option_string(self, input_option_string):
-        self.input_option_string = {}
-        copy_dict(self.input_option_string, input_option_string)
+        self.input_option_string = copy.deepcopy(input_option_string)
 
     def set_parameter(self, input_parameter):
-        self.input_parameter = {}
-        copy_dict(self.input_parameter, input_parameter)
+        self.input_parameter = copy.deepcopy(input_parameter)
 
     def set_constant(self, input_constant):
-        self.input_constant = {}
-        copy_dict(self.input_constant, input_constant)
+        self.input_constant = copy.deepcopy(input_constant)
 
     def set_waves(self, wave_possible=[], wave_nomial=[], wave_save=[]):
         self.mywave = MYWAVE(wave_possible=wave_possible, wave_nomial=wave_nomial, wave_save=wave_save)
@@ -265,7 +248,37 @@ class MYPWA():
                     outfile.write('{:<25} {:<15}\n'.format(wave, self.significance[wave]))
                 outfile.write('\n')
 
+    def get_scan(self,
+                 parameter='',
+                 limitl=0,
+                 limitr=1,
+                 inter=100):
+        outputx = []
+        outputy = []
+        unit = (limitr - limitl) / inter
+        use_parameter = copy.deepcopy(self.input_parameter)
+        for i in range(inter):
+            use_value = limitl + i * unit
+            use_parameter[parameter]['value'] = use_value
+            use_parameter[parameter]['error'] = -1
+            data = dopwa(project_source_path=self.path_program_source,
+                         project_source_name=self.project,
+                         project_path=self.path_program_execute,
+                         project_name='%1.4f_scan' % (self.energy),
+                         root_path=self.path_root_input,
+                         root_name_data=self.root_data,
+                         root_name_mc=self.root_mc,
+                         input_option_string=self.input_option_string,
+                         input_option_value=self.mywave.get_nomial_option(self.input_option_value),
+                         input_constant=self.input_constant,
+                         input_parameter=use_parameter,
+                         file_execute=self.project)
+            outputx.append(use_value)
+            outputy.append(data.least_likelyhood)
+        return [outputx, outputy]
+
     # Processing
+
     def check_significance(self):
         check_minus = 1
         check_plus = 1
