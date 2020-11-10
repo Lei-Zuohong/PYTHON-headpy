@@ -8,7 +8,6 @@ import copy
 import headpy.hfile as hfile
 
 
-
 def write_option(file_name, dict_option):
     '把dictionary（单值）对象写入文件'
     keys = dict_option.keys()
@@ -101,18 +100,18 @@ def dopwa(project_source_path='',
     mydata = MYDATA()
     # 拷贝资料文件
     hfile.copy_folder(source_path=project_source_path,
-                         source_name=project_source_name,
-                         path=project_path,
-                         name=project_name)
+                      source_name=project_source_name,
+                      path=project_path,
+                      name=project_name)
     # 拷贝root文件
     hfile.copy_file(source_path=root_path,
-                       source_name=root_name_data,
-                       path='%s/%s/%s' % (project_path, project_name, 'data'),
-                       name='data.root')
+                    source_name=root_name_data,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='data.root')
     hfile.copy_file(source_path=root_path,
-                       source_name=root_name_mc,
-                       path='%s/%s/%s' % (project_path, project_name, 'data'),
-                       name='mc.root')
+                    source_name=root_name_mc,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='mc.root')
     # 变更执行地址
     os.chdir('%s/%s' % (project_path, project_name))
     # 写入初值文件
@@ -283,9 +282,9 @@ class MYPWA():
         check_plus = 1
         for wave in self.significance:
             if(wave in self.mywave.wave_save): continue
-            if(self.significance[wave] < 0 and self.significance[wave] > -14.372):
+            if(wave in self.mywave.wave_nomial and self.significance[wave] < 0 and self.significance[wave] > -14.372):
                 check_minus = 0
-            if(self.significance[wave] > 0 and self.significance[wave] > 14.372):
+            if(wave not in self.mywave.wave_nomial and self.significance[wave] > 14.372):
                 check_plus = 0
         check = check_minus * check_plus
         return check
@@ -296,9 +295,9 @@ class MYPWA():
         check_plus = 1
         for wave in self.significance:
             if(wave in self.mywave.wave_save): continue
-            if(self.significance[wave] < 0 and self.significance[wave] > -14.372):
+            if(wave in self.mywave.wave_nomial and self.significance[wave] < 0 and self.significance[wave] > -14.372):
                 check_minus = 0
-            if(self.significance[wave] > 0 and self.significance[wave] > 14.372):
+            if(wave not in self.mywave.wave_nomial and self.significance[wave] > 14.372):
                 check_plus = 0
         # 先考虑减去波
         if(check_minus == 0):
@@ -306,6 +305,7 @@ class MYPWA():
             save_value = -9999
             for wave in self.significance:
                 if(wave in self.mywave.wave_save): continue
+                if(wave not in self.mywave.wave_nomial): continue
                 if(self.significance[wave] > 0): continue
                 if (self.significance[wave] > save_value):
                     save_key = wave
@@ -321,6 +321,8 @@ class MYPWA():
             save_value = 0
             for wave in self.significance:
                 if(wave in self.mywave.wave_save): continue
+                if(wave in self.mywave.wave_nomial): continue
+                if(self.significance[wave] < 0): continue
                 if (self.significance[wave] > save_value):
                     save_key = wave
                     save_value = self.significance[wave]
@@ -331,3 +333,6 @@ class MYPWA():
                 for wave in self.mywave.wave_nomial:
                     outfile.write('{:<25}\n'.format(wave))
                 outfile.write('\n')
+
+    def dump_significance(self, filename):
+        hfile.pkl_dump(filename, self.significance)
