@@ -5,8 +5,7 @@ import re
 import sys
 import copy
 # Private package
-import headpy.hfile.hstring as hstring
-import headpy.hfile.hoperate as hoperate
+import headpy.hfile as hfile
 
 
 
@@ -42,7 +41,7 @@ def write_parameter(file_name, dict_option):
 
 def read_parameter(file_name):
     output = {}
-    lines = hstring.txt_readlines(file_name)
+    lines = hfile.txt_readlines(file_name)
     for line in lines:
         method = r'(\S*)\s*=\s*(\S*)\s*(\S*)\s*(\S*)\s*(\S*)'
         check = re.match(method, line)
@@ -65,7 +64,7 @@ def read_parameter(file_name):
 
 def read_likelyhood(file_name):
     output = 0
-    lines = hstring.txt_readlines(file_name)
+    lines = hfile.txt_readlines(file_name)
     for line in lines:
         method = r'Best Likelihood:(.*)'
         check = re.match(method, line)
@@ -101,16 +100,16 @@ def dopwa(project_source_path='',
     origin_path = os.getcwd()
     mydata = MYDATA()
     # 拷贝资料文件
-    hoperate.copy_folder(source_path=project_source_path,
+    hfile.copy_folder(source_path=project_source_path,
                          source_name=project_source_name,
                          path=project_path,
                          name=project_name)
     # 拷贝root文件
-    hoperate.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path,
                        source_name=root_name_data,
                        path='%s/%s/%s' % (project_path, project_name, 'data'),
                        name='data.root')
-    hoperate.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path,
                        source_name=root_name_mc,
                        path='%s/%s/%s' % (project_path, project_name, 'data'),
                        name='mc.root')
