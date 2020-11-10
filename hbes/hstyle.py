@@ -121,6 +121,7 @@ def set_axis(hist, xname, yname):
     hist.GetXaxis().SetTitleSize(0.07)
     hist.GetXaxis().SetTitleOffset(1.15)
     hist.GetXaxis().CenterTitle()
+    
     hist.GetYaxis().SetLabelFont(42)
     hist.GetYaxis().SetLabelSize(0.06)
     hist.GetYaxis().SetLabelOffset(0.01)
