@@ -189,12 +189,12 @@ def significance(value=[],
     if(method == 'chisq'):
         factor = 1
     elif(method == 'likelyhood'):
-        factor = 2
+        factor = 2.
     else:
         print('Error: Wrong significance method!')
     # value
     if(len(value) == 1):
-        delta = value
+        delta = value[0]
     elif(len(value) == 2):
         delta = abs(value[1] - value[0])
     else:
