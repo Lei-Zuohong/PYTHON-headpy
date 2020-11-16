@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
-import math
-import headpy.hbes.hconst as hconst
 import headpy.hbes.hnew as hnew
+import headpy.hbes.hconst as hconst
 
 
 def algroot():

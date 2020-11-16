@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
-import headpy.hbes.hconst as hconst
+# Public package
+
+# Private package
 import headpy.hbes.hnew as hnew
+import headpy.hbes.hconst as hconst
 
 
 def algroot():

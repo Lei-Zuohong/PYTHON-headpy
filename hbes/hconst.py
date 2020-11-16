@@ -1,17 +1,8 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
+# Public package
 
-    Environment version:
+# Private package
 
-        python2
-        python3
-
-    Content:
-    
-        @pdg:
-        @energy_list:
-'''
 
 
 def pdg():
