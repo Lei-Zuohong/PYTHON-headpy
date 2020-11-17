@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 # Public package
-
 # Private package
 import headpy.hbes.hnew as hnew
 import headpy.hbes.hconst as hconst
@@ -85,7 +84,7 @@ def selecters():
                                     width=50,
                                     center_show=100,
                                     width_show=100,
-                                    inter=100,
+                                    inter=50,
                                     title=r'#chi_{#pi^{+}#pi^{-}6#gamma}^{2}')
     # 不变质量部分
     output['pip_m'] = hnew.SELECTER(center=hconst.pdg()['m_pipm'],

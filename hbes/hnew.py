@@ -106,9 +106,7 @@ class SELECTER:
     def shift(self, value):
         '整体平移坐标'
         self.left = self.left + value
-        self.left_show = self.left_show + value
         self.right = self.right + value
-        self.right_show = self.right_show + value
         self.center = self.center + value
 
     def reverse(self):
@@ -193,9 +191,7 @@ if(root_exit == 1):
 
     # root 读取类 - need to modified
 
-    def root_dict(file_root='',
-                  tree='',
-                  branchs=[]):
+    def root_dict(**kwargs):
         '''
         file_root: root文件名\n
         tree: tree名\n
@@ -204,22 +200,23 @@ if(root_exit == 1):
         1: 将root文件中对应tree的branchs，转化为numpy数组，放入列表\n
         '''
         # 读取root文件
-        tfile = ROOT.TFile(file_root)
-        ttree = tfile.Get(tree)
+        tfile = ROOT.TFile(kwargs['file_root'])
+        ttree = tfile.Get(kwargs['tree'])
         num = ttree.GetEntries()
         # 初始化输出字典
         output = {}
-        for branch in branchs:
+        for branch in kwargs['branchs']:
             output[branch] = numpy.zeros(num)
         # 输入字典
         for entry in range(num):
             ttree.GetEntry(entry)
-            for branch in branchs:
+            for branch in kwargs['branchs']:
                 exec("output[branch][entry] = ttree.%s" % (branch))
         # 输出字典
         return output
 
-    def root_pkl(file_root='',
+    def root_pkl(func,
+                 file_root='',
                  tree='',
                  branchs=[],
                  file_pkl=''):
@@ -233,11 +230,14 @@ if(root_exit == 1):
         2. 将列表存入pkl\n
         '''
         # 读取root至dict
-        output = root_dict(file_root=file_root, tree=tree, branchs=branchs)
+        output = func(file_root=file_root,
+                      tree=tree,
+                      branchs=branchs)
         # 写入pickle文件
         hfile.pkl_dump(file_pkl, output)
 
-    def dump(folder_root='',
+    def dump(func,
+             folder_root='',
              tree='',
              branchs=[]):
         '''
@@ -256,10 +256,11 @@ if(root_exit == 1):
                 name = match.group(1)
                 energy = float(name)
                 hprint.pline('Extracting %1.4f' % (energy))
-                root_pkl('%s/%s' % (folder_root, file),
-                         tree,
-                         branchs,
-                         '%s/%s_%s.pkl' % (folder_root, name, tree))
+                root_pkl(func,
+                         file_root='%s/%s' % (folder_root, file),
+                         tree=tree,
+                         branchs=branchs,
+                         file_pkl='%s/%s_%s.pkl' % (folder_root, name, tree))
         hprint.pstar()
 
     # root 写入类
@@ -584,7 +585,7 @@ if(root_exit == 1):
             tfilename = '%s/%s_%s_%s.root' % (os.getenv("TEMPROOT"), data, branch, name)
             histname = '%s_%s' % (data, branch)
             inter = self.selecters[branch].inter
-            left, right = self.selecters[branch].get_range()
+            left, right = self.selecters[branch].get_range_show()
             num = len(ntree[branch])
             hprint.ppoint('Entires', num)
             # 开始填入直方图
@@ -639,9 +640,9 @@ if(root_exit == 1):
                                      branch1,
                                      branch2)
             inter1 = self.selecters[branch1].inter
-            left1, right1 = self.selecters[branch1].get_range()
+            left1, right1 = self.selecters[branch1].get_range_show()
             inter2 = self.selecters[branch2].inter
-            left2, right2 = self.selecters[branch2].get_range()
+            left2, right2 = self.selecters[branch2].get_range_show()
             data1 = ntree[branch1]
             data2 = ntree[branch2]
             num = len(data1)
