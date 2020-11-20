@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import ROOT
+#
 
 
 def set_style():
@@ -37,6 +38,8 @@ def set_style():
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetOptFit(0)
     ROOT.gStyle.SetOptTitle(0)
+
+#
 
 
 def get_canvas(x=800, y=600, dx=1, dy=1):
@@ -105,6 +108,8 @@ def add_box(drawlist,
     in_drawlist = add_arrow(in_drawlist, r, d, l, d, Linecolor, Linewidth)
     return in_drawlist
 
+#
+
 
 def set_axis(hist, xname, yname):
     '''
@@ -121,7 +126,7 @@ def set_axis(hist, xname, yname):
     hist.GetXaxis().SetTitleSize(0.07)
     hist.GetXaxis().SetTitleOffset(1.15)
     hist.GetXaxis().CenterTitle()
-    
+
     hist.GetYaxis().SetLabelFont(42)
     hist.GetYaxis().SetLabelSize(0.06)
     hist.GetYaxis().SetLabelOffset(0.01)
@@ -162,3 +167,31 @@ def set_background(hist,
     hist.SetFillColor(Fillcolor)
     hist.SetLineWidth(Linewidth)
     hist.SetFillStyle(Fillstyle)
+
+
+def set_xrange(hist):
+    # 得到参数
+    bins = hist.GetNbinsX()
+    width = hist.GetBinWidth(0)
+    lowedge = hist.GetBinLowEdge(0)
+    bin_left = 0
+    bin_left_check = 0
+    bin_right = 0
+    for bini in range(bins):
+        bincontent = hist.GetBinContent(bini)
+        if(bincontent == 0 and bin_left_check == 0):
+            bin_left = bini
+        if(bincontent != 0):
+            bin_left_check = 1
+            bin_right = bini
+    # 调整向外延伸bin
+    bin_left_save = 1.25 * bin_left - 0.25 * bin_right
+    bin_right_save = 1.25 * bin_right - 0.25 * bin_left
+
+    if(bin_left > bin_left_save): bin_left = bin_left_save
+    if(bin_right < bin_right_save): bin_right = bin_right_save
+
+    x_left = lowedge + bin_left * width
+    x_right = lowedge + (bin_right + 1) * width
+    # 设定range
+    hist.GetXaxis().SetRangeUser(x_left, x_right)
