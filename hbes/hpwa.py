@@ -135,12 +135,16 @@ def dopwa(project_source_path='',
 
 
 class MYWAVE():
-    def __init__(self, wave_possible=[], wave_nomial=[], wave_save=[]):
+    def __init__(self, wave_possible=[], wave_consider=[], wave_nomial=[], wave_save=[]):
         self.wave_possible = copy.deepcopy(wave_possible)
+        self.wave_consider = copy.deepcopy(wave_consider)
         self.wave_nomial = copy.deepcopy(wave_nomial)
         self.wave_save = copy.deepcopy(wave_save)
 
     def get_nomial_option(self, input_option_value):
+        '''
+        字典形式输出一个wave是否被添加
+        '''
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nomial):
@@ -150,6 +154,9 @@ class MYWAVE():
         return output
 
     def get_check_option(self, input_option_value, wave_check):
+        '''
+        字典形式输出一个wave是否被添加，对于指定的wave，变更其结果
+        '''
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nomial):
@@ -198,8 +205,11 @@ class MYPWA():
     def set_constant(self, input_constant):
         self.input_constant = copy.deepcopy(input_constant)
 
-    def set_waves(self, wave_possible=[], wave_nomial=[], wave_save=[]):
-        self.mywave = MYWAVE(wave_possible=wave_possible, wave_nomial=wave_nomial, wave_save=wave_save)
+    def set_waves(self, wave_possible=[], wave_consider=[], wave_nomial=[], wave_save=[]):
+        self.mywave = MYWAVE(wave_possible=wave_possible,
+                             wave_consider=wave_consider,
+                             wave_nomial=wave_nomial,
+                             wave_save=wave_save)
 
     def set_output_step(self, file_name):
         self.output_step = '%s/%s' % (self.path, file_name)
@@ -225,7 +235,7 @@ class MYPWA():
     def get_test_significance(self):
         data_nomial = self.get_fit_nomial()
         self.significance = {}
-        for wave in self.mywave.wave_possible:
+        for wave in self.mywave.wave_consider:
             data_check = dopwa(project_source_path=self.path_program_source,
                                project_source_name=self.project,
                                project_path=self.path_program_execute,
