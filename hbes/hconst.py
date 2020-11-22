@@ -1,8 +1,50 @@
 # -*- coding: UTF-8 -*-
 # Public package
-
 # Private package
 
+
+class PARTICLE():
+    def __init__(self,
+                 mass, mass_err, width, width_err,
+                 j=0, p=0, c=0, i=0, g=0):
+        self.name = ''
+        self.title = ''
+        self.mass = mass
+        self.mass_err = mass_err
+        self.width = width
+        self.width_err = width_err
+        self.j = j
+        self.p = p
+        self.c = c
+        self.i = i
+        self.g = g
+        self.decay = {}
+
+    def set_decay(self, name, branch_ratio):
+        self.decay[name] = branch_ratio
+
+
+# pi
+pipm = PARTICLE(0.13957039, 0.00018, 0, 0, j=0)
+piz = PARTICLE(0.1349768, 0.0005, 0, 0, j=0)
+piz.set_decay('gammagamma', 0.98823)
+# omega
+omega782 = PARTICLE(0.78265, 0.00012, 0.00849, 0.00008, j=1)
+omega782.set_decay('pippimpiz', 0.893)
+omega1420 = PARTICLE(1.41, 0.06, 0.29, 0.19, j=1)
+omega1650 = PARTICLE(1.67, 0.03, 0.315, 0.035, j=1)
+omega1670 = PARTICLE(1.667, 0.004, 0.168, 0.01, j=3)
+# rho
+rho770n = PARTICLE(0.77526, 0.00025, 0.1478, 0.0009, j=1)
+rho770c = PARTICLE(0.77511, 0.00034, 0.1491, 0.0008, j=1)
+rho770 = PARTICLE((rho770n.mass + rho770c.mass) / 2,
+                  (rho770n.mass_err + rho770c.mass_err) / 2,
+                  (rho770n.width + rho770c.width) / 2,
+                  (rho770n.width_err + rho770c.width_err) / 2)
+rho1450 = PARTICLE(1.465, 0.025, 0.4, 0.06, j=1)
+rho1570 = PARTICLE(1.57, 0.072, 0.144, 0.086, j=1)
+rho1700 = PARTICLE(1.72, 0.02, 0.25, 0.1, j=1)
+rho1690 = PARTICLE(1.6888, 0.0021, 0.161, 0.01, j=3)
 
 
 def pdg():
@@ -10,11 +52,11 @@ def pdg():
     作用: 提供PDG网页上的各种参数\n
     '''
     output = {}
-    output['m_omega'] = 0.78265
-    output['m_pi0'] = 0.13498
-    output['m_pipm'] = 0.13957
-    output['br_omega'] = 0.893
-    output['br_pi0'] = 0.98823
+    output['m_omega'] = omega782.mass
+    output['m_pi0'] = omegapiz.mass
+    output['m_pipm'] = omegapipm.mass
+    output['br_omega'] = omega782.decay['pippimpiz']
+    output['br_pi0'] = piz.decay['gammagamma']
     return output
 
 
@@ -55,9 +97,9 @@ def energy_list():
                 }
     return out_list
 
+
 def energy_sort():
     in_energy_list = energy_list()
     out_energy_list = in_energy_list.keys()
     out_energy_list.sort()
     return out_energy_list
-    
