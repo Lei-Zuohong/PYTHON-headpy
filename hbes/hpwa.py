@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import copy
+import numpy
 # Private package
 import headpy.hfile as hfile
 
@@ -39,6 +40,7 @@ def write_parameter(file_name, dict_option):
 
 
 def read_parameter(file_name):
+    '读取: parameter = value error limitl limitr 类txt信息'
     output = {}
     lines = hfile.txt_readlines(file_name)
     for line in lines:
@@ -61,7 +63,29 @@ def read_parameter(file_name):
     return output
 
 
+def read_matrix(file_name):
+    length = 0
+    massages = []
+    lines = hfile.txt_readlines(file_name)
+    for line in lines:
+        method = r'(\S*)\s*(\S*)\s*(\S*)'
+        check = re.match(method, line)
+        if(check):
+            num1 = int(check.group(1))
+            num2 = int(check.group(2))
+            num3 = float(check.group(3))
+            massages.append([num1, num2, num3])
+            if(num1 > length): length = num1
+            if(num2 > length): length = num2
+    output = numpy.zeros([length + 1, length + 1])
+    for massage in massages:
+        output[massage[0]][massage[1]] = massage[2]
+    output = output.tolist()
+    return output
+
+
 def read_likelyhood(file_name):
+    '读取：Best likelihood: value 类txt信息'
     output = 0
     lines = hfile.txt_readlines(file_name)
     for line in lines:
@@ -76,10 +100,14 @@ class MYDATA():
     def __init__(self):
         self.option_value = {}
         self.option_string = {}
+
         self.input_parameter = {}
         self.input_constant = {}
         self.output_parameter = {}
         self.output_constant = {}
+
+        self.fraction = [[]]
+
         self.least_likelyhood = 0
 
 
@@ -129,6 +157,7 @@ def dopwa(project_source_path='',
     mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
     mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
     mydata.least_likelyhood = copy.deepcopy(read_likelyhood('output_fitresult.txt'))
+    mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
     # 结束
     os.chdir(origin_path)
     return mydata
@@ -166,6 +195,27 @@ class MYWAVE():
         if(wave_check in self.wave_possible):
             output['add_%s' % (wave_check)] = 1 - output['add_%s' % (wave_check)]
         return output
+
+    def give_fraction_name(self, input_list):
+        '''
+        将一个fraction矩阵转化为波名字作为索引的字典
+        '''
+        output_dict = {}
+        output_wave = []
+        # 按顺序整合wave
+        for wave in self.wave_possible:
+            if(wave in self.wave_nomial):
+                output_wave.append(wave)
+        # 检测矩阵长度是否一致
+        length = len(input_list)
+        if(length != len(self.wave_nomial)):
+            print("Error: Fraction matrix with wrong length!")
+            exit()
+        for i in range(length):
+            output_dict[output_wave[i]] = {}
+            for j in range(length):
+                output_dict[output_wave[i]][output_wave[j]] = input_list[i][j]
+        return output_dict
 
 
 class MYPWA():
@@ -230,6 +280,7 @@ class MYPWA():
                        input_constant=self.input_constant,
                        input_parameter=self.input_parameter,
                        file_execute=self.project)
+        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
     def get_test_significance(self):
@@ -288,6 +339,7 @@ class MYPWA():
     # Processing
 
     def check_significance(self):
+        '检查significance是否满足5sigma，返回bool'
         check_minus = 1
         check_plus = 1
         for wave in self.significance:
@@ -300,6 +352,7 @@ class MYPWA():
         return check
 
     def adjust_significance(self):
+        '根据significance调整mywave的wave_nomial列表'
         # 得到检测结果
         check_minus = 1
         check_plus = 1
