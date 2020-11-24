@@ -53,8 +53,8 @@ def pdg():
     '''
     output = {}
     output['m_omega'] = omega782.mass
-    output['m_pi0'] = omegapiz.mass
-    output['m_pipm'] = omegapipm.mass
+    output['m_pi0'] = piz.mass
+    output['m_pipm'] = pipm.mass
     output['br_omega'] = omega782.decay['pippimpiz']
     output['br_pi0'] = piz.decay['gammagamma']
     return output
