@@ -31,10 +31,10 @@ def write_parameter(file_name, dict_option):
     for key in keys:
         output += '{:<25}'.format(key)
         output += ' = '
-        output += '{:<15}'.format(dict_option[key]['value'])
-        output += '{:<15}'.format(dict_option[key]['error'])
-        output += '{:<15}'.format(dict_option[key]['limitl'])
-        output += '{:<15}'.format(dict_option[key]['limitr'])
+        output += '{:<15}'.format('%.6f'%(dict_option[key]['value']))
+        output += '{:<15}'.format('%.6f'%(dict_option[key]['error']))
+        output += '{:<15}'.format('%.6f'%(dict_option[key]['limitl']))
+        output += '{:<15}'.format('%.6f'%(dict_option[key]['limitr']))
         output += '\n'
     with open(file_name, 'w') as outfile:
         outfile.write(output)
@@ -160,7 +160,7 @@ def dopwa(project_source_path='',
     mydata.least_likelyhood = copy.deepcopy(read_likelyhood('output_fitresult.txt'))
     mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
     # 删除大体积文件
-    os.system('rm %s'%(file_execute))
+    os.system('rm %s' % (file_execute))
     os.system('rm -r data')
     # 结束
     os.chdir(origin_path)
@@ -343,11 +343,28 @@ class MYPWA():
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
+    def get_fit_nomial_spread(self):
+        output = dopwa_spread(project_source_path=self.path_program_source,
+                              project_source_name=self.project,
+                              project_path=self.path_program_execute,
+                              project_name='%1.4f_nomial' % (self.energy),
+                              root_path=self.path_root_input,
+                              root_name_data=self.root_data,
+                              root_name_mc=self.root_mc,
+                              input_option_string=self.input_option_string,
+                              input_option_value=self.mywave.get_nomial_option(self.input_option_value),
+                              input_constant=self.input_constant,
+                              input_parameter=self.input_parameter,
+                              file_execute=self.project,
+                              nrandom=100)
+        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
+        return output
+
     def get_test_significance(self):
         data_nomial = self.get_fit_nomial()
         self.significance = {}
         for wave in self.mywave.wave_consider:
-            print('Checking wave name: %s'%(wave))
+            print('Checking wave name: %s' % (wave))
             data_check = dopwa(project_source_path=self.path_program_source,
                                project_source_name=self.project,
                                project_path=self.path_program_execute,
