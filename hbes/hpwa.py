@@ -97,21 +97,6 @@ def read_likelyhood(file_name):
     return output
 
 
-class MYDATA():
-    def __init__(self):
-        self.option_value = {}
-        self.option_string = {}
-
-        self.input_parameter = {}
-        self.input_constant = {}
-        self.output_parameter = {}
-        self.output_constant = {}
-
-        self.fraction = [[]]
-
-        self.least_likelyhood = 0
-
-
 def dopwa(project_source_path='',
           project_source_name='',
           project_path='',
@@ -207,7 +192,7 @@ def dopwa_spread(project_source_path='',
                        file_execute=file_execute)
         if(result.least_likelyhood < best_likelyhood):
             best_likelyhood = result.least_likelyhood
-            best_input_parameter = use_input_parameter
+            best_input_parameter = copy.deepcopy(use_input_parameter)
         del result
     output = dopwa(project_source_path=project_source_path,
                    project_source_name=project_source_name,
@@ -222,6 +207,21 @@ def dopwa_spread(project_source_path='',
                    input_parameter=best_input_parameter,
                    file_execute=file_execute)
     return output
+
+
+class MYDATA():
+    def __init__(self):
+        self.option_value = {}
+        self.option_string = {}
+
+        self.input_parameter = {}
+        self.input_constant = {}
+        self.output_parameter = {}
+        self.output_constant = {}
+
+        self.fraction = [[]]
+
+        self.least_likelyhood = 0
 
 
 class MYWAVE():
@@ -357,7 +357,7 @@ class MYPWA():
                               input_constant=self.input_constant,
                               input_parameter=self.input_parameter,
                               file_execute=self.project,
-                              nrandom=100)
+                              nrandom=50)
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
@@ -394,23 +394,28 @@ class MYPWA():
         outputx = []
         outputy = []
         unit = (limitr - limitl) / inter
+        # 重新更改一些参数
         use_parameter = copy.deepcopy(self.input_parameter)
+        use_option_value = copy.deepcopy(self.mywave.get_nomial_option(self.input_option_value))
+        use_option_value['strategy_level'] = 0
+        use_option_value['strategy_times'] = 10000
         for i in range(inter):
             use_value = limitl + i * unit
             use_parameter[parameter]['value'] = use_value
             use_parameter[parameter]['error'] = -1
-            data = dopwa(project_source_path=self.path_program_source,
-                         project_source_name=self.project,
-                         project_path=self.path_program_execute,
-                         project_name='%1.4f_scan' % (self.energy),
-                         root_path=self.path_root_input,
-                         root_name_data=self.root_data,
-                         root_name_mc=self.root_mc,
-                         input_option_string=self.input_option_string,
-                         input_option_value=self.mywave.get_nomial_option(self.input_option_value),
-                         input_constant=self.input_constant,
-                         input_parameter=use_parameter,
-                         file_execute=self.project)
+            data = dopwa_spread(project_source_path=self.path_program_source,
+                                project_source_name=self.project,
+                                project_path=self.path_program_execute,
+                                project_name='%1.4f_scan' % (self.energy),
+                                root_path=self.path_root_input,
+                                root_name_data=self.root_data,
+                                root_name_mc=self.root_mc,
+                                input_option_string=self.input_option_string,
+                                input_option_value=use_option_value,
+                                input_constant=self.input_constant,
+                                input_parameter=use_parameter,
+                                file_execute=self.project,
+                                nrandom=100)
             outputx.append(use_value)
             outputy.append(data.least_likelyhood)
         return [outputx, outputy]
