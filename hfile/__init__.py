@@ -2,6 +2,7 @@
 # Public package
 # Private package
 import os
+import re
 import shutil
 import pickle
 
@@ -27,6 +28,7 @@ def copy_file(source_path='',
               path='',
               name=''):
     '''
+    复制单个文件，如果目标对象存在，则覆盖\n
     复制文件为source_path/source_name\n
     目标文件为path/name\n
     '''
@@ -44,6 +46,7 @@ def copy_folder(source_path='',
                 path='',
                 name=''):
     '''
+    复制目标文件夹，如果目标文件夹存在，则删除原文件夹\n
     复制文件夹为source_path/source_name\n
     目标文件夹为path/name\n
     '''
@@ -53,7 +56,42 @@ def copy_folder(source_path='',
                     '%s/%s' % (path, name))
 
 ################################################################################
-# pickle 相关类
+# 文件列表类
+################################################################################
+
+
+def get_tree(source_path):
+    '''
+    遍历本地目录返回字典树
+    '''
+    output = {}
+    if(os.path.isfile(source_path)):
+        return 'file'
+    else:
+        files = os.listdir(source_path)
+        for file in files:
+            if(re.match(r'\.(.*)', file)): continue
+            output[file] = get_tree(os.path.join(source_path, file))
+        return output
+
+
+def my_get_tree(source_path):
+    '''
+    遍历本地目录返回字典树\n
+    来自网络的示例，有很多不需要的特性\n
+    '''
+    dirtree = {'children': []}
+    if os.path.isfile(source_path):
+        return {'name': os.path.basename(source_path), 'href': os.path.abspath(source_path)}
+    else:
+        dirtree['name'] = os.path.basename(source_path)
+        for item in os.listdir(source_path):
+            dirtree['spread'] = True
+            dirtree['children'].append(my_get_tree(os.path.join(source_path, item)))
+        return dirtree
+
+################################################################################
+# .pickle 相关类
 ################################################################################
 
 
@@ -68,7 +106,7 @@ def pkl_dump(filename, target, protocol=2):
         pickle.dump(target, outfile, protocol=protocol)
 
 ################################################################################
-# txt 相关类
+# .txt 相关类
 ################################################################################
 
 

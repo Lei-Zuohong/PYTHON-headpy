@@ -5,6 +5,7 @@ import re
 import sys
 import copy
 import numpy
+import random
 # Private package
 import headpy.hfile as hfile
 
@@ -158,9 +159,68 @@ def dopwa(project_source_path='',
     mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
     mydata.least_likelyhood = copy.deepcopy(read_likelyhood('output_fitresult.txt'))
     mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
+    # 删除大体积文件
+    os.system('rm %s'%(file_execute))
+    os.system('rm -r data')
     # 结束
     os.chdir(origin_path)
     return mydata
+
+
+def dopwa_spread(project_source_path='',
+                 project_source_name='',
+                 project_path='',
+                 project_name='',
+                 root_path='',
+                 root_name_data='',
+                 root_name_mc='',
+                 input_option_string={},
+                 input_option_value={},
+                 input_constant={},
+                 input_parameter={},
+                 file_execute='',
+                 nrandom=100):
+    # 产生随机初始参数放入列表
+    multi_input_parameter = []
+    for i in range(nrandom):
+        new_input_parameter = copy.deepcopy(input_parameter)
+        for parameter in new_input_parameter:
+            new_input_parameter[parameter]['error'] > 0
+            new_input_parameter[parameter]['value'] = random.uniform(new_input_parameter[parameter]['limitl'],
+                                                                     new_input_parameter[parameter]['limitr'])
+        multi_input_parameter.append(copy.deepcopy(new_input_parameter))
+    # 多次拟合得到最佳结果
+    best_likelyhood = 0
+    best_input_parameter = 0
+    for use_input_parameter in multi_input_parameter:
+        result = dopwa(project_source_path=project_source_path,
+                       project_source_name=project_source_name,
+                       project_path=project_path,
+                       project_name=project_name,
+                       root_path=root_path,
+                       root_name_data=root_name_data,
+                       root_name_mc=root_name_mc,
+                       input_option_string=input_option_string,
+                       input_option_value=input_option_value,
+                       input_constant=input_constant,
+                       input_parameter=use_input_parameter,
+                       file_execute=file_execute)
+        if(result.least_likelyhood < best_likelyhood):
+            best_likelyhood = result.least_likelyhood
+            best_input_parameter = use_input_parameter
+    output = dopwa(project_source_path=project_source_path,
+                   project_source_name=project_source_name,
+                   project_path=project_path,
+                   project_name=project_name,
+                   root_path=root_path,
+                   root_name_data=root_name_data,
+                   root_name_mc=root_name_mc,
+                   input_option_string=input_option_string,
+                   input_option_value=input_option_value,
+                   input_constant=input_constant,
+                   input_parameter=best_input_parameter,
+                   file_execute=file_execute)
+    return output
 
 
 class MYWAVE():
@@ -287,6 +347,7 @@ class MYPWA():
         data_nomial = self.get_fit_nomial()
         self.significance = {}
         for wave in self.mywave.wave_consider:
+            print('Checking wave name: %s'%(wave))
             data_check = dopwa(project_source_path=self.path_program_source,
                                project_source_name=self.project,
                                project_path=self.path_program_execute,
