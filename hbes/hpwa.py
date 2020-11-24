@@ -31,10 +31,10 @@ def write_parameter(file_name, dict_option):
     for key in keys:
         output += '{:<25}'.format(key)
         output += ' = '
-        output += '{:<15}'.format('%.6f'%(dict_option[key]['value']))
-        output += '{:<15}'.format('%.6f'%(dict_option[key]['error']))
-        output += '{:<15}'.format('%.6f'%(dict_option[key]['limitl']))
-        output += '{:<15}'.format('%.6f'%(dict_option[key]['limitr']))
+        output += '{:<15}'.format('%.6f' % (dict_option[key]['value']))
+        output += '{:<15}'.format('%.6f' % (dict_option[key]['error']))
+        output += '{:<15}'.format('%.6f' % (dict_option[key]['limitl']))
+        output += '{:<15}'.format('%.6f' % (dict_option[key]['limitr']))
         output += '\n'
     with open(file_name, 'w') as outfile:
         outfile.write(output)
@@ -185,9 +185,9 @@ def dopwa_spread(project_source_path='',
     for i in range(nrandom):
         new_input_parameter = copy.deepcopy(input_parameter)
         for parameter in new_input_parameter:
-            new_input_parameter[parameter]['error'] > 0
-            new_input_parameter[parameter]['value'] = random.uniform(new_input_parameter[parameter]['limitl'],
-                                                                     new_input_parameter[parameter]['limitr'])
+            if(new_input_parameter[parameter]['error'] > 0):
+                new_input_parameter[parameter]['value'] = random.uniform(new_input_parameter[parameter]['limitl'],
+                                                                         new_input_parameter[parameter]['limitr'])
         multi_input_parameter.append(copy.deepcopy(new_input_parameter))
     # 多次拟合得到最佳结果
     best_likelyhood = 0
@@ -208,6 +208,7 @@ def dopwa_spread(project_source_path='',
         if(result.least_likelyhood < best_likelyhood):
             best_likelyhood = result.least_likelyhood
             best_input_parameter = use_input_parameter
+        del result
     output = dopwa(project_source_path=project_source_path,
                    project_source_name=project_source_name,
                    project_path=project_path,
