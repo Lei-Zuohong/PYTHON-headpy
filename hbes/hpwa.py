@@ -397,8 +397,10 @@ class MYPWA():
         # 重新更改一些参数
         use_parameter = copy.deepcopy(self.input_parameter)
         use_option_value = copy.deepcopy(self.mywave.get_nomial_option(self.input_option_value))
+        use_option_value['multifit_times'] = 20  # 50
         use_option_value['strategy_level'] = 0
-        use_option_value['strategy_times'] = 10000
+        use_option_value['strategy_times'] = 5000
+        nrandom = 10  # 10
         for i in range(inter):
             use_value = limitl + i * unit
             use_parameter[parameter]['value'] = use_value
@@ -415,7 +417,7 @@ class MYPWA():
                                 input_constant=self.input_constant,
                                 input_parameter=use_parameter,
                                 file_execute=self.project,
-                                nrandom=100)
+                                nrandom=nrandom)
             outputx.append(use_value)
             outputy.append(data.least_likelyhood)
         return [outputx, outputy]
