@@ -387,20 +387,17 @@ class MYPWA():
                 outfile.write('\n')
 
     def get_scan(self,
-                 parameter='',
-                 limitl=0,
-                 limitr=1,
-                 inter=100):
+                 parameter='', limitl=0, limitr=1, inter=100):
         outputx = []
         outputy = []
         unit = (limitr - limitl) / inter
         # 重新更改一些参数
         use_parameter = copy.deepcopy(self.input_parameter)
         use_option_value = copy.deepcopy(self.mywave.get_nomial_option(self.input_option_value))
-        use_option_value['multifit_times'] = 20  # 50
+        use_option_value['multifit_times'] = 20
         use_option_value['strategy_level'] = 0
         use_option_value['strategy_times'] = 5000
-        nrandom = 10  # 10
+        nrandom = 10
         for i in range(inter):
             use_value = limitl + i * unit
             use_parameter[parameter]['value'] = use_value
@@ -421,6 +418,49 @@ class MYPWA():
             outputx.append(use_value)
             outputy.append(data.least_likelyhood)
         return [outputx, outputy]
+
+    def get_scan_resonance(self,
+                               wave='',
+                               parameter1='', limitl1=0, limitr1=1, inter1=100,
+                               parameter2='', limitl2=0, limitr2=1, inter2=100):
+        outputx = []
+        outputy = []
+        outputz = []
+        unit1 = (limitr1 - limitl1) / inter1
+        unit2 = (limitr2 - limitl2) / inter1
+        # 重新更改一些参数
+        use_parameter = copy.deepcopy(self.input_parameter)
+        use_constant = copy.deepcopy(self.input_constant)
+        use_option_value = copy.deepcopy(self.mywave.get_check_option(self.input_option_value, wave))
+        use_option_value['multifit_times'] = 20
+        use_option_value['strategy_level'] = 0
+        use_option_value['strategy_times'] = 5000
+        nrandom = 10
+        for i in range(inter1):
+            for j in range(inter2):
+                use_value1 = limitl1 + unit1 * i
+                use_value2 = limitl2 + unit2 * j
+                use_constant[parameter1]['value'] = use_value1
+                use_constant[parameter1]['error'] = -1
+                use_constant[parameter2]['value'] = use_value2
+                use_constant[parameter2]['error'] = -1
+                data = dopwa_spread(project_source_path=self.path_program_source,
+                                    project_source_name=self.project,
+                                    project_path=self.path_program_execute,
+                                    project_name='%1.4f_scan' % (self.energy),
+                                    root_path=self.path_root_input,
+                                    root_name_data=self.root_data,
+                                    root_name_mc=self.root_mc,
+                                    input_option_string=self.input_option_string,
+                                    input_option_value=use_option_value,
+                                    input_constant=use_constant,
+                                    input_parameter=use_parameter,
+                                    file_execute=self.project,
+                                    nrandom=nrandom)
+                outputx.append(use_value1)
+                outputy.append(use_value2)
+                outputz.append(data.least_likelyhood)
+        return [outputx, outputy, outputz]
 
     # Processing
 
