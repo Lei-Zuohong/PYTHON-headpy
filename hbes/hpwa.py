@@ -279,6 +279,66 @@ class MYWAVE():
         return output_dict
 
 
+class MYSCANER():
+    def __init__(self,
+                 l1=0., r1=0., inter1=10,
+                 l2=0., r2=0., inter2=10):
+        self.l1 = float(l1)
+        self.r1 = float(r1)
+        self.inter1 = int(inter1)
+        self.l2 = float(l2)
+        self.r2 = float(r2)
+        self.inter2 = int(inter2)
+        # 计算输入参数
+        self.d1 = (self.r1 - self.l1) / self.inter1
+        self.d2 = (self.r2 - self.l2) / self.inter2
+        # 一维坐标序列
+        self.plot1dx = numpy.zeros(self.inter1)
+        self.plot1dy = numpy.zeros(self.inter2)
+        for i1 in range(self.inter1):
+            self.plot1dx[i1] = self.l1 + self.d1 * i1
+        for i2 in range(self.inter2):
+            self.plot1dy[i2] = self.l2 + self.d2 * i2
+        # 二维坐标序列
+        self.plot2dx = numpy.zeros([self.inter1, self.inter2])
+        self.plot2dy = numpy.zeros([self.inter1, self.inter2])
+        self.plot2dz = numpy.zeros([self.inter1, self.inter2])
+        for i1 in range(self.inter1):
+            for i2 in range(self.inter2):
+                self.plot2dx[i1][i2] = self.l1 + self.d1 * i1
+                self.plot2dy[i1][i2] = self.l2 + self.d2 * i2
+
+    def get_xy(self):
+        outputx = copy.deepcopy(self.plot1dx)
+        outputy = copy.deepcopy(self.plot1dy)
+        return outputx, outputy
+
+    def set_z(self, data):
+        for i1 in range(self.inter1):
+            for i2 in range(self.inter2):
+                self.plot2dz[i1][i2] = data[i1][i2]
+
+    def get_optimize_x(self):
+        outputz = numpy.zeros(self.inter1)
+        for i1 in range(self.inter1):
+            temp = 0
+            for i2 in range(self.inter2):
+                if(self.plot2dz[i1][i2] < temp):
+                    temp = self.plot2dz[i1][i2]
+            outputz[i1] = temp
+        return outputz
+
+    def get_optimize_y(self):
+        outputz = numpy.zeros(self.inter1)
+        for i2 in range(self.inter2):
+            temp = 0
+            for i1 in range(self.inter1):
+                if(self.plot2dz[i1][i2] < temp):
+                    temp = self.plot2dz[i1][i2]
+            outputz[i2] = temp
+        return outputz
+
+
 class MYPWA():
 
     def __init__(self, project):
@@ -420,29 +480,28 @@ class MYPWA():
         return [outputx, outputy]
 
     def get_scan_resonance(self,
-                               wave='',
-                               parameter1='', limitl1=0, limitr1=1, inter1=100,
-                               parameter2='', limitl2=0, limitr2=1, inter2=100):
-        outputx = []
-        outputy = []
-        outputz = []
-        unit1 = (limitr1 - limitl1) / inter1
-        unit2 = (limitr2 - limitl2) / inter1
+                           wave='',
+                           parameter1='', limitl1=0, limitr1=1, inter1=100,
+                           parameter2='', limitl2=0, limitr2=1, inter2=100):
+        myscaner = MYSCANER(l1=limitl1, r1=limitr1, inter1=inter1,
+                            l2=limitl2, r2=limitr2, inter2=inter2)
+        listx, listy = myscaner.get_xy()
         # 重新更改一些参数
         use_parameter = copy.deepcopy(self.input_parameter)
         use_constant = copy.deepcopy(self.input_constant)
         use_option_value = copy.deepcopy(self.mywave.get_check_option(self.input_option_value, wave))
-        use_option_value['multifit_times'] = 20
-        use_option_value['strategy_level'] = 0
-        use_option_value['strategy_times'] = 5000
-        nrandom = 10
-        for i in range(inter1):
-            for j in range(inter2):
-                use_value1 = limitl1 + unit1 * i
-                use_value2 = limitl2 + unit2 * j
-                use_constant[parameter1]['value'] = use_value1
+        use_option_value['multifit_times'] = 20  # 20
+        use_option_value['strategy_level'] = 0  # 0
+        use_option_value['strategy_times'] = 5000  # 5000
+        nrandom = 10  # 10
+        # 进行拟合
+        outputz = numpy.zeros([int(inter1), int(inter2)])
+        for i1, value1 in enumerate(listx):
+            for i2, value2 in enumerate(listy):
+                print('Iteration: %.4f %.4f' % (value1, value2))
+                use_constant[parameter1]['value'] = value1
                 use_constant[parameter1]['error'] = -1
-                use_constant[parameter2]['value'] = use_value2
+                use_constant[parameter2]['value'] = value2
                 use_constant[parameter2]['error'] = -1
                 data = dopwa_spread(project_source_path=self.path_program_source,
                                     project_source_name=self.project,
@@ -457,10 +516,9 @@ class MYPWA():
                                     input_parameter=use_parameter,
                                     file_execute=self.project,
                                     nrandom=nrandom)
-                outputx.append(use_value1)
-                outputy.append(use_value2)
-                outputz.append(data.least_likelyhood)
-        return [outputx, outputy, outputz]
+                outputz[i1][i2] = data.least_likelyhood
+        myscaner.set_z(outputz)
+        return myscaner
 
     # Processing
 
