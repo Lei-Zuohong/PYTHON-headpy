@@ -163,6 +163,16 @@ class SELECTER_value:
         return output
 
 
+def significance_no_root(value=10, num_parameter=1):
+    execute_path = os.getenv("SIGNIFICANCE")
+    execute_path = '%s/significance' % (execute_path)
+    os.system('%s %f %d | tee significance.txt' % (execute_path, value, num_parameter))
+    text = hfile.txt_read('significance.txt')
+    output = float(text)
+    os.system('rm significance.txt')
+    return output
+
+
 if(root_exit == 1):
     # 计算函数
 
