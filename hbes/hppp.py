@@ -94,7 +94,7 @@ def selecters():
                                     title=r'#chi^{2}')
     #
     output['a_pippim'] = hnew.SELECTER(title=r'#theta(Track^{+},Track^{-})')
-    output['a_pippim'].set_by_edge(0, 170)
+    output['a_pippim'].set_by_edge(0, 160)
     output['a_pippim'].set_by_edge_show(100, 180)
     output['a_pippim'].inter = 80
     output['b_pippim'] = output['a_pippim']
