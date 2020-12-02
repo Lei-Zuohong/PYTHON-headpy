@@ -85,7 +85,7 @@ def read_matrix(file_name):
     return output
 
 
-def read_likelyhood(file_name):
+def read_likelihood(file_name):
     '读取：Best likelihood: value 类txt信息'
     output = 0
     lines = hfile.txt_readlines(file_name)
@@ -142,7 +142,7 @@ def dopwa(project_source_path='',
     # 读取末值文件
     mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
     mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
-    mydata.least_likelyhood = copy.deepcopy(read_likelyhood('output_fitresult.txt'))
+    mydata.least_likelihood = copy.deepcopy(read_likelihood('output_fitresult.txt'))
     mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
     # 删除大体积文件
     os.system('rm %s' % (file_execute))
@@ -175,7 +175,7 @@ def dopwa_spread(project_source_path='',
                                                                          new_input_parameter[parameter]['limitr'])
         multi_input_parameter.append(copy.deepcopy(new_input_parameter))
     # 多次拟合得到最佳结果
-    best_likelyhood = 0
+    best_likelihood = 0
     best_input_parameter = 0
     for use_input_parameter in multi_input_parameter:
         result = dopwa(project_source_path=project_source_path,
@@ -190,8 +190,8 @@ def dopwa_spread(project_source_path='',
                        input_constant=input_constant,
                        input_parameter=use_input_parameter,
                        file_execute=file_execute)
-        if(result.least_likelyhood < best_likelyhood):
-            best_likelyhood = result.least_likelyhood
+        if(result.least_likelihood < best_likelihood):
+            best_likelihood = result.least_likelihood
             best_input_parameter = copy.deepcopy(use_input_parameter)
         del result
     output = dopwa(project_source_path=project_source_path,
@@ -221,23 +221,23 @@ class MYDATA():
 
         self.fraction = [[]]
 
-        self.least_likelyhood = 0
+        self.least_likelihood = 0
 
 
 class MYWAVE():
-    def __init__(self, wave_possible=[], wave_consider=[], wave_nomial=[], wave_save=[]):
+    def __init__(self, wave_possible=[], wave_consider=[], wave_nominal=[], wave_save=[]):
         self.wave_possible = copy.deepcopy(wave_possible)
         self.wave_consider = copy.deepcopy(wave_consider)
-        self.wave_nomial = copy.deepcopy(wave_nomial)
+        self.wave_nominal = copy.deepcopy(wave_nominal)
         self.wave_save = copy.deepcopy(wave_save)
 
-    def get_nomial_option(self, input_option_value):
+    def get_nominal_option(self, input_option_value):
         '''
         字典形式输出一个wave是否被添加
         '''
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
-            if(wave in self.wave_nomial):
+            if(wave in self.wave_nominal):
                 output['add_%s' % (wave)] = 1
             else:
                 output['add_%s' % (wave)] = 0
@@ -249,7 +249,7 @@ class MYWAVE():
         '''
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
-            if(wave in self.wave_nomial):
+            if(wave in self.wave_nominal):
                 output['add_%s' % (wave)] = 1
             else:
                 output['add_%s' % (wave)] = 0
@@ -265,11 +265,11 @@ class MYWAVE():
         output_wave = []
         # 按顺序整合wave
         for wave in self.wave_possible:
-            if(wave in self.wave_nomial):
+            if(wave in self.wave_nominal):
                 output_wave.append(wave)
         # 检测矩阵长度是否一致
         length = len(input_list)
-        if(length != len(self.wave_nomial)):
+        if(length != len(self.wave_nominal)):
             print("Error: Fraction matrix with wrong length!")
             exit()
         for i in range(length):
@@ -376,10 +376,10 @@ class MYPWA():
     def set_constant(self, input_constant):
         self.input_constant = copy.deepcopy(input_constant)
 
-    def set_waves(self, wave_possible=[], wave_consider=[], wave_nomial=[], wave_save=[]):
+    def set_waves(self, wave_possible=[], wave_consider=[], wave_nominal=[], wave_save=[]):
         self.mywave = MYWAVE(wave_possible=wave_possible,
                              wave_consider=wave_consider,
-                             wave_nomial=wave_nomial,
+                             wave_nominal=wave_nominal,
                              wave_save=wave_save)
 
     def set_output_step(self, file_name):
@@ -388,32 +388,32 @@ class MYPWA():
             outfile.write('Fitting start:\n\n')
 
     # Fitting
-    def get_fit_nomial(self):
+    def get_fit_nominal(self):
         output = dopwa(project_source_path=self.path_program_source,
                        project_source_name=self.project,
                        project_path=self.path_program_execute,
-                       project_name='%1.4f_nomial' % (self.energy),
+                       project_name='%1.4f_nominal' % (self.energy),
                        root_path=self.path_root_input,
                        root_name_data=self.root_data,
                        root_name_mc=self.root_mc,
                        input_option_string=self.input_option_string,
-                       input_option_value=self.mywave.get_nomial_option(self.input_option_value),
+                       input_option_value=self.mywave.get_nominal_option(self.input_option_value),
                        input_constant=self.input_constant,
                        input_parameter=self.input_parameter,
                        file_execute=self.project)
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
-    def get_fit_nomial_spread(self):
+    def get_fit_nominal_spread(self):
         output = dopwa_spread(project_source_path=self.path_program_source,
                               project_source_name=self.project,
                               project_path=self.path_program_execute,
-                              project_name='%1.4f_nomial' % (self.energy),
+                              project_name='%1.4f_nominal' % (self.energy),
                               root_path=self.path_root_input,
                               root_name_data=self.root_data,
                               root_name_mc=self.root_mc,
                               input_option_string=self.input_option_string,
-                              input_option_value=self.mywave.get_nomial_option(self.input_option_value),
+                              input_option_value=self.mywave.get_nominal_option(self.input_option_value),
                               input_constant=self.input_constant,
                               input_parameter=self.input_parameter,
                               file_execute=self.project,
@@ -422,7 +422,7 @@ class MYPWA():
         return output
 
     def get_test_significance(self):
-        data_nomial = self.get_fit_nomial()
+        data_nominal = self.get_fit_nominal()
         self.significance = {}
         for wave in self.mywave.wave_consider:
             print('Checking wave name: %s' % (wave))
@@ -438,7 +438,7 @@ class MYPWA():
                                input_constant=self.input_constant,
                                input_parameter=self.input_parameter,
                                file_execute=self.project)
-            self.significance[wave] = data_nomial.least_likelyhood - data_check.least_likelyhood
+            self.significance[wave] = data_nominal.least_likelihood - data_check.least_likelihood
         if(hasattr(self, 'output_step')):
             with open(self.output_step, 'a') as outfile:
                 outfile.write('Check significance:\n')
@@ -453,7 +453,7 @@ class MYPWA():
         unit = (limitr - limitl) / inter
         # 重新更改一些参数
         use_parameter = copy.deepcopy(self.input_parameter)
-        use_option_value = copy.deepcopy(self.mywave.get_nomial_option(self.input_option_value))
+        use_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         use_option_value['multifit_times'] = 20
         use_option_value['strategy_level'] = 0
         use_option_value['strategy_times'] = 5000
@@ -476,7 +476,7 @@ class MYPWA():
                                 file_execute=self.project,
                                 nrandom=nrandom)
             outputx.append(use_value)
-            outputy.append(data.least_likelyhood)
+            outputy.append(data.least_likelihood)
         return [outputx, outputy]
 
     def get_scan_resonance(self,
@@ -516,7 +516,7 @@ class MYPWA():
                                     input_parameter=use_parameter,
                                     file_execute=self.project,
                                     nrandom=nrandom)
-                outputz[i1][i2] = data.least_likelyhood
+                outputz[i1][i2] = data.least_likelihood
         myscaner.set_z(outputz)
         return myscaner
 
@@ -528,23 +528,23 @@ class MYPWA():
         check_plus = 1
         for wave in self.significance:
             if(wave in self.mywave.wave_save): continue
-            if(wave in self.mywave.wave_nomial and self.significance[wave] < 0 and self.significance[wave] > -14.372):
+            if(wave in self.mywave.wave_nominal and self.significance[wave] < 0 and self.significance[wave] > -14.372):
                 check_minus = 0
-            if(wave not in self.mywave.wave_nomial and self.significance[wave] > 14.372):
+            if(wave not in self.mywave.wave_nominal and self.significance[wave] > 14.372):
                 check_plus = 0
         check = check_minus * check_plus
         return check
 
     def adjust_significance(self):
-        '根据significance调整mywave的wave_nomial列表'
+        '根据significance调整mywave的wave_nominal列表'
         # 得到检测结果
         check_minus = 1
         check_plus = 1
         for wave in self.significance:
             if(wave in self.mywave.wave_save): continue
-            if(wave in self.mywave.wave_nomial and self.significance[wave] < 0 and self.significance[wave] > -14.372):
+            if(wave in self.mywave.wave_nominal and self.significance[wave] < 0 and self.significance[wave] > -14.372):
                 check_minus = 0
-            if(wave not in self.mywave.wave_nomial and self.significance[wave] > 14.372):
+            if(wave not in self.mywave.wave_nominal and self.significance[wave] > 14.372):
                 check_plus = 0
         # 先考虑减去波
         if(check_minus == 0):
@@ -552,32 +552,32 @@ class MYPWA():
             save_value = -9999
             for wave in self.significance:
                 if(wave in self.mywave.wave_save): continue
-                if(wave not in self.mywave.wave_nomial): continue
+                if(wave not in self.mywave.wave_nominal): continue
                 if(self.significance[wave] > 0): continue
                 if (self.significance[wave] > save_value):
                     save_key = wave
                     save_value = self.significance[wave]
-            new_nomial = []
-            for wave in self.mywave.wave_nomial:
+            new_nominal = []
+            for wave in self.mywave.wave_nominal:
                 if(wave != save_key):
-                    new_nomial.append(wave)
-            self.mywave.wave_nomial = new_nomial
+                    new_nominal.append(wave)
+            self.mywave.wave_nominal = new_nominal
         # 再考虑加上波
         elif(check_plus == 0):
             save_key = ''
             save_value = 0
             for wave in self.significance:
                 if(wave in self.mywave.wave_save): continue
-                if(wave in self.mywave.wave_nomial): continue
+                if(wave in self.mywave.wave_nominal): continue
                 if(self.significance[wave] < 0): continue
                 if (self.significance[wave] > save_value):
                     save_key = wave
                     save_value = self.significance[wave]
-            self.mywave.wave_nomial.append(save_key)
+            self.mywave.wave_nominal.append(save_key)
         if(hasattr(self, 'output_step')):
             with open(self.output_step, 'a') as outfile:
-                outfile.write('Adjust nomial waves:\n')
-                for wave in self.mywave.wave_nomial:
+                outfile.write('Adjust nominal waves:\n')
+                for wave in self.mywave.wave_nominal:
                     outfile.write('{:<25}\n'.format(wave))
                 outfile.write('\n')
 
