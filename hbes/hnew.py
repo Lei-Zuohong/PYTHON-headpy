@@ -173,6 +173,12 @@ def significance_no_root(value=10, num_parameter=1):
     return output
 
 
+def hep_sub(file, command):
+    hfile.txt_write(file, command)
+    os.system('chmod u=rwx,go=rx %s' % (file))
+    os.system('hep_sub %s' % (file))
+
+
 if(root_exit == 1):
     # 计算函数
 
@@ -216,19 +222,22 @@ if(root_exit == 1):
         # 初始化输出字典
         output = {}
         for branch in kwargs['branchs']:
-            output[branch] = numpy.zeros(num)
+            output[branch] = []
         # 输入字典
         for entry in range(num):
             ttree.GetEntry(entry)
             for branch in kwargs['branchs']:
-                exec("output[branch][entry] = ttree.%s" % (branch))
+                exec("output[branch].append(ttree.%s)" % (branch))
         # 输出字典
+        for branch in kwargs['branchs']:
+            output[branch] = numpy.array(output[branch])
         return output
 
     def root_pkl(func,
                  file_root='',
                  tree='',
                  branchs=[],
+                 tree_cut=0,
                  file_pkl=''):
         '''
         file_root: root文件名\n
@@ -242,14 +251,16 @@ if(root_exit == 1):
         # 读取root至dict
         output = func(file_root=file_root,
                       tree=tree,
-                      branchs=branchs)
+                      branchs=branchs,
+                      tree_cut=tree_cut)
         # 写入pickle文件
         hfile.pkl_dump(file_pkl, output)
 
     def dump(func,
              folder_root='',
              tree='',
-             branchs=[]):
+             branchs=[],
+             tree_cut=0):
         '''
         folder_root: 存放root文件的文件夹\n
         tree: tree名\n
@@ -270,7 +281,8 @@ if(root_exit == 1):
                          file_root='%s/%s' % (folder_root, file),
                          tree=tree,
                          branchs=branchs,
-                         file_pkl='%s/%s_%s.pkl' % (folder_root, name, tree))
+                         file_pkl='%s/%s_%s.pkl' % (folder_root, name, tree),
+                         tree_cut=tree_cut)
         hprint.pstar()
 
     # root 写入类

@@ -25,19 +25,25 @@ unit_imag = 0.0 + 1.0j
 
 
 def fundecaymomentum(mr_2, m1_2, m2_2):
-    mr = mr_2**(1 / 2)
+    mr = math.sqrt(mr_2)
+    m1 = math.sqrt(m1_2)
+    m2 = math.sqrt(m2_2)
     poly = mr_2**2 + m1_2**2 + m2_2**2 - 2 * m1_2 * m2_2 - 2 * mr_2 * m2_2 - 2 * m1_2 * mr_2
-    output = poly**(1 / 2) / (2 * mr)
-    if(m1_2**(1 / 2) + m2_2**(1 / 2) > mr):
+    if(poly < 0.0 and poly > -0.00001): poly = 0.0
+    output = math.sqrt(poly) / (2 * mr)
+    if(m1 + m2 > mr):
         output = 0.0
     return output
 
 
 def fundecaymomentum2(mr_2, m1_2, m2_2):
-    mr = mr_2**(1 / 2)
+    mr = math.sqrt(mr_2)
+    m1 = math.sqrt(m1_2)
+    m2 = math.sqrt(m2_2)
     poly = mr_2**2 + m1_2**2 + m2_2**2 - 2 * m1_2 * m2_2 - 2 * mr_2 * m2_2 - 2 * m1_2 * mr_2
+    if(poly < 0.0 and poly > -0.00001): poly = 0.0
     output = poly / (4 * mr_2)
-    if(m1_2**(1 / 2) + m2_2**(1 / 2) > mr):
+    if(m1 + m2 > mr):
         output = 0.0
     return output
 
@@ -53,20 +59,23 @@ def dh(m0, q0):
 
 
 def f(m0, sx, q0, q):
-    m = sx**(1 / 2)
+    m = math.sqrt(sx)
     output = m0 * m0 / (q0 * q0 * q0) * (q * q * (h(m, q) - h(m0, q0)) + (m0 * m0 - sx) * q0 * q0 * dh(m0, q0))
     return output
 
 
 def d(m0, q0):
-    output = 3.0 / pi * mpipm * mpipm / (q0 * q0) * math.log((m0 + 2.0 * q0) / (2.0 * mpipm)) + m0 / (2.0 * pi * q0) - (mpipm * mpim * m0) / (pi * q0 * q0 * q0)
+    part1 = 3.0 / pi * mpipm * mpipm / (q0 * q0) * math.log((m0 + 2.0 * q0) / (2.0 * mpipm))
+    part2 = m0 / (2.0 * pi * q0)
+    part3 = (mpipm * mpim * m0) / (pi * q0 * q0 * q0)
+    output = part1 + part2 - part3
     return output
 
 
 def wid(mass, sa, sb, sc, r, l):
     widm = 1.0
     sa0 = mass * mass
-    m = sa**(1 / 2)
+    m = math.sqrt(sa)
     q = fundecaymomentum2(sa, sb, sc)
     q0 = fundecaymomentum2(sa0, sb, sc)
     z = q * r * r
@@ -80,7 +89,7 @@ def wid(mass, sa, sb, sc, r, l):
         F = math.sqrt((9.0 + 3.0 * z0 + z0 * z0) / (9.0 + 3.0 * z + z * z))
     t = math.sqrt(q / q0)
     for i in range(2 * l + 1):
-        widm = wid * t
+        widm = widm * t
     widm = widm * (mass / m * F * F)
     return widm
 
@@ -204,7 +213,7 @@ def epsilon(A, B, C, D):
         if(B > C): g += 1
         if(B > D): g += 1
         if(C > D): g += 1
-        output = (-1.0)**(g)
+        output = pow(-1.0, g)
     return output
 
 
@@ -353,19 +362,19 @@ def amplitude(v1, v2, v3,
                 t3_rhoz_pip_pim[i][j][k] = b3_rhoz_pip_pim * (vr_1_2[i] * vr_1_2[j] * vr_1_2[k] - 0.2 * scalar(vr_1_2, vr_1_2) * (gelta[i][j] * vr_1_2[k] + gelta[j][k] * vr_1_2[i] + gelta[k][i] * vr_1_2[j]))
     # endregion
     # region set propagator
-    prop_rho770pi_p = kernelGS(s13, hconst.rho770.mass, hconst.rho770.width, s1, s3, 3.0, 1)
-    prop_rho770pi_m = kernelGS(s23, hconst.rho770.mass, hconst.rho770.width, s2, s3, 3.0, 1)
-    prop_rho770pi_z = kernelGS(s12, hconst.rho770.mass, hconst.rho770.width, s1, s2, 3.0, 1)
-    prop_rho1450pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1450.mass, hconst.rho1450.width, s1, s3, 1)
-    prop_rho1450pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1450.mass, hconst.rho1450.width, s2, s3, 1)
-    prop_rho1450pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1450.mass, hconst.rho1450.width, s1, s2, 1)
-    prop_rho1700pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1700.mass, hconst.rho1700.width, s1, s3, 1)
-    prop_rho1700pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1700.mass, hconst.rho1700.width, s2, s3, 1)
-    prop_rho1700pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1700.mass, hconst.rho1700.width, s1, s2, 1)
-    prop_rho1690pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1690.mass, hconst.rho1690.width, s1, s3, 3)
-    prop_rho1690pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1690.mass, hconst.rho1690.width, s2, s3, 3)
-    prop_rho1690pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1690.mass, hconst.rho1690.width, s1, s2, 3)
-    prop_omega782pi = kernelmassdependentbreitwigner(s12, hconst.omega782.mass, hconst.omega782.width, s1, s2, 1)
+    prop_rho770pi_p = kernelGS(s13, hconst.rho770.mass, hconst.rho770.width, mpip**2, mpiz**2, 3.0, 1)
+    prop_rho770pi_m = kernelGS(s23, hconst.rho770.mass, hconst.rho770.width, mpim**2, mpiz**2, 3.0, 1)
+    prop_rho770pi_z = kernelGS(s12, hconst.rho770.mass, hconst.rho770.width, mpip**2, mpim**2, 3.0, 1)
+    prop_rho1450pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1450.mass, hconst.rho1450.width, mpip**2, mpiz**2, 1)
+    prop_rho1450pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1450.mass, hconst.rho1450.width, mpim**2, mpiz**2, 1)
+    prop_rho1450pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1450.mass, hconst.rho1450.width, mpip**2, mpim**2, 1)
+    prop_rho1700pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1700.mass, hconst.rho1700.width, mpip**2, mpiz**2, 1)
+    prop_rho1700pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1700.mass, hconst.rho1700.width, mpim**2, mpiz**2, 1)
+    prop_rho1700pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1700.mass, hconst.rho1700.width, mpip**2, mpim**2, 1)
+    prop_rho1690pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1690.mass, hconst.rho1690.width, mpip**2, mpiz**2, 3)
+    prop_rho1690pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1690.mass, hconst.rho1690.width, mpim**2, mpiz**2, 3)
+    prop_rho1690pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1690.mass, hconst.rho1690.width, mpip**2, mpim**2, 3)
+    prop_omega782pi = kernelmassdependentbreitwigner(s12, hconst.omega782.mass, hconst.omega782.width, mpip**2, mpim**2, 1)
     # endregion
     # region set fCF fCP pa fu
     nwaves = 5
