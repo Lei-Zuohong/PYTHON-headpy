@@ -165,6 +165,7 @@ def dopwa_spread(project_source_path='',
                  input_parameter={},
                  file_execute='',
                  nrandom=100):
+    '进行多次拟合操作，返回结果类'
     # 产生随机初始参数放入列表
     multi_input_parameter = []
     for i in range(nrandom):
@@ -207,6 +208,68 @@ def dopwa_spread(project_source_path='',
                    input_parameter=best_input_parameter,
                    file_execute=file_execute)
     return output
+
+
+def dopwa_amplitude(project_source_path='',
+                    project_source_name='',
+                    project_path='',
+                    project_name='',
+                    root_path='',
+                    root_name_data='',
+                    root_name_mc='',
+                    input_option_string={},
+                    input_option_value={},
+                    input_constant={},
+                    input_parameter={},
+                    file_execute=''):
+    '进行一次拟合操作，计算输入数据的振幅'
+    origin_path = os.getcwd()
+    mydata = MYDATA()
+    # 拷贝资料文件
+    hfile.copy_folder(source_path=project_source_path,
+                      source_name=project_source_name,
+                      path=project_path,
+                      name=project_name)
+    # 拷贝root文件
+    hfile.copy_file(source_path=root_path,
+                    source_name=root_name_data,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='data.root')
+    hfile.copy_file(source_path=root_path,
+                    source_name=root_name_mc,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='mc.root')
+    # 变更执行地址
+    os.chdir('%s/%s' % (project_path, project_name))
+    # 更改临时初值文件
+    new_input_option_value = copy.deepcopy(input_option_value)
+    new_input_parameter = copy.deepcopy(input_parameter)
+    new_input_option_value['do_fit_minuit'] = 0
+    new_input_option_value['do_output_amplitude'] = 1
+    for parameter in new_input_parameter:
+        new_input_parameter[parameter]['error'] = -1
+    # 写入初值文件
+    write_option(file_name='input_option_string.txt', dict_option=input_option_string)
+    write_option(file_name='input_option_value.txt', dict_option=new_input_option_value)
+    write_parameter(file_name='input_constant.txt', dict_option=input_constant)
+    write_parameter(file_name='input_parameter.txt', dict_option=new_input_parameter)
+    mydata.option_string = copy.deepcopy(input_option_string)
+    mydata.option_value = copy.deepcopy(input_option_value)
+    mydata.input_constant = copy.deepcopy(input_constant)
+    mydata.input_parameter = copy.deepcopy(input_parameter)
+    # 开始执行
+    os.system('./%s | tee log.txt' % (file_execute))
+    # 读取末值文件
+    mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
+    mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
+    mydata.least_likelihood = copy.deepcopy(read_likelihood('output_fitresult.txt'))
+    mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
+    # 删除大体积文件
+    os.system('rm %s' % (file_execute))
+    os.system('rm -r data')
+    # 结束
+    os.chdir(origin_path)
+    return mydata
 
 
 class MYDATA():
@@ -418,6 +481,22 @@ class MYPWA():
                               input_parameter=self.input_parameter,
                               file_execute=self.project,
                               nrandom=50)
+        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
+        return output
+
+    def get_fit_amplitude(self):
+        output = dopwa_amplitude(project_source_path=self.path_program_source,
+                                 project_source_name=self.project,
+                                 project_path=self.path_program_execute,
+                                 project_name='%1.4f_amplitude' % (self.energy),
+                                 root_path=self.path_root_input,
+                                 root_name_data=self.root_data,
+                                 root_name_mc=self.root_mc,
+                                 input_option_string=self.input_option_string,
+                                 input_option_value=self.mywave.get_nominal_option(self.input_option_value),
+                                 input_constant=self.input_constant,
+                                 input_parameter=self.input_parameter,
+                                 file_execute=self.project)
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
