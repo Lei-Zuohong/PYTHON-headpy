@@ -101,8 +101,9 @@ def dopwa(project_source_path='',
           project_source_name='',
           project_path='',
           project_name='',
-          root_path='',
+          root_path_data='',
           root_name_data='',
+          root_path_mc='',
           root_name_mc='',
           input_option_string={},
           input_option_value={},
@@ -118,11 +119,11 @@ def dopwa(project_source_path='',
                       path=project_path,
                       name=project_name)
     # 拷贝root文件
-    hfile.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path_data,
                     source_name=root_name_data,
                     path='%s/%s/%s' % (project_path, project_name, 'data'),
                     name='data.root')
-    hfile.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path_mc,
                     source_name=root_name_mc,
                     path='%s/%s/%s' % (project_path, project_name, 'data'),
                     name='mc.root')
@@ -183,8 +184,9 @@ def dopwa_spread(project_source_path='',
                        project_source_name=project_source_name,
                        project_path=project_path,
                        project_name=project_name,
-                       root_path=root_path,
+                       root_path_data=root_path,
                        root_name_data=root_name_data,
+                       root_path_mc=root_path,
                        root_name_mc=root_name_mc,
                        input_option_string=input_option_string,
                        input_option_value=input_option_value,
@@ -199,8 +201,9 @@ def dopwa_spread(project_source_path='',
                    project_source_name=project_source_name,
                    project_path=project_path,
                    project_name=project_name,
-                   root_path=root_path,
+                   root_path_data=root_path,
                    root_name_data=root_name_data,
+                   root_path_mc=root_path,
                    root_name_mc=root_name_mc,
                    input_option_string=input_option_string,
                    input_option_value=input_option_value,
@@ -214,8 +217,9 @@ def dopwa_amplitude(project_source_path='',
                     project_source_name='',
                     project_path='',
                     project_name='',
-                    root_path='',
+                    root_path_data='',
                     root_name_data='',
+                    root_path_mc='',
                     root_name_mc='',
                     input_option_string={},
                     input_option_value={},
@@ -231,11 +235,11 @@ def dopwa_amplitude(project_source_path='',
                       path=project_path,
                       name=project_name)
     # 拷贝root文件
-    hfile.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path_data,
                     source_name=root_name_data,
                     path='%s/%s/%s' % (project_path, project_name, 'data'),
                     name='data.root')
-    hfile.copy_file(source_path=root_path,
+    hfile.copy_file(source_path=root_path_mc,
                     source_name=root_name_mc,
                     path='%s/%s/%s' % (project_path, project_name, 'data'),
                     name='mc.root')
@@ -260,10 +264,12 @@ def dopwa_amplitude(project_source_path='',
     # 开始执行
     os.system('./%s | tee log.txt' % (file_execute))
     # 读取末值文件
-    mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
-    mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
-    mydata.least_likelihood = copy.deepcopy(read_likelihood('output_fitresult.txt'))
     mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
+    mydata.amplitude = hfile.txt_readlines('output_amplitude_data.txt')
+    new_amplitude = []
+    for i in range(len(mydata.amplitude) - 1):
+        new_amplitude.append(float(re.match(r'(.*)\n', mydata.amplitude[i]).group(1)))
+    mydata.amplitude = new_amplitude
     # 删除大体积文件
     os.system('rm %s' % (file_execute))
     os.system('rm -r data')
@@ -285,6 +291,8 @@ class MYDATA():
         self.fraction = [[]]
 
         self.least_likelihood = 0
+
+        self.amplitude = []
 
 
 class MYWAVE():
@@ -456,8 +464,9 @@ class MYPWA():
                        project_source_name=self.project,
                        project_path=self.path_program_execute,
                        project_name='%1.4f_nominal' % (self.energy),
-                       root_path=self.path_root_input,
+                       root_path_data=self.path_root_input,
                        root_name_data=self.root_data,
+                       root_path_mc=self.path_root_input,
                        root_name_mc=self.root_mc,
                        input_option_string=self.input_option_string,
                        input_option_value=self.mywave.get_nominal_option(self.input_option_value),
@@ -472,8 +481,9 @@ class MYPWA():
                               project_source_name=self.project,
                               project_path=self.path_program_execute,
                               project_name='%1.4f_nominal' % (self.energy),
-                              root_path=self.path_root_input,
+                              root_path_data=self.path_root_input,
                               root_name_data=self.root_data,
+                              root_path_mc=self.path_root_input,
                               root_name_mc=self.root_mc,
                               input_option_string=self.input_option_string,
                               input_option_value=self.mywave.get_nominal_option(self.input_option_value),
@@ -484,16 +494,42 @@ class MYPWA():
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
-    def get_fit_amplitude(self):
+    def get_fit_amplitude_fit4c(self):
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        nums = hfile.pkl_read('root_fit4c/%1.4f_entries.pkl' % (self.energy))
+        new_input_option_value['number_data'] = nums['signal']
+
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
                                  project_path=self.path_program_execute,
                                  project_name='%1.4f_amplitude' % (self.energy),
-                                 root_path=self.path_root_input,
-                                 root_name_data=self.root_data,
+                                 root_path_data='root_fit4c',
+                                 root_name_data='%1.4f_mc.root' % (self.energy),
+                                 root_path_mc=self.path_root_input,
                                  root_name_mc=self.root_mc,
                                  input_option_string=self.input_option_string,
-                                 input_option_value=self.mywave.get_nominal_option(self.input_option_value),
+                                 input_option_value=new_input_option_value,
+                                 input_constant=self.input_constant,
+                                 input_parameter=self.input_parameter,
+                                 file_execute=self.project)
+        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
+        return output
+
+    def get_fit_amplitude_truth(self):
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        nums = hfile.pkl_read('root_truth/%1.4f_entries.pkl' % (self.energy))
+        new_input_option_value['number_data'] = nums['signal']
+
+        output = dopwa_amplitude(project_source_path=self.path_program_source,
+                                 project_source_name=self.project,
+                                 project_path=self.path_program_execute,
+                                 project_name='%1.4f_amplitude' % (self.energy),
+                                 root_path_data='root_truth',
+                                 root_name_data='%1.4f_mc.root' % (self.energy),
+                                 root_path_mc=self.path_root_input,
+                                 root_name_mc=self.root_mc,
+                                 input_option_string=self.input_option_string,
+                                 input_option_value=new_input_option_value,
                                  input_constant=self.input_constant,
                                  input_parameter=self.input_parameter,
                                  file_execute=self.project)
