@@ -366,3 +366,7 @@ def dofit_method2(energy=0,
     del datar
     del datam
     return output
+
+
+class MYFIT():
+    def __init__(self):
