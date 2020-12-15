@@ -267,7 +267,7 @@ def dopwa_amplitude(project_source_path='',
     mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
     mydata.amplitude = hfile.txt_readlines('output_amplitude_data.txt')
     new_amplitude = []
-    for i in range(len(mydata.amplitude) - 1):
+    for i in range(new_input_option_value['number_data']):
         new_amplitude.append(float(re.match(r'(.*)\n', mydata.amplitude[i]).group(1)))
     mydata.amplitude = new_amplitude
     # 删除大体积文件
@@ -502,7 +502,7 @@ class MYPWA():
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
                                  project_path=self.path_program_execute,
-                                 project_name='%1.4f_amplitude' % (self.energy),
+                                 project_name='%1.4f_amplitude_fit4c' % (self.energy),
                                  root_path_data='root_fit4c',
                                  root_name_data='%1.4f_mc.root' % (self.energy),
                                  root_path_mc=self.path_root_input,
@@ -513,6 +513,9 @@ class MYPWA():
                                  input_parameter=self.input_parameter,
                                  file_execute=self.project)
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
+        if(len(output.amplitude) != nums['signal']):
+            print("Input  entries: %d" % (nums['signal']))
+            print("Output entries: %d" % (len(output.amplitude)))
         return output
 
     def get_fit_amplitude_truth(self):
@@ -523,7 +526,7 @@ class MYPWA():
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
                                  project_path=self.path_program_execute,
-                                 project_name='%1.4f_amplitude' % (self.energy),
+                                 project_name='%1.4f_amplitude_truth' % (self.energy),
                                  root_path_data='root_truth',
                                  root_name_data='%1.4f_mc.root' % (self.energy),
                                  root_path_mc=self.path_root_input,
@@ -534,6 +537,9 @@ class MYPWA():
                                  input_parameter=self.input_parameter,
                                  file_execute=self.project)
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
+        if(len(output.amplitude) != nums['signal']):
+            print("Input  entries: %d" % (nums['signal']))
+            print("Output entries: %d" % (len(output.amplitude)))
         return output
 
     def get_test_significance(self):
@@ -545,8 +551,9 @@ class MYPWA():
                                project_source_name=self.project,
                                project_path=self.path_program_execute,
                                project_name='%1.4f_%s' % (self.energy, wave),
-                               root_path=self.path_root_input,
+                               root_path_data=self.path_root_input,
                                root_name_data=self.root_data,
+                               root_path_mc=self.path_root_input,
                                root_name_mc=self.root_mc,
                                input_option_string=self.input_option_string,
                                input_option_value=self.mywave.get_check_option(self.input_option_value, wave),
