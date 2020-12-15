@@ -3,8 +3,33 @@
 # Private package
 import os
 import re
+import sys
+import copy
 import shutil
 import pickle
+
+
+################################################################################
+# Python 命令行指令操作类
+################################################################################
+
+def argv(argv=sys.argv):
+    '返回命令行输入的列表和字典'
+    option_list = []
+    option_dict = {}
+    option = copy.deepcopy(argv)
+    for i in range(len(option)):
+        check1 = re.match(r'-(.*)', option[i])
+        check2 = re.match(r'--(.*)', option[i])
+        if(check2):
+            if(i + 1 >= len(option)):
+                print('Info from hfile.argv: Error with input option!')
+                exit(0)
+            option_dict[check2.group(1)] = option[i + 1]
+        elif(check1):
+            option_list.append(check1.group(1))
+    return option_list, option_dict
+
 
 ################################################################################
 # 文件操作类
@@ -16,7 +41,7 @@ def mv(path_source, path_target):
     shutil.move(path_source, path_target)
 
 
-def add_folder(name, path):
+def add_folder(name='', path=''):
     '查看某绝对路径下是否存在某名字的文件夹，没有则创建'
     filelist = os.listdir(path)
     if(name not in filelist):
@@ -74,21 +99,6 @@ def get_tree(source_path):
             output[file] = get_tree(os.path.join(source_path, file))
         return output
 
-
-def my_get_tree(source_path):
-    '''
-    遍历本地目录返回字典树\n
-    来自网络的示例，有很多不需要的特性\n
-    '''
-    dirtree = {'children': []}
-    if os.path.isfile(source_path):
-        return {'name': os.path.basename(source_path), 'href': os.path.abspath(source_path)}
-    else:
-        dirtree['name'] = os.path.basename(source_path)
-        for item in os.listdir(source_path):
-            dirtree['spread'] = True
-            dirtree['children'].append(my_get_tree(os.path.join(source_path, item)))
-        return dirtree
 
 ################################################################################
 # .pickle 相关类
