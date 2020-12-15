@@ -201,7 +201,7 @@ def kernelmassdependentbreitwigner(mx2, mr, wr, m1_2, m2_2, l):
 
 
 # endregion
-# region Generator
+# region generator
 def epsilon(A, B, C, D):
     if(A == B or A == C or A == D or B == C or B == D or C == D):
         output = 0.0
@@ -305,9 +305,9 @@ def amplitude(v1, v2, v3,
             vr_1_2[i] += r_1_2[j] * delta[j][j] * (delta[i][j] - v12[i] * v12[j] / s12)
             vr_1_3[i] += r_1_3[j] * delta[j][j] * (delta[i][j] - v13[i] * v13[j] / s13)
             vr_2_3[i] += r_2_3[j] * delta[j][j] * (delta[i][j] - v23[i] * v23[j] / s23)
-            vr_12_3[i] += r_12_3[j] * gelta[i][j] * delta[j][j]
-            vr_13_2[i] += r_13_2[j] * gelta[i][j] * delta[j][j]
-            vr_23_1[i] += r_23_1[j] * gelta[i][j] * delta[j][j]
+            vr_12_3[i] += r_12_3[j] * delta[j][j] * (delta[i][j] - v123[i] * v123[j] / s123)
+            vr_13_2[i] += r_13_2[j] * delta[j][j] * (delta[i][j] - v123[i] * v123[j] / s123)
+            vr_23_1[i] += r_23_1[j] * delta[j][j] * (delta[i][j] - v123[i] * v123[j] / s123)
     # endregion
     # region set q_function
     q_all_rhop_pim = q_function(s123, s13, s2)
@@ -354,12 +354,12 @@ def amplitude(v1, v2, v3,
     for i in range(4):
         for j in range(4):
             for k in range(4):
-                t3_all_rhop_pim[i][j][k] = b3_all_rhop_pim * (vr_13_2[i] * vr_13_2[j] * vr_13_2[k] - 0.2 * scalar(vr_13_2, vr_13_2) * (gelta[i][j] * vr_13_2[k] + gelta[j][k] * vr_13_2[i] + gelta[k][i] * vr_13_2[j]))
-                t3_all_rhom_pip[i][j][k] = b3_all_rhom_pip * (vr_23_1[i] * vr_23_1[j] * vr_23_1[k] - 0.2 * scalar(vr_23_1, vr_23_1) * (gelta[i][j] * vr_23_1[k] + gelta[j][k] * vr_23_1[i] + gelta[k][i] * vr_23_1[j]))
-                t3_all_rhoz_piz[i][j][k] = b3_all_rhoz_piz * (vr_12_3[i] * vr_12_3[j] * vr_12_3[k] - 0.2 * scalar(vr_12_3, vr_12_3) * (gelta[i][j] * vr_12_3[k] + gelta[j][k] * vr_12_3[i] + gelta[k][i] * vr_12_3[j]))
-                t3_rhop_pip_piz[i][j][k] = b3_rhop_pip_piz * (vr_1_3[i] * vr_1_3[j] * vr_1_3[k] - 0.2 * scalar(vr_1_3, vr_1_3) * (gelta[i][j] * vr_1_3[k] + gelta[j][k] * vr_1_3[i] + gelta[k][i] * vr_1_3[j]))
-                t3_rhom_pim_piz[i][j][k] = b3_rhom_pim_piz * (vr_2_3[i] * vr_2_3[j] * vr_2_3[k] - 0.2 * scalar(vr_2_3, vr_2_3) * (gelta[i][j] * vr_2_3[k] + gelta[j][k] * vr_2_3[i] + gelta[k][i] * vr_2_3[j]))
-                t3_rhoz_pip_pim[i][j][k] = b3_rhoz_pip_pim * (vr_1_2[i] * vr_1_2[j] * vr_1_2[k] - 0.2 * scalar(vr_1_2, vr_1_2) * (gelta[i][j] * vr_1_2[k] + gelta[j][k] * vr_1_2[i] + gelta[k][i] * vr_1_2[j]))
+                t3_all_rhop_pim[i][j][k] = b3_all_rhop_pim * (vr_13_2[i] * vr_13_2[j] * vr_13_2[k] - 0.2 * scalar(vr_13_2, vr_13_2) * (delta[i][j] * vr_13_2[k] + delta[j][k] * vr_13_2[i] + delta[k][i] * vr_13_2[j]))
+                t3_all_rhom_pip[i][j][k] = b3_all_rhom_pip * (vr_23_1[i] * vr_23_1[j] * vr_23_1[k] - 0.2 * scalar(vr_23_1, vr_23_1) * (delta[i][j] * vr_23_1[k] + delta[j][k] * vr_23_1[i] + delta[k][i] * vr_23_1[j]))
+                t3_all_rhoz_piz[i][j][k] = b3_all_rhoz_piz * (vr_12_3[i] * vr_12_3[j] * vr_12_3[k] - 0.2 * scalar(vr_12_3, vr_12_3) * (delta[i][j] * vr_12_3[k] + delta[j][k] * vr_12_3[i] + delta[k][i] * vr_12_3[j]))
+                t3_rhop_pip_piz[i][j][k] = b3_rhop_pip_piz * (vr_1_3[i] * vr_1_3[j] * vr_1_3[k] - 0.2 * scalar(vr_1_3, vr_1_3) * (delta[i][j] * vr_1_3[k] + delta[j][k] * vr_1_3[i] + delta[k][i] * vr_1_3[j]))
+                t3_rhom_pim_piz[i][j][k] = b3_rhom_pim_piz * (vr_2_3[i] * vr_2_3[j] * vr_2_3[k] - 0.2 * scalar(vr_2_3, vr_2_3) * (delta[i][j] * vr_2_3[k] + delta[j][k] * vr_2_3[i] + delta[k][i] * vr_2_3[j]))
+                t3_rhoz_pip_pim[i][j][k] = b3_rhoz_pip_pim * (vr_1_2[i] * vr_1_2[j] * vr_1_2[k] - 0.2 * scalar(vr_1_2, vr_1_2) * (delta[i][j] * vr_1_2[k] + delta[j][k] * vr_1_2[i] + delta[k][i] * vr_1_2[j]))
     # endregion
     # region set propagator
     prop_rho770pi_p = kernelGS(s13, hconst.rho770.mass, hconst.rho770.width, mpip**2, mpiz**2, 3.0, 1)
@@ -400,6 +400,301 @@ def amplitude(v1, v2, v3,
                 pa[i][j] = 2.0 * temp.real
             else:
                 pa[i][j] = 2.0 * temp.imag
+    # endregion
+    # region calculate waves
+    cf_rho770pi_p = [0.0 + 0.0j] * 3
+    cf_rho770pi_m = [0.0 + 0.0j] * 3
+    cf_rho770pi_z = [0.0 + 0.0j] * 3
+    cf_rho1450pi_p = [0.0 + 0.0j] * 3
+    cf_rho1450pi_m = [0.0 + 0.0j] * 3
+    cf_rho1450pi_z = [0.0 + 0.0j] * 3
+    cf_rho1700pi_p = [0.0 + 0.0j] * 3
+    cf_rho1700pi_m = [0.0 + 0.0j] * 3
+    cf_rho1700pi_z = [0.0 + 0.0j] * 3
+    cf_rho1690pi_p = [0.0 + 0.0j] * 3
+    cf_rho1690pi_m = [0.0 + 0.0j] * 3
+    cf_rho1690pi_z = [0.0 + 0.0j] * 3
+    cf_omega782pi = [0.0 + 0.0j] * 3
+    # rho770pi
+    for I in range(2):
+        for J in range(4):
+            for K in range(4):
+                for N in range(4):
+                    cf_rho770pi_p[I] += v123[N] * epsilon(I, J, K, N) * t1_rhop_pip_piz[K] * t1_all_rhop_pim[J] * delta[J][J] * delta[K][K] * prop_rho770pi_p
+                    cf_rho770pi_m[I] += v123[N] * epsilon(I, J, K, N) * t1_rhom_pim_piz[K] * t1_all_rhom_pip[J] * delta[J][J] * delta[K][K] * prop_rho770pi_m
+                    cf_rho770pi_z[I] += v123[N] * epsilon(I, J, K, N) * t1_rhoz_pip_pim[K] * t1_all_rhoz_piz[J] * delta[J][J] * delta[K][K] * prop_rho770pi_z
+    # rho1450pi
+    for I in range(2):
+        for J in range(4):
+            for K in range(4):
+                for N in range(4):
+                    cf_rho1450pi_p[I] += v123[N] * epsilon(I, J, K, N) * t1_rhop_pip_piz[K] * t1_all_rhop_pim[J] * delta[J][J] * delta[K][K] * prop_rho1450pi_p
+                    cf_rho1450pi_m[I] += v123[N] * epsilon(I, J, K, N) * t1_rhom_pim_piz[K] * t1_all_rhom_pip[J] * delta[J][J] * delta[K][K] * prop_rho1450pi_m
+                    cf_rho1450pi_z[I] += v123[N] * epsilon(I, J, K, N) * t1_rhoz_pip_pim[K] * t1_all_rhoz_piz[J] * delta[J][J] * delta[K][K] * prop_rho1450pi_z
+    # rho1700pi
+    for I in range(2):
+        for J in range(4):
+            for K in range(4):
+                for N in range(4):
+                    cf_rho1700pi_p[I] += v123[N] * epsilon(I, J, K, N) * t1_rhop_pip_piz[K] * t1_all_rhop_pim[J] * delta[J][J] * delta[K][K] * prop_rho1700pi_p
+                    cf_rho1700pi_m[I] += v123[N] * epsilon(I, J, K, N) * t1_rhom_pim_piz[K] * t1_all_rhom_pip[J] * delta[J][J] * delta[K][K] * prop_rho1700pi_m
+                    cf_rho1700pi_z[I] += v123[N] * epsilon(I, J, K, N) * t1_rhoz_pip_pim[K] * t1_all_rhoz_piz[J] * delta[J][J] * delta[K][K] * prop_rho1700pi_z
+    # rho1690pi
+    for I in range(2):
+        for J in range(4):
+            for K in range(4):
+                for M in range(4):
+                    for L in range(4):
+                        for N in range(4):
+                            cf_rho1690pi_p[I] += v123[N] * epsilon(I, J, K, N) * t3_all_rhop_pim[J][M][L] * t3_rhop_pip_piz[K][M][L] * delta[J][J] * delta[L][L] * delta[K][K] * delta[M][M] * delta[N][N] * prop_rho1690pi_p
+                            cf_rho1690pi_m[I] += v123[N] * epsilon(I, J, K, N) * t3_all_rhom_pip[J][M][L] * t3_rhom_pim_piz[K][M][L] * delta[J][J] * delta[L][L] * delta[K][K] * delta[M][M] * delta[N][N] * prop_rho1690pi_m
+                            cf_rho1690pi_z[I] += v123[N] * epsilon(I, J, K, N) * t3_all_rhoz_piz[J][M][L] * t3_rhoz_pip_pim[K][M][L] * delta[J][J] * delta[L][L] * delta[K][K] * delta[M][M] * delta[N][N] * prop_rho1690pi_z
+    # omegapi
+    for I in range(2):
+        for J in range(4):
+            for K in range(4):
+                for N in range(4):
+                    cf_omega782pi[I] += v123[N] * epsilon(I, J, K, N) * t1_rhoz_pip_pim[K] * t1_all_rhoz_piz[J] * delta[J][J] * delta[K][K] * prop_omega782pi
+    # endregion
+    # region calculate amplitude
+    for i in range(2):
+        fCF[0][i] = cf_rho770pi_m[i] + cf_rho770pi_z[i] - cf_rho770pi_p[i]
+        fCF[1][i] = cf_rho1450pi_m[i] + cf_rho1450pi_z[i] - cf_rho1450pi_p[i]
+        fCF[2][i] = cf_rho1700pi_m[i] + cf_rho1700pi_z[i] - cf_rho1700pi_p[i]
+        fCF[3][i] = cf_rho1690pi_m[i] + cf_rho1690pi_z[i] - cf_rho1690pi_p[i]
+        fCF[4][i] = cf_omega782pi[i]
+    for i in range(nwaves):
+        for j in range(nwaves):
+            temp = 0.0 + 0.0j
+            for u in range(2):
+                temp += 0.5 * fCF[i][u] * fCF[j][u].conjugate()
+            if(i == j):
+                fu[i][j] += temp.real
+            if(i < j):
+                fu[i][j] += temp.real
+            if(i > j):
+                fu[i][j] += -temp.imag
+    output = 0.0
+    for i in range(nwaves):
+        for j in range(nwaves):
+            output += pa[i][j] * fu[i][j]
+    if(output < 0.0):
+        output = 0.00000001
+    if(1 == 0):
+        print('Propagator:')
+        print(prop_rho770pi_p)
+        print(prop_rho770pi_m)
+        print(prop_rho770pi_z)
+        print(prop_rho1450pi_p)
+        print(prop_rho1450pi_m)
+        print(prop_rho1450pi_z)
+        print(prop_rho1700pi_p)
+        print(prop_rho1700pi_m)
+        print(prop_rho1700pi_z)
+        print(prop_rho1690pi_p)
+        print(prop_rho1690pi_m)
+        print(prop_rho1690pi_z)
+        print(prop_omega782pi)
+    if(1 == 0):
+        print('Amplitude:')
+        print(output)
+        print('\n')
+    return output
+    # endregion
+
+# endregion
+
+
+'''
+# region Generator
+def epsilon(A, B, C, D):
+    if(A == B or A == C or A == D or B == C or B == D or C == D):
+        output = 0.0
+    else:
+        g = 0
+        if(A > B): g += 1
+        if(A > C): g += 1
+        if(A > D): g += 1
+        if(B > C): g += 1
+        if(B > D): g += 1
+        if(C > D): g += 1
+        output = pow(-1.0, g)
+    return output
+
+
+def vadd(v1, v2):
+    output = [0.0] * 4
+    for i in range(4):
+        output[i] = v1[i] + v2[i]
+    return output
+
+
+def vsub(v1, v2):
+    output = [0.0] * 4
+    for i in range(4):
+        output[i] = v1[i] - v2[i]
+    return output
+
+
+def scalar(v1, v2):
+    output = 0.0
+    for i in range(4):
+        output += v1[i] * v2[i] * delta[i][i]
+    return output
+
+
+def q_function(v1, v2, v3):
+    sa = scalar(v1, v1)
+    sb = scalar(v2, v2)
+    sc = scalar(v3, v3)
+    output = (sa + sb - sc)**2
+    output = output / (4 * sa) - sb
+    return output
+
+
+def b_function(v1, v2, v3, l):
+    output = 0.0
+    p1 = 0.197321 / 0.728656
+    p0 = p1 * p1
+    ps = q_function(v1, v2, v3)
+    if(l == 1):
+        output = math.sqrt(2.0 / (ps * p0))
+    if(l == 2):
+        output = math.sqrt(13.0 / (pow(ps, 2) + 3.0 * ps * p0 + 9.0 * pow(p0, 2)))
+    if(l == 3):
+        output = math.sqrt(227.0 / (pow(ps, 3) + 6.0 * pow(ps, 2) * p0 + 45.0 * ps * pow(p0, 2) + 225.0 * pow(p0, 3)))
+    if(l == 4):
+        output = math.sqrt(12746.0 / (pow(ps, 4) + 10.0 * pow(ps, 3) * p0 + 135.0 * pow(ps, 2) * pow(p0, 2) + 1575.0 * ps * pow(p0, 3) + 11025.0 * pow(p0, 4)))
+    return output
+
+
+def g_function(v1):
+    s1 = scalar(v1, v1)
+    output = [[0.0 for i in range(4)] for j in range(4)]
+    for i in range(4):
+        for j in range(4):
+            output[i][j] = delta[i][j] - ((v1[i] * v1[j]) / s1)
+    return output
+
+
+def r_function(v1, v2, v3):
+    output = [0.0] * 4
+    vr = vsub(v2, v3)
+    guv = g_function(v1)
+    for i in range(4):
+        for j in range(4):
+            output[i] += guv[i][j] * vr[j] * delta[j][j]
+    return output
+
+
+def spin1tensor(v1, v2, v3):
+    output = [0.0] * 4
+    barrier = b_function(v1, v2, v3, 1)
+    r = r_function(v1, v2, v3)
+    for i in range(4):
+        output[i] = r[i] * barrier
+    return output
+
+
+def spin2tensor(v1, v2, v3):
+    output = [[0.0 for i in range(4)] for j in range(4)]
+    barrier = b_function(v1, v2, v3, 2)
+    r = r_function(v1, v2, v3)
+    rr = scalar(r, r)
+    guv = g_function(v1)
+    for i in range(4):
+        for j in range(4):
+            output[i][j] = r[i] * r[j]
+            output[i][j] -= (1.0 / 3.0) * rr * guv[i][j]
+            output[i][j] *= barrier
+    return output
+
+
+def spin3tensor(v1, v2, v3):
+    output = [[[0.0 for i in range(4)] for j in range(4)] for k in range(4)]
+    barrier = b_function(v1, v2, v3, 3)
+    r = r_function(v1, v2, v3)
+    rr = scalar(r, r)
+    guv = g_function(v1)
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                output[i][j][k] = r[i] * r[j] * r[k]
+                output[i][j][k] -= 0.2 * rr * (guv[i][j] * r[k] + guv[k][i] * r[j] + guv[j][k] * r[i])
+                output[i][j][k] *= barrier
+    return output
+
+
+def amplitude(v1, v2, v3,
+              a1, b1,
+              a2, b2,
+              a3, b3,
+              a4, b4,
+              a5, b5):
+    # region set v s m
+    v12 = vadd(v1, v2)
+    v13 = vadd(v1, v3)
+    v23 = vadd(v2, v3)
+    v123 = vadd(v12, v3)
+    s1 = scalar(v1, v1)
+    s2 = scalar(v2, v2)
+    s3 = scalar(v3, v3)
+    s12 = scalar(v12, v12)
+    s13 = scalar(v13, v13)
+    s23 = scalar(v23, v23)
+    s123 = scalar(v123, v123)
+    m1 = math.sqrt(s1)
+    m2 = math.sqrt(s2)
+    m3 = math.sqrt(s3)
+    m12 = math.sqrt(s12)
+    m13 = math.sqrt(s13)
+    m23 = math.sqrt(s23)
+    m123 = math.sqrt(s123)
+    # endregion
+    # region set t_function
+    t1_all_rhop_pim = spin1tensor(v123, v13, v2)
+    t1_all_rhom_pip = spin1tensor(v123, v23, v1)
+    t1_all_rhoz_piz = spin1tensor(v123, v12, v3)
+    t1_rhop_pip_piz = spin1tensor(v13, v1, v3)
+    t1_rhom_pim_piz = spin1tensor(v23, v2, v3)
+    t1_rhoz_pip_pim = spin1tensor(v12, v1, v2)
+    t3_all_rhop_pim = spin3tensor(v123, v13, v2)
+    t3_all_rhom_pip = spin3tensor(v123, v23, v1)
+    t3_all_rhoz_piz = spin3tensor(v123, v12, v3)
+    t3_rhop_pip_piz = spin3tensor(v13, v1, v3)
+    t3_rhom_pim_piz = spin3tensor(v23, v2, v3)
+    t3_rhoz_pip_pim = spin3tensor(v12, v1, v2)
+    # endregion
+    # region set propagator
+    prop_rho770pi_p = kernelGS(s13, hconst.rho770.mass, hconst.rho770.width, mpip**2, mpiz**2, 3.0, 1)
+    prop_rho770pi_m = kernelGS(s23, hconst.rho770.mass, hconst.rho770.width, mpim**2, mpiz**2, 3.0, 1)
+    prop_rho770pi_z = kernelGS(s12, hconst.rho770.mass, hconst.rho770.width, mpip**2, mpim**2, 3.0, 1)
+    prop_rho1450pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1450.mass, hconst.rho1450.width, mpip**2, mpiz**2, 1)
+    prop_rho1450pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1450.mass, hconst.rho1450.width, mpim**2, mpiz**2, 1)
+    prop_rho1450pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1450.mass, hconst.rho1450.width, mpip**2, mpim**2, 1)
+    prop_rho1700pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1700.mass, hconst.rho1700.width, mpip**2, mpiz**2, 1)
+    prop_rho1700pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1700.mass, hconst.rho1700.width, mpim**2, mpiz**2, 1)
+    prop_rho1700pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1700.mass, hconst.rho1700.width, mpip**2, mpim**2, 1)
+    prop_rho1690pi_p = kernelmassdependentbreitwigner(s13, hconst.rho1690.mass, hconst.rho1690.width, mpip**2, mpiz**2, 3)
+    prop_rho1690pi_m = kernelmassdependentbreitwigner(s23, hconst.rho1690.mass, hconst.rho1690.width, mpim**2, mpiz**2, 3)
+    prop_rho1690pi_z = kernelmassdependentbreitwigner(s12, hconst.rho1690.mass, hconst.rho1690.width, mpip**2, mpim**2, 3)
+    prop_omega782pi = kernelmassdependentbreitwigner(s12, hconst.omega782.mass, hconst.omega782.width, mpip**2, mpim**2, 1)
+    # endregion
+    # region set fCF fCP pa fu
+    nwaves = 5
+    fCF = [[0.0 + 0.0j for i in range(2)] for j in range(nwaves)]
+    fCP = [0.0 + 0.0j] * nwaves
+    for i in range(nwaves):
+        fCF[i][0] = 0.0 + 0.0j
+        fCF[i][1] = 0.0 + 0.0j
+        fCP[i] = 0.0 + 0.0j
+    pa = [[0.0 for i in range(5)] for j in range(5)]
+    fu = [[0.0 for i in range(5)] for j in range(5)]
+    fCP[0] = (a1 * math.cos(b1)) * unit_real + (a1 * math.sin(b1)) * unit_imag
+    fCP[1] = (a2 * math.cos(b2)) * unit_real + (a2 * math.sin(b2)) * unit_imag
+    fCP[2] = (a3 * math.cos(b3)) * unit_real + (a3 * math.sin(b3)) * unit_imag
+    fCP[3] = (a4 * math.cos(b4)) * unit_real + (a4 * math.sin(b4)) * unit_imag
+    fCP[4] = (a5 * math.cos(b5)) * unit_real + (a5 * math.sin(b5)) * unit_imag
     # endregion
     # region calculate waves
     cf_rho770pi_p = [0.0 + 0.0j] * 3
@@ -460,6 +755,15 @@ def amplitude(v1, v2, v3,
         fCF[4][i] = cf_omega782pi[i]
     for i in range(nwaves):
         for j in range(nwaves):
+            temp = fCP[i] * fCP[j].conjugate()
+            if(i == j):
+                pa[i][j] = temp.real
+            elif(i < j):
+                pa[i][j] = 2.0 * temp.real
+            else:
+                pa[i][j] = 2.0 * temp.imag
+    for i in range(nwaves):
+        for j in range(nwaves):
             temp = 0.0 + 0.0j
             for u in range(2):
                 temp += 0.5 * fCF[i][u] * fCF[j][u].conjugate()
@@ -478,3 +782,4 @@ def amplitude(v1, v2, v3,
     return output
     # endregion
 # endregion
+'''
