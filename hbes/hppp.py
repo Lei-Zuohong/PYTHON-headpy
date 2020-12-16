@@ -131,21 +131,21 @@ def selecters():
                                      width=1.5,
                                      center_show=1.5,
                                      width_show=1.5,
-                                     inter=120,
+                                     inter=60,
                                      title=r'M_{#pi^{+}#pi^{-}}',
                                      unit=r'(GeV/c^{2})')
     output['pipz_m'] = hnew.SELECTER(center=1.5,
                                      width=1.5,
                                      center_show=1.5,
                                      width_show=1.5,
-                                     inter=120,
+                                     inter=60,
                                      title=r'M_{#pi^{+}#pi^{0}}',
                                      unit=r'(GeV/c^{2})')
     output['pimz_m'] = hnew.SELECTER(center=1.5,
                                      width=1.5,
                                      center_show=1.5,
                                      width_show=1.5,
-                                     inter=120,
+                                     inter=60,
                                      title=r'M_{#pi^{-}#pi^{0}}',
                                      unit=r'(GeV/c^{2})')
     #
