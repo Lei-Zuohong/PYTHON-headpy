@@ -240,6 +240,65 @@ def dopwa_amplitude(**argv):
     return mydata
 
 
+def dopwa_plot(target_folder, target_file, **argv):
+    '进行一次拟合操作，返回结果类'
+    # 读取 argv
+    project_source_path = argv['project_source_path']
+    project_source_name = argv['project_source_name']
+    project_path = argv['project_path']
+    project_name = argv['project_name']
+    root_path_data = argv['root_path_data']
+    root_name_data = argv['root_name_data']
+    root_path_mc = argv['root_path_mc']
+    root_name_mc = argv['root_name_mc']
+    input_option_string = copy.deepcopy(argv['input_option_string'])
+    input_option_value = copy.deepcopy(argv['input_option_value'])
+    input_constant = copy.deepcopy(argv['input_constant'])
+    input_parameter = copy.deepcopy(argv['input_parameter'])
+    file_execute = argv['file_execute']
+    # 1. 初始化拟合
+    origin_path = os.getcwd()
+    mydata = MYDATA()
+    # 2. 拷贝资料文件
+    hfile.copy_folder(source_path=project_source_path,
+                      source_name=project_source_name,
+                      path=project_path,
+                      name=project_name)
+    # 2. 拷贝root文件
+    hfile.copy_file(source_path=root_path_data,
+                    source_name=root_name_data,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='data.root')
+    hfile.copy_file(source_path=root_path_mc,
+                    source_name=root_name_mc,
+                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+                    name='mc.root')
+    # 2. 变更执行地址
+    os.chdir('%s/%s' % (project_path, project_name))
+    # 2. 写入初值文件
+    write_option(file_name='input_option_string.txt', dict_option=input_option_string)
+    write_option(file_name='input_option_value.txt', dict_option=input_option_value)
+    write_parameter(file_name='input_constant.txt', dict_option=input_constant)
+    write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
+    mydata.option_string = copy.deepcopy(input_option_string)
+    mydata.option_value = copy.deepcopy(input_option_value)
+    mydata.input_constant = copy.deepcopy(input_constant)
+    mydata.input_parameter = copy.deepcopy(input_parameter)
+    # 3. 开始执行拟合
+    os.system('./%s | tee log.txt' % (file_execute))
+    # 4. 删除大体积文件
+    os.system('rm %s' % (file_execute))
+    os.system('rm -r data')
+    # 4. 转移文件
+    hfile.copy_file(source_path='.',
+                    source_name='output.root',
+                    path=target_folder,
+                    name=target_file)
+    # 4. 结束
+    os.chdir(origin_path)
+    return mydata
+
+
 def dopwa_spread(nrandom, **argv):
     '依照input_parameter进行撒点拟合'
     # 产生随机初始参数放入列表
@@ -527,6 +586,25 @@ class MYPWA():
             print("Input  entries: %d" % (nums['signal']))
             print("Output entries: %d" % (len(output.amplitude)))
         return output
+
+    def get_fit_plot(self, target_folder):
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_option_value['do_output_root'] = 1
+        new_input_option_value['do_fit_minuit'] = 0
+        output = dopwa_plot(target_folder, '%1.4f.root' % (self.energy),
+                            project_source_path=self.path_program_source,
+                            project_source_name=self.project,
+                            project_path=self.path_program_execute,
+                            project_name='%1.4f_plot' % (self.energy),
+                            root_path_data=self.path_root_input,
+                            root_name_data=self.root_data,
+                            root_path_mc=self.path_root_input,
+                            root_name_mc=self.root_mc,
+                            input_option_string=self.input_option_string,
+                            input_option_value=new_input_option_value,
+                            input_constant=self.input_constant,
+                            input_parameter=self.input_parameter,
+                            file_execute=self.project)
 
     def get_test_significance(self):
         data_nominal = self.get_fit_nominal()
