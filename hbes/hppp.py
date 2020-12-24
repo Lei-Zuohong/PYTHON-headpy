@@ -215,3 +215,12 @@ def selecters():
                                         title=r'M^{2}_{#pi^{-}#pi^{0}}',
                                         unit=r'(GeV^{2}/c^{4})')
     return output
+
+
+def docuts():
+    output = ['pip_ep', 'pim_ep', 'pip_pid_pi', 'pim_pid_pi',
+              'chisq',
+              'a_pippim',
+              'gamma1_heli', 'gamma2_heli',
+              'piz_m']
+    return output

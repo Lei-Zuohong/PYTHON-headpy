@@ -15,7 +15,7 @@ else:
 import headpy.hfile as hfile
 import headpy.hscreen.hprint as hprint
 
-# 类型定义
+# 事例选择
 
 
 class SELECTER:
@@ -161,6 +161,134 @@ class SELECTER_value:
         if(self.reverse != 0):
             output = bool(1) ^ output
         return output
+
+
+# Reweight 方法
+
+class BINS:
+    def __init__(self, left=0.0, right=1.0, inter=100.0):
+        self.left = left
+        self.right = right
+        self.inter = inter
+        self.binw = (right - left) / inter
+
+    def get_bin_left(self, index):
+        output = self.left + self.binw * index
+        return output
+
+    def get_bin_right(self, index):
+        output = self.left + self.binw * (index + 1)
+        return output
+
+    def get_bin_index(self, value):
+        output = int((value - self.left) / self.binw)
+        if(output < 0 or output > (self.inter - 1)):
+            output = -1
+        return output
+
+
+class WEIGHTER2D:
+    def __init__(self):
+        self.step_0 = 1
+        self.branchx = ''
+        self.branchy = ''
+        self.x_left = 0.0
+        self.x_right = 1.0
+        self.x_inter = 40
+        self.y_left = 0.0
+        self.y_right = 1.0
+        self.y_inter = 40
+
+        self.step_m = 0
+        self.step_r = 0
+        self.step_b = 0
+        self.step_bins = 0
+        self.step_matrix = 0
+        self.step_weight = 0
+
+    def set_data_m(self, datax=[], datay=[]):
+        self.step_m = 1
+        self.datax_m = datax
+        self.datay_m = datay
+
+    def set_data_r(self, datax=[], datay=[]):
+        self.step_r = 1
+        self.datax_r = datax
+        self.datay_r = datay
+
+    def set_data_b(self, datax1=[], datay1=[], datax2=[], datay2=[]):
+        self.step_b = 1
+        self.datax_b1 = datax1
+        self.datay_b1 = datay1
+        self.datax_b2 = datax2
+        self.datay_b2 = datay2
+
+    def set_bins(self):
+        self.step_bins = 1
+        compare_min_x = []
+        compare_max_x = []
+        compare_min_y = []
+        compare_max_y = []
+        compare_min_x.append(min(self.datax_m))
+        compare_max_x.append(max(self.datax_m))
+        compare_min_y.append(min(self.datay_m))
+        compare_max_y.append(max(self.datay_m))
+        compare_min_x.append(min(self.datax_r))
+        compare_max_x.append(max(self.datax_r))
+        compare_min_y.append(min(self.datay_r))
+        compare_max_y.append(max(self.datay_r))
+        if(self.step_b == 1):
+            if(len(self.datax_b1) != 0):
+                compare_min_x.append(min(self.datax_b1))
+                compare_max_x.append(max(self.datax_b1))
+                compare_min_y.append(min(self.datay_b1))
+                compare_max_y.append(max(self.datay_b1))
+            if(len(self.datax_b2) != 0):
+                compare_min_x.append(min(self.datax_b2))
+                compare_max_x.append(max(self.datax_b2))
+                compare_min_y.append(min(self.datay_b2))
+                compare_max_y.append(max(self.datay_b2))
+        self.x_left = min(compare_min_x)
+        self.x_right = max(compare_max_x)
+        self.y_left = min(compare_min_y)
+        self.y_right = max(compare_max_y)
+        self.x_bins = BINS(left=self.x_left, right=self.x_right, inter=self.x_inter)
+        self.y_bins = BINS(left=self.y_left, right=self.y_right, inter=self.y_inter)
+
+    def data_to_matrix(self, datax, datay):
+        output = numpy.zeros([self.x_inter, self.y_inter])
+        for i, tempi in enumerate(output):
+            for j, tempj in enumerate(output[i]):
+                output[i][j] = float(output[i][j])
+        for count, i in enumerate(datax):
+            output[self.x_bins.get_bin_index(datax[count]),
+                   self.y_bins.get_bin_index(datay[count])] += 1
+        return output
+
+    def set_matrix(self):
+        self.step_matrix = 1
+        self.matrix_m = self.data_to_matrix(self.datax_m, self.datay_m)
+        self.matrix_r = self.data_to_matrix(self.datax_r, self.datay_r)
+        if(self.step_b == 1):
+            self.matrix_b1 = self.data_to_matrix(self.datax_b1, self.datay_b1)
+            self.matrix_b2 = self.data_to_matrix(self.datay_b1, self.datay_b2)
+
+    def set_weight(self):
+        self.step_weight = 1
+        for i, tempi in enumerate(self.matrix_m):
+            for j, tempj in enumerate(self.matrix_m[i]):
+                if(self.matrix_m[i][j] == 0):
+                    self.matrix_m[i][j] = 1
+                    self.matrix_r[i][j] = 0
+                    if(self.step_b == 1):
+                        self.matrix_b1[i][j] = 0
+                        self.matrix_b2[i][j] = 0
+        output = self.matrix_r / self.matrix_m
+        if(self.step_b == 1):
+            output = (self.matrix_r - 0.5 * self.matrix_b1 - 0.5 * self.matrix_b2) / self.matrix_m
+        self.weight = output
+
+# 高能所函数
 
 
 def significance_no_root(value=10, num_parameter=1):
@@ -589,6 +717,34 @@ if(root_exit == 1):
                                    name_branch=name_branch)
             else:
                 print('Error dimension!!!!')
+
+        def get_weighter_2d(self,
+                            data='',
+                            energy=0,
+                            name_weight='',
+                            name_branch=''):
+            '内部调用函数'
+            # 读取weight信息
+            weight_file = '%s/%s/%1.4f.pkl' % (self.massages['weight'],
+                                               name_weight,
+                                               energy)
+            weight = hfile.pkl_read(weight_file)
+            # 更改cut
+            self.selecters[weight.branchx].set_by_edge_show(weight.x_left, weight.x_right)
+            self.selecters[weight.branchx].inter = weight.x_inter
+            self.selecters[weight.branchy].set_by_edge_show(weight.y_left, weight.y_right)
+            self.selecters[weight.branchy].inter = weight.y_inter
+            # 添加新的branch
+            new_branch = []
+            for i in range(tree_len(self.trees[data])):
+                xindex = weight.x_bins.get_bin_index(self.trees[data][weight.branchx][i])
+                yindex = weight.y_bins.get_bin_index(self.trees[data][weight.branchy][i])
+                if(xindex == -1 or yindex == -1):
+                    new_branch.append(0)
+                else:
+                    new_branch.append(weight.weight[xindex][yindex])
+            new_branch = numpy.array(new_branch)
+            self.trees[data][name_branch] = new_branch
 
         def hist1d(self,
                    data='',
