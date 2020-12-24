@@ -205,43 +205,30 @@ def dopwa_amplitude(**argv):
                     name='mc.root')
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_path, project_name))
-    ######################################## 更改临时初值文件 ########################################
-    new_input_option_value = copy.deepcopy(input_option_value)
-    new_input_parameter = copy.deepcopy(input_parameter)
-    new_input_option_value['do_fit_minuit'] = 0
-    new_input_option_value['do_output_amplitude'] = 1
-    for parameter in new_input_parameter:
-        new_input_parameter[parameter]['error'] = -1
-    ######################################## 更改临时初值文件 ########################################
     # 2. 写入初值文件
     write_option(file_name='input_option_string.txt', dict_option=input_option_string)
     write_option(file_name='input_option_value.txt', dict_option=input_option_value)
     write_parameter(file_name='input_constant.txt', dict_option=input_constant)
     write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
-    mydata.option_string = copy.deepcopy(input_option_string)
-    mydata.option_value = copy.deepcopy(input_option_value)
-    mydata.input_constant = copy.deepcopy(input_constant)
-    mydata.input_parameter = copy.deepcopy(input_parameter)
     # 3. 开始执行拟合
     os.system('./%s | tee log.txt' % (file_execute))
-    ######################################## 读取振幅文件 ########################################
-    mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
-    mydata.amplitude = hfile.txt_readlines('output_amplitude_data.txt')
-    new_amplitude = []
-    for i in range(new_input_option_value['number_data']):
-        new_amplitude.append(float(re.match(r'(.*)\n', mydata.amplitude[i]).group(1)))
-    mydata.amplitude = new_amplitude
+    # 4. 读取振幅文件
+    output = hfile.txt_readlines('output_amplitude_data.txt')
+    new_output = []
+    for i in range(input_option_value['number_data']):
+        new_output.append(float(re.match(r'(.*)\n', output[i]).group(1)))
+    output = new_output
     ######################################## 读取振幅文件 ########################################
     # 4. 删除大体积文件
     os.system('rm %s' % (file_execute))
     os.system('rm -r data')
     # 4. 结束
     os.chdir(origin_path)
-    return mydata
+    return output
 
 
 def dopwa_plot(target_folder, target_file, **argv):
-    '进行一次拟合操作，返回结果类'
+    '不进行拟合，直接进行作图'
     # 读取 argv
     project_source_path = argv['project_source_path']
     project_source_name = argv['project_source_name']
@@ -280,10 +267,6 @@ def dopwa_plot(target_folder, target_file, **argv):
     write_option(file_name='input_option_value.txt', dict_option=input_option_value)
     write_parameter(file_name='input_constant.txt', dict_option=input_constant)
     write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
-    mydata.option_string = copy.deepcopy(input_option_string)
-    mydata.option_value = copy.deepcopy(input_option_value)
-    mydata.input_constant = copy.deepcopy(input_constant)
-    mydata.input_parameter = copy.deepcopy(input_parameter)
     # 3. 开始执行拟合
     os.system('./%s | tee log.txt' % (file_execute))
     # 4. 删除大体积文件
@@ -541,8 +524,13 @@ class MYPWA():
 
     def get_fit_amplitude_fit4c(self):
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_parameter = copy.deepcopy(self.input_parameter)
         nums = hfile.pkl_read('root_fit4c/%1.4f_entries.pkl' % (self.energy))
         new_input_option_value['number_data'] = nums['signal']
+        new_input_option_value['do_fit_minuit'] = 0
+        new_input_option_value['do_output_amplitude'] = 1
+        for parameter in new_input_parameter:
+            new_input_parameter[parameter]['error'] = -1
 
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
@@ -555,18 +543,22 @@ class MYPWA():
                                  input_option_string=self.input_option_string,
                                  input_option_value=new_input_option_value,
                                  input_constant=self.input_constant,
-                                 input_parameter=self.input_parameter,
+                                 input_parameter=new_input_parameter,
                                  file_execute=self.project)
-        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
-        if(len(output.amplitude) != nums['signal']):
+        if(len(output) != nums['signal']):
             print("Input  entries: %d" % (nums['signal']))
-            print("Output entries: %d" % (len(output.amplitude)))
+            print("Output entries: %d" % (len(output)))
         return output
 
     def get_fit_amplitude_truth(self):
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_parameter = copy.deepcopy(self.input_parameter)
         nums = hfile.pkl_read('root_truth/%1.4f_entries.pkl' % (self.energy))
         new_input_option_value['number_data'] = nums['signal']
+        new_input_option_value['do_fit_minuit'] = 0
+        new_input_option_value['do_output_amplitude'] = 1
+        for parameter in new_input_parameter:
+            new_input_parameter[parameter]['error'] = -1
 
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
@@ -581,10 +573,9 @@ class MYPWA():
                                  input_constant=self.input_constant,
                                  input_parameter=self.input_parameter,
                                  file_execute=self.project)
-        output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
-        if(len(output.amplitude) != nums['signal']):
+        if(len(output) != nums['signal']):
             print("Input  entries: %d" % (nums['signal']))
-            print("Output entries: %d" % (len(output.amplitude)))
+            print("Output entries: %d" % (len(output)))
         return output
 
     def get_fit_plot(self, target_folder):
