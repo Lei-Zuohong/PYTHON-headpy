@@ -187,18 +187,16 @@ class BINS:
         return output
 
 
-class WEIGHTER2D:
+class WEIGHTER:
     def __init__(self):
-        self.step_0 = 1
-        self.branchx = ''
-        self.branchy = ''
-        self.x_left = 0.0
-        self.x_right = 1.0
-        self.x_inter = 40
-        self.y_left = 0.0
-        self.y_right = 1.0
-        self.y_inter = 40
+        self.branch = []
+        self.left = []
+        self.right = []
+        self.inter = []
 
+        self.dimension = 0
+
+        self.step_0 = 1
         self.step_m = 0
         self.step_r = 0
         self.step_b = 0
@@ -206,213 +204,102 @@ class WEIGHTER2D:
         self.step_matrix = 0
         self.step_weight = 0
 
-    def set_data_m(self, datax=[], datay=[]):
+    def set_branch(self, branchs):
+        self.dimension = len(branchs)
+        self.branch = copy.deepcopy(branchs)
+
+    def set_data_m(self, data=[]):
+        if(len(data) != self.dimension):
+            print('Info from hnew.WEIGHTER.set_data: Wrong data dimension!!!')
+            exit(0)
         self.step_m = 1
-        self.datax_m = datax
-        self.datay_m = datay
+        self.data_m = copy.deepcopy(data)
 
-    def set_data_r(self, datax=[], datay=[]):
+    def set_data_r(self, data=[]):
+        if(len(data) != self.dimension):
+            print('Info from hnew.WEIGHTER.set_data: Wrong data dimension!!!')
+            exit(0)
         self.step_r = 1
-        self.datax_r = datax
-        self.datay_r = datay
+        self.data_r = copy.deepcopy(data)
 
-    def set_data_b(self, datax1=[], datay1=[], datax2=[], datay2=[]):
+    def set_data_b(self, data1=[], data2=[]):
+        if(len(data1) != self.dimension or len(data2) != self.dimension):
+            print('Info from hnew.WEIGHTER.set_data: Wrong data dimension!!!')
+            exit(0)
         self.step_b = 1
-        self.datax_b1 = datax1
-        self.datay_b1 = datay1
-        self.datax_b2 = datax2
-        self.datay_b2 = datay2
+        self.data_b1 = copy.deepcopy(data1)
+        self.data_b2 = copy.deepcopy(data2)
 
-    def set_bins(self):
+    def set_bins(self, inter=[]):
         self.step_bins = 1
-        compare_min_x = []
-        compare_max_x = []
-        compare_min_y = []
-        compare_max_y = []
-        compare_min_x.append(min(self.datax_m))
-        compare_max_x.append(max(self.datax_m))
-        compare_min_y.append(min(self.datay_m))
-        compare_max_y.append(max(self.datay_m))
-        compare_min_x.append(min(self.datax_r))
-        compare_max_x.append(max(self.datax_r))
-        compare_min_y.append(min(self.datay_r))
-        compare_max_y.append(max(self.datay_r))
-        if(self.step_b == 1):
-            if(len(self.datax_b1) != 0):
-                compare_min_x.append(min(self.datax_b1))
-                compare_max_x.append(max(self.datax_b1))
-                compare_min_y.append(min(self.datay_b1))
-                compare_max_y.append(max(self.datay_b1))
-            if(len(self.datax_b2) != 0):
-                compare_min_x.append(min(self.datax_b2))
-                compare_max_x.append(max(self.datax_b2))
-                compare_min_y.append(min(self.datay_b2))
-                compare_max_y.append(max(self.datay_b2))
-        self.x_left = min(compare_min_x)
-        self.x_right = max(compare_max_x)
-        self.y_left = min(compare_min_y)
-        self.y_right = max(compare_max_y)
-        self.x_bins = BINS(left=self.x_left, right=self.x_right, inter=self.x_inter)
-        self.y_bins = BINS(left=self.y_left, right=self.y_right, inter=self.y_inter)
+        compare_min = [[] for i in range(self.dimension)]
+        compare_max = [[] for i in range(self.dimension)]
+        for i in range(self.dimension):
+            compare_min[i].append(min(self.data_m[i]))
+            compare_max[i].append(max(self.data_m[i]))
+            compare_min[i].append(min(self.data_r[i]))
+            compare_max[i].append(max(self.data_r[i]))
+            if(self.step_b == 1):
+                if(len(self.data_b1[i]) != 0):
+                    compare_min[i].append(min(self.data_b1[i]))
+                    compare_max[i].append(max(self.data_b1[i]))
+                if(len(self.data_b2[i]) != 0):
+                    compare_min[i].append(min(self.data_b2[i]))
+                    compare_max[i].append(max(self.data_b2[i]))
+        for i in range(self.dimension):
+            self.left.append(min(compare_min[i]))
+            self.right.append(max(compare_max[i]))
+        if(len(inter) == 0):
+            self.inter = [40 for i in range(self.dimension)]
+        elif(len(inter) != self.dimension):
+            print('Info from hnew.WEIGHTER.set_bins: Wrong inter dimension!!!')
+        else:
+            self.inter = copy.deepcopy(inter)
+        self.bins = []
+        for i in range(self.dimension):
+            self.bins.append(BINS(left=self.left[i], right=self.right[i], inter=self.inter[i]))
+        return 1
 
-    def data_to_matrix(self, datax, datay):
-        output = numpy.zeros([self.x_inter, self.y_inter])
-        for i, tempi in enumerate(output):
-            for j, tempj in enumerate(output[i]):
-                output[i][j] = float(output[i][j])
-        for count, i in enumerate(datax):
-            output[self.x_bins.get_bin_index(datax[count]),
-                   self.y_bins.get_bin_index(datay[count])] += 1
+    def data_to_matrix(self, data):
+        output = numpy.zeros(self.inter)
+        for count, i in enumerate(data[0]):
+            if(self.dimension == 1):
+                output[self.bins[0].get_bin_index(data[0][count])] += 1
+            elif(self.dimension == 2):
+                output[self.bins[0].get_bin_index(data[0][count]),
+                       self.bins[1].get_bin_index(data[1][count])] += 1
+            elif(self.dimension == 3):
+                output[self.bins[0].get_bin_index(data[0][count]),
+                       self.bins[1].get_bin_index(data[1][count]),
+                       self.bins[2].get_bin_index(data[2][count])] += 1
+            elif(self.dimension == 4):
+                output[self.bins[0].get_bin_index(data[0][count]),
+                       self.bins[1].get_bin_index(data[1][count]),
+                       self.bins[2].get_bin_index(data[2][count]),
+                       self.bins[3].get_bin_index(data[3][count])] += 1
         return output
 
     def set_matrix(self):
         self.step_matrix = 1
-        self.matrix_m = self.data_to_matrix(self.datax_m, self.datay_m)
-        self.matrix_r = self.data_to_matrix(self.datax_r, self.datay_r)
+        self.matrix_m = self.data_to_matrix(self.data_m)
+        self.matrix_r = self.data_to_matrix(self.data_r)
         if(self.step_b == 1):
-            self.matrix_b1 = self.data_to_matrix(self.datax_b1, self.datay_b1)
-            self.matrix_b2 = self.data_to_matrix(self.datay_b1, self.datay_b2)
+            self.matrix_b1 = self.data_to_matrix(self.data_b1)
+            self.matrix_b2 = self.data_to_matrix(self.data_b2)
+        return 1
 
     def set_weight(self):
         self.step_weight = 1
-        for i, tempi in enumerate(self.matrix_m):
-            for j, tempj in enumerate(self.matrix_m[i]):
-                if(self.matrix_m[i][j] == 0):
-                    self.matrix_m[i][j] = 1
-                    self.matrix_r[i][j] = 0
-                    if(self.step_b == 1):
-                        self.matrix_b1[i][j] = 0
-                        self.matrix_b2[i][j] = 0
+        where = numpy.where(self.matrix_m == 0)
+        self.matrix_m[where] = 1
+        self.matrix_r[where] = 0
+        self.matrix_b1[where] = 0
+        self.matrix_b2[where] = 0
         output = self.matrix_r / self.matrix_m
         if(self.step_b == 1):
             output = (self.matrix_r - 0.5 * self.matrix_b1 - 0.5 * self.matrix_b2) / self.matrix_m
         self.weight = output
 
-
-class WEIGHTER3D:
-    def __init__(self):
-        self.step_0 = 1
-        self.branchx = ''
-        self.branchy = ''
-        self.branchz = ''
-        self.x_left = 0.0
-        self.x_right = 1.0
-        self.x_inter = 40
-        self.y_left = 0.0
-        self.y_right = 1.0
-        self.y_inter = 40
-        self.z_left = 0.0
-        self.z_right = 1.0
-        self.z_inter = 40
-
-        self.step_m = 0
-        self.step_r = 0
-        self.step_b = 0
-        self.step_bins = 0
-        self.step_matrix = 0
-        self.step_weight = 0
-
-    def set_data_m(self, datax=[], datay=[], dataz=[]):
-        self.step_m = 1
-        self.datax_m = datax
-        self.datay_m = datay
-        self.dataz_m = dataz
-
-    def set_data_r(self, datax=[], datay=[], dataz=[]):
-        self.step_r = 1
-        self.datax_r = datax
-        self.datay_r = datay
-        self.dataz_r = dataz
-
-    def set_data_b(self, datax1=[], datay1=[], dataz1=[], datax2=[], datay2=[], dataz2=[]):
-        self.step_b = 1
-        self.datax_b1 = datax1
-        self.datay_b1 = datay1
-        self.dataz_b1 = dataz1
-        self.datax_b2 = datax2
-        self.datay_b2 = datay2
-        self.dataz_b2 = dataz2
-
-    def set_bins(self):
-        self.step_bins = 1
-        compare_min_x = []
-        compare_max_x = []
-        compare_min_y = []
-        compare_max_y = []
-        compare_min_z = []
-        compare_max_z = []
-        compare_min_x.append(min(self.datax_m))
-        compare_max_x.append(max(self.datax_m))
-        compare_min_y.append(min(self.datay_m))
-        compare_max_y.append(max(self.datay_m))
-        compare_min_z.append(min(self.dataz_m))
-        compare_max_z.append(max(self.dataz_m))
-        compare_min_x.append(min(self.datax_r))
-        compare_max_x.append(max(self.datax_r))
-        compare_min_y.append(min(self.datay_r))
-        compare_max_y.append(max(self.datay_r))
-        compare_min_z.append(min(self.dataz_r))
-        compare_max_z.append(max(self.dataz_r))
-        if(self.step_b == 1):
-            if(len(self.datax_b1) != 0):
-                compare_min_x.append(min(self.datax_b1))
-                compare_max_x.append(max(self.datax_b1))
-                compare_min_y.append(min(self.datay_b1))
-                compare_max_y.append(max(self.datay_b1))
-                compare_min_z.append(min(self.dataz_b1))
-                compare_max_z.append(max(self.dataz_b1))
-            if(len(self.datax_b2) != 0):
-                compare_min_x.append(min(self.datax_b2))
-                compare_max_x.append(max(self.datax_b2))
-                compare_min_y.append(min(self.datay_b2))
-                compare_max_y.append(max(self.datay_b2))
-                compare_min_z.append(min(self.dataz_b2))
-                compare_max_z.append(max(self.dataz_b2))
-        self.x_left = min(compare_min_x)
-        self.x_right = max(compare_max_x)
-        self.y_left = min(compare_min_y)
-        self.y_right = max(compare_max_y)
-        self.z_left = min(compare_min_z)
-        self.z_right = max(compare_max_z)
-        self.x_bins = BINS(left=self.x_left, right=self.x_right, inter=self.x_inter)
-        self.y_bins = BINS(left=self.y_left, right=self.y_right, inter=self.y_inter)
-        self.z_bins = BINS(left=self.z_left, right=self.z_right, inter=self.z_inter)
-
-    def data_to_matrix(self, datax, datay, dataz):
-        output = numpy.zeros([self.x_inter, self.y_inter, self.z_inter])
-        for i, tempi in enumerate(output):
-            for j, tempj in enumerate(output[i]):
-                for k, tempk in enumerate(output[i][j]):
-                    output[i][j][k] = float(output[i][j][k])
-        for count, i in enumerate(datax):
-            output[self.x_bins.get_bin_index(datax[count]),
-                   self.y_bins.get_bin_index(datay[count]),
-                   self.z_bins.get_bin_index(dataz[count])] += 1
-        return output
-
-    def set_matrix(self):
-        self.step_matrix = 1
-        self.matrix_m = self.data_to_matrix(self.datax_m, self.datay_m, self.dataz_m)
-        self.matrix_r = self.data_to_matrix(self.datax_r, self.datay_r, self.dataz_r)
-        if(self.step_b == 1):
-            self.matrix_b1 = self.data_to_matrix(self.datax_b1, self.datay_b1, self.dataz_b1)
-            self.matrix_b2 = self.data_to_matrix(self.datay_b1, self.datay_b2, self.dataz_b2)
-
-    def set_weight(self):
-        self.step_weight = 1
-        for i, tempi in enumerate(self.matrix_m):
-            for j, tempj in enumerate(self.matrix_m[i]):
-                for k, tempk in enumerate(self.matrix_m[i][j]):
-                    if(self.matrix_m[i][j][k] == 0):
-                        self.matrix_m[i][j][k] = 1
-                        self.matrix_r[i][j][k] = 0
-                        if(self.step_b == 1):
-                            self.matrix_b1[i][j][k] = 0
-                            self.matrix_b2[i][j][k] = 0
-        output = self.matrix_r / self.matrix_m
-        if(self.step_b == 1):
-            output = (self.matrix_r - 0.5 * self.matrix_b1 - 0.5 * self.matrix_b2) / self.matrix_m
-        self.weight = output
 
 # 高能所函数
 
@@ -844,11 +731,11 @@ if(root_exit == 1):
             else:
                 print('Error dimension!!!!')
 
-        def get_weighter_2d(self,
-                            data='',
-                            energy=0,
-                            name_weight='',
-                            name_branch=''):
+        def get_weighter(self,
+                         data='',
+                         energy=0,
+                         name_weight='',
+                         name_branch=''):
             '内部调用函数'
             # 读取weight信息
             weight_file = '%s/%s/%1.4f.pkl' % (self.massages['weight'],
@@ -856,50 +743,25 @@ if(root_exit == 1):
                                                energy)
             weight = hfile.pkl_read(weight_file)
             # 更改cut
-            self.selecters[weight.branchx].set_by_edge_show(weight.x_left, weight.x_right)
-            self.selecters[weight.branchx].inter = weight.x_inter
-            self.selecters[weight.branchy].set_by_edge_show(weight.y_left, weight.y_right)
-            self.selecters[weight.branchy].inter = weight.y_inter
+            for i in range(weight.dimension):
+                self.selecters[weight.branch[i]].set_by_edge_show(weight.left[i], weight.right[i])
+                self.selecters[weight.branch[i]].inter = weight.inter[i]
             # 添加新的branch
             new_branch = []
             for i in range(tree_len(self.trees[data])):
-                xindex = weight.x_bins.get_bin_index(self.trees[data][weight.branchx][i])
-                yindex = weight.y_bins.get_bin_index(self.trees[data][weight.branchy][i])
-                if(xindex == -1 or yindex == -1):
+                index = []
+                for d in range(weight.dimension):
+                    index.append(weight.bins[d].get_bin_index(self.trees[data][weight.branch[d]][i]))
+                if(-1 in index):
                     new_branch.append(0)
-                else:
-                    new_branch.append(weight.weight[xindex][yindex])
-            new_branch = numpy.array(new_branch)
-            self.trees[data][name_branch] = new_branch
-
-        def get_weighter_3d(self,
-                            data='',
-                            energy=0,
-                            name_weight='',
-                            name_branch=''):
-            '内部调用函数'
-            # 读取weight信息
-            weight_file = '%s/%s/%1.4f.pkl' % (self.massages['weight'],
-                                               name_weight,
-                                               energy)
-            weight = hfile.pkl_read(weight_file)
-            # 更改cut
-            self.selecters[weight.branchx].set_by_edge_show(weight.x_left, weight.x_right)
-            self.selecters[weight.branchx].inter = weight.x_inter
-            self.selecters[weight.branchy].set_by_edge_show(weight.y_left, weight.y_right)
-            self.selecters[weight.branchy].inter = weight.y_inter
-            self.selecters[weight.branchz].set_by_edge_show(weight.z_left, weight.z_right)
-            self.selecters[weight.branchz].inter = weight.z_inter
-            # 添加新的branch
-            new_branch = []
-            for i in range(tree_len(self.trees[data])):
-                xindex = weight.x_bins.get_bin_index(self.trees[data][weight.branchx][i])
-                yindex = weight.y_bins.get_bin_index(self.trees[data][weight.branchy][i])
-                zindex = weight.z_bins.get_bin_index(self.trees[data][weight.branchz][i])
-                if(xindex == -1 or yindex == -1 or zindex == -1):
-                    new_branch.append(0)
-                else:
-                    new_branch.append(weight.weight[xindex][yindex][zindex])
+                elif(weight.dimension == 1):
+                    new_branch.append(weight.weight[index[0]])
+                elif(weight.dimension == 2):
+                    new_branch.append(weight.weight[index[0]][index[1]])
+                elif(weight.dimension == 3):
+                    new_branch.append(weight.weight[index[0]][index[1]][index[2]])
+                elif(weight.dimension == 4):
+                    new_branch.append(weight.weight[index[0]][index[1]][index[2]][index[3]])
             new_branch = numpy.array(new_branch)
             self.trees[data][name_branch] = new_branch
 
