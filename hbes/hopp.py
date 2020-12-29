@@ -6,16 +6,10 @@ import headpy.hbes.hconst as hconst
 
 
 def algroot():
-    '''
-    作用: 返回进行opp分析的分析程序调用所需要的三个字符串\n
-    '''
     return ['OMEGAALGROOT', 'jobOptions_Omega.txt', 'Omega']
 
 
 def energy_list():
-    '''
-    作用: 返回能够进行opp相空间分析的19个能量点\n
-    '''
     in_list = hconst.energy_list()
     se_list = [2.0000,
                2.0500,
@@ -233,4 +227,10 @@ def selecters():
                                         title='Y')
     output['dalitz_x2'] = output['dalitz_x1']
     output['dalitz_y2'] = output['dalitz_y1']
+    return output
+
+
+def docuts():
+    output = ['pi01_m', 'pi02_m', 'pi03_m',
+              'chisq', 'omega_m']
     return output
