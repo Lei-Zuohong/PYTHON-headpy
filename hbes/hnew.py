@@ -127,7 +127,7 @@ class SELECTER:
         '返回坐标轴标题'
         value = 2 * self.width_show / self.inter
         xtitle = self.title
-        ytitle = r'Events/%s' % (str(value))
+        ytitle = 'Events/%.3f' % (value)
         xtitle += self.unit
         ytitle += self.unit
         return xtitle, ytitle

@@ -1,32 +1,7 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
+# Public package
+# Private package
 
-    Environment version:
-
-        python 2
-        python 3
-        请使用英文字符，否则格式可能不对称
-
-    Content:
-
-        @star(len=81):
-            return a string with len's '*' (default 105)
-        @pstar(len=81):
-            print a string with len's '*' (default 105)
-        @line(string1):
-            return a string such as '*** string1 ***'
-        @pline(string1):
-            print a string such as '*** string1 ***'
-        @point(string1,string2):
-            return a string such as '*** string1 ==> string2 ***'
-        @ppoint(string1,string2):
-            print a string such as '*** string1 ==> string2 ***'
-        @pointbox(dict[string1]=string2):
-            return a string box such as '*** string1 ==> string2 ***'
-        @ppointbox(dict[string1]=string2):
-            print a string box such as '*** string1 ==> string2 ***'
-'''
 
 # region Point star
 
