@@ -565,15 +565,6 @@ if(root_exit == 1):
             output = len(dict_tree[i])
         return output
 
-    def get_index(data, l, r, i):
-        '''
-        返回bin的位置
-        '''
-        output = int(i * (data - l) / (r - l))
-        if(output > i - 1 or output < 0):
-            output = 'empty'
-        return output
-
     # 系统信息处理类
 
     def massage_read(file_read='massage.txt',
@@ -649,87 +640,6 @@ if(root_exit == 1):
             self.trees = copy.deepcopy(trees)
             self.selecters = copy.deepcopy(selecters)
             self.massages = copy.deepcopy(massages)
-
-        def get_weight_2d(self,
-                          data='',
-                          energy=0,
-                          name_weight='',
-                          name_branch=''):
-            '内部调用函数'
-            # 读取weight信息
-            weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
-                                               name_weight,
-                                               energy)
-            weight = hfile.pkl_read(weight_file)
-            # 更改cut
-            self.selecters[weight['branchx']].set_by_edge_show(weight['xl'], weight['xr'])
-            self.selecters[weight['branchx']].inter = weight['xi']
-            self.selecters[weight['branchy']].set_by_edge_show(weight['yl'], weight['yr'])
-            self.selecters[weight['branchy']].inter = weight['yi']
-            # 添加新的branch
-            new_branch = []
-            for i in range(tree_len(self.trees[data])):
-                xindex = get_index(self.trees[data][weight['branchx']][i],
-                                   weight['xl'],
-                                   weight['xr'],
-                                   weight['xi'])
-                yindex = get_index(self.trees[data][weight['branchy']][i],
-                                   weight['yl'],
-                                   weight['yr'],
-                                   weight['yi'])
-                if(xindex != 'empty' and yindex != 'empty'):
-                    new_branch.append(weight['ratio'][xindex][yindex])
-                else:
-                    new_branch.append(0)
-            new_branch = numpy.array(new_branch)
-            self.trees[data][name_branch] = new_branch
-
-        def get_weight_1d(self,
-                          data='',
-                          energy=0,
-                          name_weight='',
-                          name_branch=''):
-            '内部调用函数'
-            # 读取weight信息
-            weight_file = '%s/%s_%1.4f.pkl' % (self.massages['weight'],
-                                               name_weight,
-                                               energy)
-            weight = hfile.pkl_read(weight_file)
-            # 更改cut
-            self.selecters[weight['branchx']].set_by_edge_show(weight['xl'], weight['xr'])
-            self.selecters[weight['branchx']].inter = weight['xi']
-            # 添加新的branch
-            new_branch = []
-            for i in range(tree_len(self.trees[data])):
-                xindex = get_index(self.trees[data][weight['branchx']][i],
-                                   weight['xl'],
-                                   weight['xr'],
-                                   weight['xi'])
-                if(xindex != 'empty'):
-                    new_branch.append(weight['ratio'][xindex])
-                else:
-                    new_branch.append(0)
-            new_branch = numpy.array(new_branch)
-            self.trees[data][name_branch] = new_branch
-
-        def get_weight(self,
-                       data='',
-                       energy=0,
-                       name_weight='',
-                       name_branch='',
-                       dimension=0):
-            if(dimension == 2):
-                self.get_weight_2d(data=data,
-                                   energy=energy,
-                                   name_weight=name_weight,
-                                   name_branch=name_branch)
-            elif(dimension == 1):
-                self.get_weight_1d(data=data,
-                                   energy=energy,
-                                   name_weight=name_weight,
-                                   name_branch=name_branch)
-            else:
-                print('Error dimension!!!!')
 
         def get_weighter(self,
                          data='',

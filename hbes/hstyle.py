@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 import ROOT
-#
 
 
 def set_style():

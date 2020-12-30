@@ -164,10 +164,11 @@ def dofit(**argv):
         massframe.GetYaxis().CenterTitle()
         massframe.Draw()
         pt = ROOT.TPaveText(0.60, 0.60, 0.85, 0.85, 'BRNDC')
+        pt.SetFillColor(10)
         pt.SetBorderSize(0)
         pt.SetTextAlign(12)
         pt.SetTextColor(1)
-        pt.SetTextSize(0.05)
+        pt.SetTextSize(0.04)
         pt.AddText('Energy: %1.4f GeV' % (picture_energy))
         pt.AddText('Sig: %.1f #pm %.1f' % (parameter['npdf1'].getVal(), parameter['npdf1'].getError()))
         pt.AddText('Bkg: %.1f #pm %.1f' % (parameter['npdf2'].getVal(), parameter['npdf2'].getError()))
@@ -195,6 +196,9 @@ class MYFIT():
 
     def set_parameters(self, parameters):
         self.parameters = copy.deepcopy(parameters)
+
+    def set_best_parameters(self, best_parameters):
+        self.best_parameters = copy.deepcopy(best_parameters)
 
     def do_dump(self, func_dump, **argv):
         self.namef, self.nameh = func_dump(**argv)
@@ -233,7 +237,7 @@ class MYFIT():
                 record_output.append(fit_data)
                 count1 += 1
             count2 += 1
-        # 选择spread序列
+        # 统计spread序列
         sum = 0
         for i in range(argv['spread_times']):
             sum += record_nevent[i]
@@ -245,5 +249,21 @@ class MYFIT():
             if(abs(sum - record_nevent[i]) < use_dif):
                 use_i = i
                 use_dif = abs(sum - record_nevent[i])
+        # 储存拟合结果
+        self.best_parameters = record_parameters[use_i]
+        self.best_output = record_output[use_i]
         # 返回拟合结果
         return record_output[use_i]
+
+    def do_fit_plot(self, **argv):
+        if(hasattr(self, 'best_parameters')):
+            print('')
+        else:
+            print('Info from hfit.MYFIT.do_fit_plot: Have not done fit_spread yet!!!')
+            exit(0)
+        # 设定ROOT文件
+        argv['parameters'] = self.best_parameters
+        argv['namef'] = self.namef
+        argv['nameh'] = self.nameh
+        output = argv['func_fit'](**argv)
+        return output
