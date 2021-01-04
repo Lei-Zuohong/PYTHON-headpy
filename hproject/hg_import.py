@@ -1,7 +1,16 @@
+# -*- coding: UTF-8 -*-
+# Public package
+import configpars
+
+# Private package
+
+
+
+
 api_key = ''
 actor_dict = {}
 
-print('\n>> 导入头像...')	
+	
 if quiet_flag:
     for filename,pic_path in pic_path_dict.items():
         proc_md5 = md5((filename+'+3').encode('UTF-8')).hexdigest()[14:-14]
