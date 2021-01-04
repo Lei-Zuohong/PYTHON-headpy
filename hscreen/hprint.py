@@ -66,19 +66,21 @@ def pika():
     输出一个皮卡丘\n
     输出一个皮卡丘
     '''
-    output = ''' 　　
-　 　/＼　  　  ／|     皮~~~~~~卡~~~~~~~！！！
-　  /　│　　 ／　／
-　 │　Z ＿,＜　／ 　   /`ヽ
-　 │　　　　　ヽ　    /　　〉
-　  Y　　　　　ヽ　  /　　/
-　 ｲ●　､　●　　 |  〈　　/
-　()　 へ　 ()　|　  ＼〈
-　　>ｰ ､_　 ィ　 │   ／／
-　 / へ　　 /　ﾉ＜|  ＼＼
-　 ヽ_ﾉ　　(_／　 │ ／／
-　　7　　　　　　　|／
-　　＞―r￣￣`ｰ―＿―|
+    output = '''
+____________________________________________________________________________ 　　
+|　 　/＼　  　  ／|                                                        |
+|　  /　│　　 ／　／                                                        |
+|　 │　 L＿,＜　／ 　   /`ヽ       This code is supported by Zuohong Lei.   |
+|　 │　　　　　ヽ　    /＼　〉                                              |
+|　  Y　　　　　ヽ　  /　　/       QQ: 791397845                            |
+|　 ｲ●　､　●　　 |  〈　　/        Phone: 18702767538                       |
+|　()　 へ　 ()　|　  ＼〈         E-mail: leizuoho@mail.ustc.edu.cn        |
+|　　>ｰ ､_　 ィ　 │   ／／                                                  |
+|　 / へ　　 /　ﾉ＜|  ＼＼                                                  |
+|　 ヽ_ﾉ　　(_／　 │ ／／                                                   |
+|　　7　　　　　　　|／                                                     |
+|　　＞―r￣￣`ｰ―＿―|                                                        |
+L___________________________________________________________________________|
     '''
     return output
 
@@ -102,9 +104,9 @@ class TABLE:
         for i in range(total_width):
             output += '*'
         output += '\n'
-        for count1, i1 in enumerate(self.content):
-            output += '* '
-            for count2, i2 in enumerate(i1):
+        for count1 in range(len(self.content)):
+            output += ''
+            for count2 in range(len(self.content[count1])):
                 exec("output += '{:<%d}'.format(self.content[count1][count2])" % (self.width[count2]))
                 output += ' * '
             output += '\n'
@@ -114,6 +116,28 @@ class TABLE:
 
     def ptable(self):
         print(self.table())
+
+    def latex(self):
+        output = ''
+        total_width = sum(self.width) + 3 * len(self.width) - 1
+        for i in range(total_width):
+            output += '*'
+        output += '\n'
+        for count1 in range(len(self.content)):
+            output += ''
+            for count2 in range(len(self.content[count1])):
+                exec("output += '{:<%d}'.format(self.content[count1][count2])" % (self.width[count2]))
+                if(count2 < len(self.content[count1])-1):
+                    output += ' & '
+                else:
+                    output += '\\\\'
+            output += '\n'
+        for i in range(total_width):
+            output += '*'
+        return output
+
+    def platex(self):
+        print(self.latex())
 
     def add_line(self, line):
         if(len(self.content) == 0):
@@ -139,16 +163,19 @@ class TABLE:
         return 1
 
     def add_dict(self, dict_in, keys1_use=[], keys2_use=[], key1=''):
+        # 得到横纵索引
         keys1 = dict_in.keys()
         keys1.sort()
         keys2 = dict_in[keys1[0]].keys()
         keys2.sort()
+        # 填入第一行
         temp = []
         temp.append(key1)
         for key2 in keys2:
             if(len(keys2_use) != 0 and key2 not in keys2_use): continue
             temp.append(key2)
         self.add_line(temp)
+        # 填入后续行
         for key1 in keys1:
             if(len(keys1_use) != 0 and key1 not in keys1_use): continue
             temp = [key1]

@@ -80,6 +80,17 @@ def copy_folder(source_path='',
     shutil.copytree('%s/%s' % (source_path, source_name),
                     '%s/%s' % (path, name))
 
+
+def rm_file(path='',
+            name=''):
+    os.remove('%s/%s' % (path, name))
+
+
+def rm_folder(path='',
+              name=''):
+    shutil.rmtree('%s/%s' % (path, name))
+
+
 ################################################################################
 # 文件列表类
 ################################################################################

@@ -1,22 +1,9 @@
 # -*- coding: UTF-8 -*-
-'''
-This is a package document.
-
-    Environment version:
-
-        etc
-
-    Content:
-    
-        @etc:
-            etc
-'''
-
-
 # Public package
+import os
 import sys
 import requests
-import os
+# Private package
 
 
 def download(url, file_path):
