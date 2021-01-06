@@ -10,6 +10,22 @@ import random
 import headpy.hfile as hfile
 
 
+def addjust_phase_zero(value):
+    pi = 3.1415926
+    output = value
+    while(output > pi): output -= 2 * pi
+    while(output < 0 - pi): output += 2 * pi
+    return output
+
+
+def addjust_phase_pi(value):
+    pi = 3.1415926
+    output = value
+    while(output > 2 * pi): output -= 2 * pi
+    while(output < 0): output += 2 * pi
+    return output
+
+
 def write_option(file_name, dict_option):
     '把dictionary（单值）对象写入文件'
     keys = dict_option.keys()
@@ -59,6 +75,8 @@ def read_parameter(file_name):
                 output[name]['error'] = error
                 output[name]['limitl'] = limitl
                 output[name]['limitr'] = limitr
+                if(re.match(r'(.*)_phase', name)):
+                    output[name]['value'] = addjust_phase_zero(output[name]['value'])
             except:
                 pass
     return output
