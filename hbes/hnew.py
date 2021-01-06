@@ -300,6 +300,12 @@ class WEIGHTER:
             output = (self.matrix_r - 0.5 * self.matrix_b1 - 0.5 * self.matrix_b2) / self.matrix_m
         self.weight = output
 
+    def clean(self):
+        self.data_r = []
+        self.data_m = []
+        self.data_b1 = []
+        self.data_b2 = []
+
 
 # 高能所函数
 
