@@ -505,7 +505,8 @@ class MYPWA():
             outfile.write('Fitting start:\n\n')
 
     # Fitting
-    def get_fit_nominal(self):
+
+    def get_fit_nominal(self):  # 进行一次正常拟合
         output = dopwa(project_source_path=self.path_program_source,
                        project_source_name=self.project,
                        project_path=self.path_program_execute,
@@ -522,7 +523,7 @@ class MYPWA():
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
-    def get_fit_nominal_spread(self):
+    def get_fit_nominal_spread(self):  # 进行一次撒点拟合
         output = dopwa_spread(50,
                               project_source_path=self.path_program_source,
                               project_source_name=self.project,
@@ -540,10 +541,10 @@ class MYPWA():
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
-    def get_fit_amplitude_fit4c(self):
+    def get_fit_amplitude(self, target_folder='root_fit4c'):  # 读取指定文件夹中的root，返回amplitude列表
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         new_input_parameter = copy.deepcopy(self.input_parameter)
-        nums = hfile.pkl_read('root_fit4c/%1.4f_entries.pkl' % (self.energy))
+        nums = hfile.pkl_read('%s/%1.4f_entries.pkl' % (target_folder, self.energy))
         new_input_option_value['number_data'] = nums['signal']
         new_input_option_value['do_fit_minuit'] = 0
         new_input_option_value['do_output_amplitude'] = 1
@@ -553,8 +554,8 @@ class MYPWA():
         output = dopwa_amplitude(project_source_path=self.path_program_source,
                                  project_source_name=self.project,
                                  project_path=self.path_program_execute,
-                                 project_name='%1.4f_amplitude_fit4c' % (self.energy),
-                                 root_path_data='root_fit4c',
+                                 project_name='%1.4f_amplitude' % (self.energy),
+                                 root_path_data='%s' % (target_folder),
                                  root_name_data='%1.4f_mc.root' % (self.energy),
                                  root_path_mc=self.path_root_input,
                                  root_name_mc=self.root_mc,
@@ -568,35 +569,7 @@ class MYPWA():
             print("Output entries: %d" % (len(output)))
         return output
 
-    def get_fit_amplitude_truth(self):
-        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
-        new_input_parameter = copy.deepcopy(self.input_parameter)
-        nums = hfile.pkl_read('root_truth/%1.4f_entries.pkl' % (self.energy))
-        new_input_option_value['number_data'] = nums['signal']
-        new_input_option_value['do_fit_minuit'] = 0
-        new_input_option_value['do_output_amplitude'] = 1
-        for parameter in new_input_parameter:
-            new_input_parameter[parameter]['error'] = -1
-
-        output = dopwa_amplitude(project_source_path=self.path_program_source,
-                                 project_source_name=self.project,
-                                 project_path=self.path_program_execute,
-                                 project_name='%1.4f_amplitude_truth' % (self.energy),
-                                 root_path_data='root_truth',
-                                 root_name_data='%1.4f_mc.root' % (self.energy),
-                                 root_path_mc=self.path_root_input,
-                                 root_name_mc=self.root_mc,
-                                 input_option_string=self.input_option_string,
-                                 input_option_value=new_input_option_value,
-                                 input_constant=self.input_constant,
-                                 input_parameter=self.input_parameter,
-                                 file_execute=self.project)
-        if(len(output) != nums['signal']):
-            print("Input  entries: %d" % (nums['signal']))
-            print("Output entries: %d" % (len(output)))
-        return output
-
-    def get_fit_plot(self, target_folder):
+    def get_fit_plot(self, target_folder='root_plot'):  # 绘制拟合图片，返回指定文件夹
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         new_input_option_value['do_output_root'] = 1
         new_input_option_value['do_fit_minuit'] = 0
@@ -615,7 +588,7 @@ class MYPWA():
                             input_parameter=self.input_parameter,
                             file_execute=self.project)
 
-    def get_test_significance(self):
+    def get_test_significance(self):  # 计算significance
         data_nominal = self.get_fit_nominal()
         self.significance = {}
         for wave in self.mywave.wave_consider:
@@ -719,7 +692,7 @@ class MYPWA():
 
     # Processing
 
-    def check_significance(self):
+    def check_significance(self):  # 判断significance
         '检查significance是否满足5sigma，返回bool'
         check_minus = 1
         check_plus = 1
@@ -732,7 +705,7 @@ class MYPWA():
         check = check_minus * check_plus
         return check
 
-    def adjust_significance(self):
+    def adjust_significance(self):  # 调整significance
         '根据significance调整mywave的wave_nominal列表'
         # 得到检测结果
         check_minus = 1
@@ -778,5 +751,35 @@ class MYPWA():
                     outfile.write('{:<25}\n'.format(wave))
                 outfile.write('\n')
 
-    def dump_significance(self, filename):
+    def dump_significance(self, filename):  # 储存significance
         hfile.pkl_dump(filename, self.significance)
+
+    # Special analysis
+
+    def analysis_bump(self,  # 得到关于一个关于参数扫描的细致图片
+                      parameter_name='rho1450pi_phase',
+                      parameter_left=0.0,
+                      parameter_right=1.0,
+                      parameter_inter=100,
+                      target_folder=''):
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_option_value['do_output_root'] = 1
+        new_input_option_value['do_fit_minuit'] = 0
+        new_input_parameter = copy.deepcopy(self.input_parameter)
+        for i in range(parameter_inter):
+            temp_value = parameter_left + float(i) / parameter_inter * (parameter_right - parameter_left)
+            new_input_parameter[parameter_name]['value'] = temp_value
+            output = dopwa_plot(target_folder, '%1.4f_%03d.root' % (self.energy, i),
+                                project_source_path=self.path_program_source,
+                                project_source_name=self.project,
+                                project_path=self.path_program_execute,
+                                project_name='%1.4f_plot' % (self.energy),
+                                root_path_data=self.path_root_input,
+                                root_name_data=self.root_data,
+                                root_path_mc=self.path_root_input,
+                                root_name_mc=self.root_mc,
+                                input_option_string=self.input_option_string,
+                                input_option_value=new_input_option_value,
+                                input_constant=self.input_constant,
+                                input_parameter=new_input_parameter,
+                                file_execute=self.project)
