@@ -29,7 +29,7 @@ def fundecaymomentum(mr_2, m1_2, m2_2):
     m1 = math.sqrt(m1_2)
     m2 = math.sqrt(m2_2)
     poly = mr_2**2 + m1_2**2 + m2_2**2 - 2 * m1_2 * m2_2 - 2 * mr_2 * m2_2 - 2 * m1_2 * mr_2
-    if(poly < 0.0 and poly > -0.00001): poly = 0.0
+    if(poly < 0.0): poly = 0.0
     output = math.sqrt(poly) / (2 * mr)
     if(m1 + m2 > mr):
         output = 0.0
@@ -41,7 +41,7 @@ def fundecaymomentum2(mr_2, m1_2, m2_2):
     m1 = math.sqrt(m1_2)
     m2 = math.sqrt(m2_2)
     poly = mr_2**2 + m1_2**2 + m2_2**2 - 2 * m1_2 * m2_2 - 2 * mr_2 * m2_2 - 2 * m1_2 * mr_2
-    if(poly < 0.0 and poly > -0.00001): poly = 0.0
+    if(poly < 0.0): poly = 0.0
     output = poly / (4 * mr_2)
     if(m1 + m2 > mr):
         output = 0.0
