@@ -104,7 +104,6 @@ def read_matrix(file_name):
 
 
 def read_likelihood(file_name):
-    '读取：Best likelihood: value 类txt信息'
     output = 0
     lines = hfile.txt_readlines(file_name)
     for line in lines:
@@ -113,6 +112,28 @@ def read_likelihood(file_name):
         if(check):
             output = float(check.group(1))
     return output
+
+
+def read_covariance(file_name):
+    lines = hfile.txt_readlines(file_name)
+    for i in range(len(lines)):
+        if(re.match(r'MnUserCovariance Parameter correlations:', lines[i])):
+            line_start = i + 2
+    for i in range(len(lines)):
+        if(i < line_start + 2): continue
+        if(len(lines[i]) < 2):
+            line_end = i - 1
+            break
+    file_txt = ''
+    for i in range(len(lines)):
+        if(i >= line_start and i < line_end):
+            file_txt += lines[i]
+            file_txt += '\n'
+        elif(i == line_end):
+            file_txt += lines[i]
+    hfile.txt_write('temp.txt', file_txt)
+    output = numpy.loadtxt('temp.txt', dtype=numpy.float)
+    return output.tolist()
 
 
 def dopwa(**argv):
@@ -176,6 +197,10 @@ def dopwa(**argv):
         print('Info from hpwa.dopwa: Missing output file.')
     try:
         mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
+    except:
+        print('Info from hpwa.dopwa: Missing output file.')
+    try:
+        mydata.covariance = copy.deepcopy(read_covariance('minimum_covariance.txt'))
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     # 4. 删除大体积文件
@@ -339,6 +364,7 @@ class MYDATA():
         self.output_constant = {}
 
         self.fraction = [[]]
+        self.covariance = [[]]
 
         self.least_likelihood = 0
 
