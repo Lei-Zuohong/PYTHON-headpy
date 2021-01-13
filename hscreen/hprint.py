@@ -209,19 +209,18 @@ class TABLE:
                 for count, order in enumerate(order2):
                     if(temp[0][i] == order):
                         order2[count] = i
-            temp[:, range(shape[0])] = temp[:, [0] + order2]
+            temp[:, range(shape[1])] = temp[:, [0] + order2]
             temp_width = numpy.array(self.width)
-            temp_width[range(shape[0])] = temp_width[[0] + order2]
+            temp_width[range(shape[1])] = temp_width[[0] + order2]
             self.width = temp_width.tolist()
         self.content = temp.tolist()
 
     def set_format(self, func, list1=[], list2=[]):
-        print('check1')
         for count1, temp1 in enumerate(self.content):
             for count2, temp2 in enumerate(self.content[count1]):
-                #if(count1 == 0): continue
-                #if(count2 == 0): continue
-                print(self.content[0][count2])
+                if(count1 == 0 and count2 == 0): continue
+                if(count1 == 0): continue
+                if(count2 == 0): continue
                 if(len(list1) != 0 and self.content[count1][0] not in list1): continue
                 if(len(list2) != 0 and self.content[0][count2] not in list2): continue
                 args = [self.content[count1][count2]]
