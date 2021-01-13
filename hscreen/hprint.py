@@ -216,10 +216,12 @@ class TABLE:
         self.content = temp.tolist()
 
     def set_format(self, func, list1=[], list2=[]):
+        print('check1')
         for count1, temp1 in enumerate(self.content):
             for count2, temp2 in enumerate(self.content[count1]):
-                if(count1 == 0): continue
-                if(count2 == 0): continue
+                #if(count1 == 0): continue
+                #if(count2 == 0): continue
+                print(self.content[0][count2])
                 if(len(list1) != 0 and self.content[count1][0] not in list1): continue
                 if(len(list2) != 0 and self.content[0][count2] not in list2): continue
                 args = [self.content[count1][count2]]
