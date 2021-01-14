@@ -2,8 +2,8 @@
 # Public package
 import copy
 import numpy
+import hpicture
 # Private package
-
 
 # region Point star
 
@@ -58,38 +58,6 @@ def pointbox(stringlist):
 def ppointbox(stringlist):
     "print a string box such as '*** string1 ==> string2 ***'"
     print(pointbox(stringlist))
-
-# endregion
-# region Picture
-
-
-def pika():
-    '''
-    输出一个皮卡丘\n
-    输出一个皮卡丘
-    '''
-    output = '''
-____________________________________________________________________________ 　　
-|　 　/＼　  　  ／|                                                        |
-|　  /　│　　 ／　／                                                        |
-|　 │　 L＿,＜　／ 　   /`ヽ       This code is supported by Zuohong Lei.   |
-|　 │　　　　　ヽ　    /＼　〉                                              |
-|　  Y　　　　　ヽ　  /　　/       QQ: 791397845                            |
-|　 ｲ●　､　●　　 |  〈　　/        Phone: +86 18702767538                   |
-|　()　 へ　 ()　|　  ＼〈         E-mail: leizuoho@mail.ustc.edu.cn        |
-|　　>ｰ ､_　 ィ　 │   ／／                                                  |
-|　 / へ　　 /　ﾉ＜|  ＼＼                                                  |
-|　 ヽ_ﾉ　　(_／　 │ ／／                                                   |
-|　　7　　　　　　　|／                                                     |
-|　　＞―r￣￣`ｰ―＿―|                                                        |
-L___________________________________________________________________________|
-    '''
-    return output
-
-
-def ppika():
-    '输出一个皮卡丘\n输出一个皮卡丘'
-    print(pika())
 
 # endregion
 # region Table
@@ -227,5 +195,13 @@ class TABLE:
                 value = func(*args)
                 self.content[count1][count2] = value
 
+
+# endregion
+# region Picture
+
+
+def ppika():
+    '输出一个皮卡丘\n输出一个皮卡丘'
+    print(hpicture.pika())
 
 # endregion

@@ -7,133 +7,8 @@ import copy
 import numpy
 import random
 # Private package
+import hdata as hdata
 import headpy.hfile as hfile
-
-
-def addjust_phase_zero(value):
-    pi = 3.1415926
-    output = value
-    while(output > pi): output -= 2 * pi
-    while(output < 0 - pi): output += 2 * pi
-    return output
-
-
-def addjust_phase_pi(value):
-    pi = 3.1415926
-    output = value
-    while(output > 2 * pi): output -= 2 * pi
-    while(output < 0): output += 2 * pi
-    return output
-
-
-def write_option(file_name, dict_option):
-    '把dictionary（单值）对象写入文件'
-    keys = dict_option.keys()
-    keys.sort()
-    output = ''
-    for key in keys:
-        output += '{:<25}'.format(key)
-        output += '{:<20}'.format(dict_option[key])
-        output += '\n'
-    with open(file_name, 'w') as outfile:
-        outfile.write(output)
-
-
-def write_parameter(file_name, dict_option):
-    '把dictionary（参数）对象写入文件'
-    keys = dict_option.keys()
-    keys.sort()
-    output = ''
-    for key in keys:
-        output += '{:<25}'.format(key)
-        output += ' = '
-        output += '{:<15}'.format('%.6f' % (dict_option[key]['value']))
-        output += '{:<15}'.format('%.6f' % (dict_option[key]['error']))
-        output += '{:<15}'.format('%.6f' % (dict_option[key]['limitl']))
-        output += '{:<15}'.format('%.6f' % (dict_option[key]['limitr']))
-        output += '\n'
-    with open(file_name, 'w') as outfile:
-        outfile.write(output)
-
-
-def read_parameter(file_name):
-    '读取: parameter = value error limitl limitr 类txt信息'
-    output = {}
-    lines = hfile.txt_readlines(file_name)
-    for line in lines:
-        method = r'(\S*)\s*=\s*(\S*)\s*(\S*)\s*(\S*)\s*(\S*)'
-        check = re.match(method, line)
-        if(check):
-            try:
-                name = check.group(1)
-                value = float(check.group(2))
-                error = float(check.group(3))
-                limitl = float(check.group(4))
-                limitr = float(check.group(5))
-                output[name] = {}
-                output[name]['value'] = value
-                output[name]['error'] = error
-                output[name]['limitl'] = limitl
-                output[name]['limitr'] = limitr
-                if(re.match(r'(.*)_phase', name)):
-                    output[name]['value'] = addjust_phase_zero(output[name]['value'])
-            except:
-                pass
-    return output
-
-
-def read_matrix(file_name):
-    length = 0
-    massages = []
-    lines = hfile.txt_readlines(file_name)
-    for line in lines:
-        method = r'(\S*)\s*(\S*)\s*(\S*)'
-        check = re.match(method, line)
-        if(check):
-            num1 = int(check.group(1))
-            num2 = int(check.group(2))
-            num3 = float(check.group(3))
-            massages.append([num1, num2, num3])
-            if(num1 > length): length = num1
-            if(num2 > length): length = num2
-    output = numpy.zeros([length + 1, length + 1])
-    for massage in massages:
-        output[massage[0]][massage[1]] = massage[2]
-    output = output.tolist()
-    return output
-
-
-def read_likelihood(file_name):
-    output = 0
-    lines = hfile.txt_readlines(file_name)
-    for line in lines:
-        method = r'Best Likelihood:(.*)'
-        check = re.match(method, line)
-        if(check):
-            output = float(check.group(1))
-    return output
-
-
-def read_covariance(file_name):
-    lines = hfile.txt_readlines(file_name)
-    for i in range(len(lines)):
-        if(re.match(r'MnUserCovariance Parameter correlations:', lines[i])):
-            line_start = i + 2
-    for i in range(len(lines)):
-        if(i < line_start + 2): continue
-        if(len(lines[i]) < 2):
-            line_end = i - 1
-            break
-    file_txt = ''
-    for i in range(len(lines)):
-        if(i >= line_start and i < line_end):
-            file_txt += lines[i]
-            file_txt += '\n'
-        elif(i == line_end):
-            file_txt += lines[i]
-    hfile.txt_write('temp.txt', file_txt)
-    output = numpy.loadtxt('temp.txt', dtype=numpy.float)
-    return output.tolist()
 
 
 def dopwa(**argv):
@@ -172,10 +47,10 @@ def dopwa(**argv):
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_path, project_name))
     # 2. 写入初值文件
-    write_option(file_name='input_option_string.txt', dict_option=input_option_string)
-    write_option(file_name='input_option_value.txt', dict_option=input_option_value)
-    write_parameter(file_name='input_constant.txt', dict_option=input_constant)
-    write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
+    hdata.write_option('input_option_string.txt', input_option_string)
+    hdata.write_option('input_option_value.txt', input_option_value)
+    hdata.write_parameter('input_constant.txt', input_constant)
+    hdata.write_parameter('input_parameter.txt', input_parameter)
     mydata.option_string = copy.deepcopy(input_option_string)
     mydata.option_value = copy.deepcopy(input_option_value)
     mydata.input_constant = copy.deepcopy(input_constant)
@@ -184,23 +59,24 @@ def dopwa(**argv):
     os.system('./%s | tee log.txt' % (file_execute))
     # 4. 读取末值文件
     try:
-        mydata.output_constant = copy.deepcopy(read_parameter('output_constant.txt'))
+        mydata.output_constant = copy.deepcopy(hdata.read_parameter('output_constant.txt'))
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     try:
-        mydata.output_parameter = copy.deepcopy(read_parameter('output_parameter.txt'))
+        mydata.output_parameter = copy.deepcopy(hdata.read_parameter('output_parameter.txt'))
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     try:
-        mydata.least_likelihood = copy.deepcopy(read_likelihood('output_fitresult.txt'))
+        mydata.least_likelihood = copy.deepcopy(hdata.read_likelihood('output_fitresult.txt'))
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     try:
-        mydata.fraction = copy.deepcopy(read_matrix('output_fraction.txt'))
+        mydata.fraction = copy.deepcopy(hdata.read_matrix('output_fraction.txt'))
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     try:
-        mydata.covariance = copy.deepcopy(read_covariance('minimum_covariance.txt'))
+        mydata.correlation = copy.deepcopy(hdata.read_correlation('minimum_covariance.txt'))
+        mydata.output_parameter.add_correlation(mydata.correlation)
     except:
         print('Info from hpwa.dopwa: Missing output file.')
     # 4. 删除大体积文件
@@ -249,10 +125,10 @@ def dopwa_amplitude(**argv):
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_path, project_name))
     # 2. 写入初值文件
-    write_option(file_name='input_option_string.txt', dict_option=input_option_string)
-    write_option(file_name='input_option_value.txt', dict_option=input_option_value)
-    write_parameter(file_name='input_constant.txt', dict_option=input_constant)
-    write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
+    hdata.write_option('input_option_string.txt', input_option_string)
+    hdata.write_option('input_option_value.txt', input_option_value)
+    hdata.write_parameter('input_constant.txt', input_constant)
+    hdata.write_parameter('input_parameter.txt', input_parameter)
     # 3. 开始执行拟合
     os.system('./%s | tee log.txt' % (file_execute))
     # 4. 读取振幅文件
@@ -306,10 +182,10 @@ def dopwa_plot(target_folder, target_file, **argv):
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_path, project_name))
     # 2. 写入初值文件
-    write_option(file_name='input_option_string.txt', dict_option=input_option_string)
-    write_option(file_name='input_option_value.txt', dict_option=input_option_value)
-    write_parameter(file_name='input_constant.txt', dict_option=input_constant)
-    write_parameter(file_name='input_parameter.txt', dict_option=input_parameter)
+    hdata.write_option('input_option_string.txt', input_option_string)
+    hdata.write_option('input_option_value.txt', input_option_value)
+    hdata.write_parameter('input_constant.txt', input_constant)
+    hdata.write_parameter('input_parameter.txt', input_parameter)
     # 3. 开始执行拟合
     os.system('./%s | tee log.txt' % (file_execute))
     # 4. 删除大体积文件
@@ -326,17 +202,9 @@ def dopwa_plot(target_folder, target_file, **argv):
 
 
 def dopwa_spread(nrandom, **argv):
-    '依照input_parameter进行撒点拟合'
     # 产生随机初始参数放入列表
     input_parameter = argv['input_parameter']
-    multi_input_parameter = []
-    for i in range(nrandom):
-        new_input_parameter = copy.deepcopy(input_parameter)
-        for parameter in new_input_parameter:
-            if(new_input_parameter[parameter]['error'] > 0):
-                new_input_parameter[parameter]['value'] = random.uniform(new_input_parameter[parameter]['limitl'],
-                                                                         new_input_parameter[parameter]['limitr'])
-        multi_input_parameter.append(copy.deepcopy(new_input_parameter))
+    multi_input_parameter = input_parameter.generate_random_spread(nrandom)
     # 多次拟合得到最佳结果
     best_likelihood = 0
     best_input_parameter = 0
@@ -364,7 +232,7 @@ class MYDATA():
         self.output_constant = {}
 
         self.fraction = [[]]
-        self.covariance = [[]]
+        self.correlation = [[]]
 
         self.least_likelihood = 0
 
@@ -654,8 +522,8 @@ class MYPWA():
         nrandom = 10
         for i in range(inter):
             use_value = limitl + i * unit
-            use_parameter[parameter]['value'] = use_value
-            use_parameter[parameter]['error'] = -1
+            use_parameter.parameters[parameter].value = use_value
+            use_parameter.parameters[parameter].error = -1
             data = dopwa_spread(project_source_path=self.path_program_source,
                                 project_source_name=self.project,
                                 project_path=self.path_program_execute,
@@ -694,10 +562,10 @@ class MYPWA():
         for i1, value1 in enumerate(listx):
             for i2, value2 in enumerate(listy):
                 print('Iteration: %.4f %.4f' % (value1, value2))
-                use_constant[parameter1]['value'] = value1
-                use_constant[parameter1]['error'] = -1
-                use_constant[parameter2]['value'] = value2
-                use_constant[parameter2]['error'] = -1
+                use_constant.parameters[parameter1].value = value1
+                use_constant.parameters[parameter1].error = -1
+                use_constant.parameters[parameter2].value = value2
+                use_constant.parameters[parameter2].error = -1
                 data = dopwa_spread(project_source_path=self.path_program_source,
                                     project_source_name=self.project,
                                     project_path=self.path_program_execute,
