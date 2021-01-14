@@ -29,6 +29,14 @@ class PARAMETER():
         self.limitl = limitl
         self.limitr = limitr
 
+    def __getitem__(self, key):
+        output = 0
+        exec('output=self.%s' % (key))
+        return output
+
+    def __setitem__(self, key, value):
+        exec('self.%s = value' % (key))
+
 
 class PARAMETERS():
     def __init__(self):
@@ -119,6 +127,12 @@ class PARAMETERS():
                 temp_parameters.parameters[name].value = new_data[name][i]
             output.append(temp_parameters)
         return output
+
+    def __getitem__(self, key):
+        return self.parameters[key]
+
+    def __setitem__(self, key, value):
+        self.parameters[key] = value
 
 
 def write_option(file_name, dict_option):
