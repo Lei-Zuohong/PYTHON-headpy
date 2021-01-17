@@ -73,15 +73,28 @@ class MYSCANER():
 
 class MYWAVE():
     def __init__(self, wave_possible=[], wave_consider=[], wave_nominal=[], wave_save=[]):
+        '''
+        wave_possible: 代表需要在option_value中赋值，指定为0或1的波的名称\n
+        wave_consider: 代表需要在significance检验中，进行检验的波的名称\n
+        wave_nominal : 代表当前在option_value中赋值，指定为1的波的名称\n
+        wave_save    : 代表需要在significance检验中，恒定设定为1的波的名称\n
+        '''
         self.wave_possible = copy.deepcopy(wave_possible)
         self.wave_consider = copy.deepcopy(wave_consider)
         self.wave_nominal = copy.deepcopy(wave_nominal)
         self.wave_save = copy.deepcopy(wave_save)
 
+    def get_nominal_parameter(self, input_parameter):
+        '改变input_parameter: 将非包含的变量的error设定为-1.0'
+        output_parameter = copy.deepcopy(input_parameter)
+        for name in input_parameter.names:
+            if(re.match(r'wave_(.*)_(.*)', name)):
+                if(re.match(r'wave_(.*)_(.*)', name).group(1) not in self.wave_nominal):
+                    output_parameter.parameters[name].error = -1.0
+        return output_parameter
+
     def get_nominal_option(self, input_option_value):
-        '''
-        字典形式输出一个wave是否被添加
-        '''
+        '改变input_option，将wave_nominal的波设定为1'
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nominal):
@@ -91,9 +104,7 @@ class MYWAVE():
         return output
 
     def get_check_option(self, input_option_value, wave_check):
-        '''
-        字典形式输出一个wave是否被添加，对于指定的wave，变更其结果
-        '''
+        '改变input_option，将wave_nominal的波设定为1，但反转特定一个波的设定'
         output = copy.deepcopy(input_option_value)
         for wave in self.wave_possible:
             if(wave in self.wave_nominal):
@@ -207,7 +218,7 @@ class MYPWA():
         output.fraction = copy.deepcopy(self.mywave.give_fraction_name(output.fraction))
         return output
 
-    def get_fit_amplitude(self, target_folder='root_fit4c'):  # 读取指定文件夹中的root，返回amplitude列表
+    def get_fit_amplitude(self, target_folder='root_fit4c/root_truth'):  # 读取指定文件夹中的root，返回amplitude列表
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         new_input_parameter = copy.deepcopy(self.input_parameter)
         nums = hfile.pkl_read('%s/%1.4f_entries.pkl' % (target_folder, self.energy))
@@ -421,6 +432,38 @@ class MYPWA():
         hfile.pkl_dump(filename, self.significance)
 
     # Special analysis
+
+    def get_error_sta_fraction(self):
+        num = 100
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(self.input_parameter))
+        multi_parameter = new_input_parameter.generate_random_correlation(num)
+        new_input_option_value['do_fit_minuit'] = 0
+        fractions = []
+        for new_input_parameter in multi_parameter:
+            data = hdopwa.dopwa(project_source_path=self.path_program_source,
+                                project_source_name=self.project,
+                                project_path=self.path_program_execute,
+                                project_name='%1.4f_nominal' % (self.energy),
+                                root_path_data=self.path_root_input,
+                                root_name_data=self.root_data,
+                                root_path_mc=self.path_root_input,
+                                root_name_mc=self.root_mc,
+                                input_option_string=self.input_option_string,
+                                input_option_value=new_input_option_value,
+                                input_constant=self.input_constant,
+                                input_parameter=new_input_parameter,
+                                file_execute=self.project)
+            data.fraction = copy.deepcopy(self.mywave.give_fraction_name(data.fraction))
+            fractions.append(copy.deepcopy(data.fraction))
+        output = copy.deepcopy(fractions[0])
+        for i1 in output:
+            for i2 in output[i1]:
+                output[i1][i2] = []
+                for i in range(num):
+                    output[i1][i2].append(fractions[i1][i2])
+                output[i1][i2] = numpy.std(output[i1][i2])
+        return output
 
     def analysis_bump(self,  # 得到关于一个关于参数扫描的细致图片
                       parameter_name='rho1450pi_phase',

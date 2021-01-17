@@ -3,6 +3,8 @@
 import math
 import numpy
 # Private package
+import headpy.hbes.hconst as hconst
+
 
 unit_pi = 3.1415926
 unit_real = 1.0 + 0.0j
@@ -158,28 +160,42 @@ def bar_function(e, mr, wr, sigma, phi, a, b):
 ################################################################################
 
 
-def snd_resonance(e, mr, wr, m1, m2, l, b1, b2):
+def snd_resonance(e, mr, wr, m1, m2, l, b):
     p_mr = decaymomentum(m12=mr, m1=m1, m2=m2)
     p_me = decaymomentum(m12=e, m1=m1, m2=m2)
     width_me = wr * mr * mr / e / e * pow(p_me / p_mr, 2 * l + 1)
-    part1 = wr * pow(mr, 1.5) * pow(12 * unit_pi * b1 * b2, 0.5) * unit_real
+    part1 = wr * pow(mr, 1.5) * pow(12 * unit_pi * b, 0.5) * unit_real
     part2 = mr * mr - e * e - unit_imag * e * width_me
     output = part1 / part2 * pow(p_me, 0.5) / pow(p_mr, 0.5)
     return output
 
 
 def snd_line_shape(e,
-                   mr_omega1450, wr_omega1450, b1b2_omega1450,
-                   mr_omega1680, wr_omega1680, b1b2_omega1680,
-                   back,
-                   phase_omega1450,
-                   phase_omega1680,
-                   phase_back):
-    resonance_1450 = snd_resonance(e, mr_omega1450, wr_omega1450, 0.77, 0.135, 1, 1.0, b1b2_omega1450)
-    resonance_1680 = snd_resonance(e, mr_omega1680, wr_omega1680, 0.77, 0.135, 1, 1.0, b1b2_omega1680)
-    phi_1450 = phase_to_value(phase_omega1450)
-    phi_1680 = phase_to_value(phase_omega1680)
-    phi_back = phase_to_value(phase_back)
-    resonance = resonance_1450 * phi_1450 + resonance_1680 * phi_1680 + back * phi_back
+                   mr_phi, wr_phi, b_phi, phase_phi,
+                   mr_omega1420, wr_omega1420, b_omega1420, phase_omega1420,
+                   mr_omega1650, wr_omega1650, b_omega1650, phase_omega1650,
+                   mr_omega_new, wr_omega_new, b_omega_new, phase_omega_new,
+                   back, phase_back):
+    resonance = 0.0 + 0.0j
+    if(1 == 1 and b_phi > 0.0):
+        resonance_phi = snd_resonance(e, mr_phi, wr_phi, hconst.rho770.mass, hconst.piz.mass, 1, b_phi)
+        phi_phi = phase_to_value(phase_phi)
+        resonance += resonance_phi * phi_phi
+    if(1 == 1 and b_omega1420 > 0.0):
+        resonance_omega1420 = snd_resonance(e, mr_omega1420, wr_omega1420, hconst.rho770.mass, hconst.piz.mass, 1, b_omega1420)
+        phi_omega1420 = phase_to_value(phase_omega1420)
+        resonance += resonance_omega1420 * phi_omega1420
+    if(1 == 1 and b_omega1650 > 0.0):
+        resonance_omega1650 = snd_resonance(e, mr_omega1650, wr_omega1650, hconst.rho770.mass, hconst.piz.mass, 1, b_omega1650)
+        phi_omega1650 = phase_to_value(phase_omega1650)
+        resonance += resonance_omega1650 * phi_omega1650
+    if(1 == 1 and b_omega_new > 0.0):
+        resonance_omega_new = snd_resonance(e, mr_omega_new, wr_omega_new, hconst.rho770.mass, hconst.piz.mass, 1, b_omega_new)
+        phi_omega_new = phase_to_value(phase_omega_new)
+        #resonance += resonance_omega_new * phi_omega_new
+    if(1 == 1 and back > 0.0):
+        phi_back = phase_to_value(phase_back)
+        resonance += back * phi_back
+
     output = abs(resonance)**2 / e**3
     return output

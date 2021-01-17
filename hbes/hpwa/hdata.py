@@ -3,136 +3,9 @@
 import re
 import copy
 import numpy
-import random
-import scipy.stats
-import scipy.linalg
 # Private package
 import headpy.hfile as hfile
-
-
-class PARAMETER():
-    def __init__(self,
-                 name='',
-                 value=0.0,
-                 error=1.0,
-                 limitl=-1.0,
-                 limitr=1.0):
-        self.name = name
-        self.value = value
-        self.error = error
-        self.limitl = limitl
-        self.limitr = limitr
-
-    def set_value(self, value, error, limitl, limitr):
-        self.value = value
-        self.error = error
-        self.limitl = limitl
-        self.limitr = limitr
-
-    def __getitem__(self, key):
-        output = 0
-        exec('output=self.%s' % (key))
-        return output
-
-    def __setitem__(self, key, value):
-        exec('self.%s = value' % (key))
-
-
-class PARAMETERS():
-    def __init__(self):
-        self.names = []
-        self.parameters = {}
-
-    def add(self, parameter):
-        self.names.append(parameter.name)
-        self.parameters[parameter.name] = parameter
-
-    def add_parameters(self, parameters):
-        for name in parameters.names:
-            if(name not in self.names):
-                self.add(parameters.parameters[name])
-
-    def add_correlation(self, correlation):
-        self.correlation = correlation
-
-    def generate_random(self, num):
-        new_data = {}
-        for name in self.names:
-            if(self.parameters[name].error <= 0.0):
-                new_data[name] = scipy.stats.norm.rvs(loc=self.parameters[name].value,
-                                                      scale=0,
-                                                      size=(num))
-            else:
-                new_data[name] = scipy.stats.norm.rvs(loc=self.parameters[name].value,
-                                                      scale=self.parameters[name].error,
-                                                      size=(num))
-        output = []
-        for i in range(num):
-            temp_parameters = copy.deepcopy(self)
-            for name in temp_parameters.names:
-                temp_parameters.parameters[name].value = new_data[name][i]
-                temp_parameters.parameters[name].error = -1.0
-            output.append(temp_parameters)
-        return output
-
-    def generate_random_correlation(self, num):
-        if(not hasattr(self, 'correlation')):
-            print('Error: no correlation imported')
-            exit(0)
-        new_data = {}
-        temp_num = 0
-        temp_names = []
-        for name in self.names:
-            if(self.parameters[name].error <= 0.0):
-                new_data[name] = scipy.stats.norm.rvs(loc=self.parameters[name].value,
-                                                      scale=0,
-                                                      size=(num))
-            else:
-                new_data[name] = scipy.stats.norm.rvs(loc=self.parameters[name].value,
-                                                      scale=self.parameters[name].error,
-                                                      size=(num))
-                temp_num += 1
-                temp_names.append(name)
-        if(len(self.correlation) != temp_num):
-            print('Error: not match parameter numbers of correlation')
-            exit(0)
-        value_matrix = numpy.array([new_data[temp_names[i]] for i in range(temp_num)])
-        eigen_value, eigen_vector = scipy.linalg.eigh(self.correlation)
-        correction = numpy.dot(eigen_vector, numpy.diag(numpy.sqrt(eigen_value)))
-        value_matrix = numpy.dot(correction, value_matrix)
-        for i in range(temp_num):
-            new_data[temp_names[i]] = value_matrix[i]
-        output = []
-        for i in range(num):
-            temp_parameters = copy.deepcopy(self)
-            for name in temp_parameters.names:
-                temp_parameters.parameters[name].value = new_data[name][i]
-                temp_parameters.parameters[name].error = -1.0
-            output.append(temp_parameters)
-        return output
-
-    def generate_random_spread(self, num):
-        new_data = {}
-        for name in self.names:
-            if(self.parameters[name].error <= 0.0):
-                new_data[name] = scipy.stats.norm.rvs(loc=self.parameters[name].value,
-                                                      scale=0,
-                                                      size=(num))
-            else:
-                new_data[name] = [random.uniform(self.parameters[name].limitl, self.parameters[name].limitr) for i in range(num)]
-        output = []
-        for i in range(num):
-            temp_parameters = copy.deepcopy(self)
-            for name in temp_parameters.names:
-                temp_parameters.parameters[name].value = new_data[name][i]
-            output.append(temp_parameters)
-        return output
-
-    def __getitem__(self, key):
-        return self.parameters[key]
-
-    def __setitem__(self, key, value):
-        self.parameters[key] = value
+import headpy.hmath.hstatis as hstatis
 
 
 def write_option(file_name, dict_option):
@@ -176,18 +49,18 @@ def write_parameter(file_name, parameters):
 
 
 def read_parameter(file_name):
-    output = PARAMETERS()
+    output = hstatis.PARAMETERS()
     lines = hfile.txt_readlines(file_name)
     for line in lines:
         method = r'(\S*)\s*=\s*(\S*)\s*(\S*)\s*(\S*)\s*(\S*)'
         check = re.match(method, line)
         if(check):
             try:
-                parameter = PARAMETER(name=check.group(1),
-                                      value=float(check.group(2)),
-                                      error=float(check.group(3)),
-                                      limitl=float(check.group(4)),
-                                      limitr=float(check.group(5)))
+                parameter = hstatis.PARAMETER(name=check.group(1),
+                                              value=float(check.group(2)),
+                                              error=float(check.group(3)),
+                                              limitl=float(check.group(4)),
+                                              limitr=float(check.group(5)))
                 if(re.match(r'(.*)space', parameter.name)):
                     continue
                 if(re.match(r'(.*)_phase', parameter.name)):
@@ -252,6 +125,14 @@ def read_likelihood(file_name):
         if(check):
             output = float(check.group(1))
     return output
+
+
+def read_amplitude(file_name, num):
+    output = hfile.txt_readlines(file_name)
+    new_output = []
+    for i in range(num):
+        new_output.append(float(re.match(r'(.*)\n', output[i]).group(1)))
+    return new_output
 
 
 def adjust_phase_zero(value):

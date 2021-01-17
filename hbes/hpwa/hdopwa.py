@@ -145,11 +145,7 @@ def dopwa_amplitude(**argv):
     # 3. 开始执行拟合
     os.system('./%s | tee log.txt' % (file_execute))
     # 4. 读取振幅文件
-    output = hfile.txt_readlines('output_amplitude_data.txt')
-    new_output = []
-    for i in range(input_option_value['number_data']):
-        new_output.append(float(re.match(r'(.*)\n', output[i]).group(1)))
-    output = new_output
+    output = hdata.read_amplitude('output_amplitude_data.txt', input_option_value['number_data'])
     ######################################## 读取振幅文件 ########################################
     # 4. 删除大体积文件
     os.system('rm %s' % (file_execute))
