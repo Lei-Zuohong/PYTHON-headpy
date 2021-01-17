@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-hnew as hnew
-hconst as hconst
+import hnew as hnew
+import hconst as hconst
 
 
 def algroot():
