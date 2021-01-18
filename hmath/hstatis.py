@@ -21,12 +21,6 @@ class PARAMETER():
         self.limitl = limitl
         self.limitr = limitr
 
-    def set_value(self, value, error, limitl, limitr):
-        self.value = value
-        self.error = error
-        self.limitl = limitl
-        self.limitr = limitr
-
     def __getitem__(self, key):
         output = 0
         exec('output=self.%s' % (key))
@@ -35,11 +29,24 @@ class PARAMETER():
     def __setitem__(self, key, value):
         exec('self.%s = value' % (key))
 
+    def set_value(self, value, error, limitl, limitr):
+        self.value = value
+        self.error = error
+        self.limitl = limitl
+        self.limitr = limitr
+
 
 class PARAMETERS():
     def __init__(self):
         self.names = []
         self.parameters = {}
+        self.itercount = 0
+
+    def __getitem__(self, key):
+        return self.parameters[key]
+
+    def __setitem__(self, key, value):
+        self.parameters[key] = value
 
     def add(self, parameter):
         self.names.append(parameter.name)
@@ -57,6 +64,7 @@ class PARAMETERS():
         self.covariance = covariance
 
     def generate_random(self, num):
+        '产生所有随机参数的高斯分布'
         new_data = {}
         for name in self.names:
             if(self.parameters[name].error <= 0.0):
@@ -77,6 +85,7 @@ class PARAMETERS():
         return output
 
     def generate_random_correlation(self, num):
+        '产生所有随机参数的高斯分布，考虑相关性'
         # 检查是否存在关联矩阵
         if(not hasattr(self, 'correlation') and not hasattr(self, 'covariance')):
             print('Error: no correlation or covariance imported')
@@ -97,9 +106,14 @@ class PARAMETERS():
                 temp_num += 1
                 temp_names.append(name)
         # 检查关联参数数量与矩阵是否一致
-        if(len(self.correlation) != temp_num):
-            print('Error: not match parameter numbers of correlation')
-            exit(0)
+        if(hasattr(self, 'correlation')):
+            if(len(self.correlation) != temp_num):
+                print('Error: not match parameter numbers of correlation')
+                exit(0)
+        if(hasattr(self, 'covariance')):
+            if(len(self.covariance) != temp_num):
+                print('Error: not match parameter numbers of covariance')
+                exit(0)
         # 转换correlation and covariance
         if(hasattr(self, 'correlation')):
             covariance = copy.deepcopy(self.correlation)
@@ -126,6 +140,7 @@ class PARAMETERS():
         return output
 
     def generate_random_spread(self, num):
+        '产生所有随机参数的均匀分布'
         new_data = {}
         for name in self.names:
             if(self.parameters[name].error <= 0.0):
@@ -142,8 +157,79 @@ class PARAMETERS():
             output.append(temp_parameters)
         return output
 
-    def __getitem__(self, key):
-        return self.parameters[key]
+    def print_data(self):
+        output = ''
+        for i in range(104):
+            output += '-'
+        output += '\n'
+        output += '{:<20} {:<20} {:<20} {:<20} {:<20}\n'.format('Name',
+                                                                'Value',
+                                                                'Error',
+                                                                'Minimum',
+                                                                'Maximum')
+        for i in range(104):
+            output += '-'
+        output += '\n'
+        for name in self.names:
+            output += '{:<20} {:<20} {:<20} {:<20} {:<20}\n'.format(self.parameters[name].name,
+                                                                    self.parameters[name].value,
+                                                                    self.parameters[name].error,
+                                                                    self.parameters[name].limitl,
+                                                                    self.parameters[name].limitr)
+        for i in range(104):
+            output += '-'
+        output += '\n'
+        print(output)
 
-    def __setitem__(self, key, value):
-        self.parameters[key] = value
+    def print_correlation(self):
+        # 检查是否存在关联矩阵
+        if(not hasattr(self, 'correlation') and not hasattr(self, 'covariance')):
+            print('Error: no correlation or covariance imported')
+            exit(0)
+        # 生成新的随机数组，其中关联部分中心值暂定为0.0
+        temp_num = 0
+        temp_names = []
+        for name in self.names:
+            if(self.parameters[name].error <= 0.0):
+                pass
+            else:
+                temp_num += 1
+                temp_names.append(name)
+        # 检查关联参数数量与矩阵是否一致
+        if(hasattr(self, 'correlation')):
+            if(len(self.correlation) != temp_num):
+                print('Error: not match parameter numbers of correlation')
+                exit(0)
+        if(hasattr(self, 'covariance')):
+            if(len(self.covariance) != temp_num):
+                print('Error: not match parameter numbers of covariance')
+                exit(0)
+        # 转换correlation and covariance
+        if(hasattr(self, 'covariance')):
+            correlation = copy.deepcopy(self.covariance)
+            for i1 in range(temp_num):
+                for i2 in range(temp_num):
+                    correlation[i1][i2] /= (self.parameters[temp_names[i1]].error * self.parameters[temp_names[i2]].error)
+        else:
+            correlation = copy.deepcopy(self.correlation)
+        # 输出
+        output = ''
+        for i in range(20 * temp_num + 22):
+            output += '-'
+        output += '\n'
+        output += '{:<20}| '.format(' ')
+        for i2 in range(temp_num):
+            output += '{:<20}'.format(self.names[i2])
+        output += '\n'
+        for i in range(20 * temp_num + 22):
+            output += '-'
+        output += '\n'
+        for i1 in range(temp_num):
+            output += '{:<20}| '.format(self.names[i1])
+            for i2 in range(temp_num):
+                output += '{:<20}'.format(correlation[i1][i2])
+            output += '\n'
+        for i in range(20 * temp_num + 22):
+            output += '-'
+        output += '\n'
+        print(output)
