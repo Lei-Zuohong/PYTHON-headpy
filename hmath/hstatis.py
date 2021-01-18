@@ -159,24 +159,24 @@ class PARAMETERS():
 
     def print_data(self):
         output = ''
-        for i in range(104):
+        for i in range(94):
             output += '-'
         output += '\n'
-        output += '{:<20} {:<20} {:<20} {:<20} {:<20}\n'.format('Name',
+        output += '{:<30} {:<15} {:<15} {:<15} {:<15}\n'.format('Name',
                                                                 'Value',
                                                                 'Error',
                                                                 'Minimum',
                                                                 'Maximum')
-        for i in range(104):
+        for i in range(94):
             output += '-'
         output += '\n'
         for name in self.names:
-            output += '{:<20} {:<20} {:<20} {:<20} {:<20}\n'.format(self.parameters[name].name,
+            output += '{:<30} {:<15} {:<15} {:<15} {:<15}\n'.format(self.parameters[name].name,
                                                                     self.parameters[name].value,
                                                                     self.parameters[name].error,
                                                                     self.parameters[name].limitl,
                                                                     self.parameters[name].limitr)
-        for i in range(104):
+        for i in range(94):
             output += '-'
         output += '\n'
         print(output)
@@ -214,22 +214,22 @@ class PARAMETERS():
             correlation = copy.deepcopy(self.correlation)
         # 输出
         output = ''
-        for i in range(20 * temp_num + 22):
+        for i in range(30 * temp_num + 32):
             output += '-'
         output += '\n'
-        output += '{:<20}| '.format(' ')
+        output += '{:<30}| '.format(' ')
         for i2 in range(temp_num):
-            output += '{:<20}'.format(self.names[i2])
+            output += '{:<30}'.format(self.names[i2])
         output += '\n'
-        for i in range(20 * temp_num + 22):
+        for i in range(30 * temp_num + 32):
             output += '-'
         output += '\n'
         for i1 in range(temp_num):
-            output += '{:<20}| '.format(self.names[i1])
+            output += '{:<30}| '.format(self.names[i1])
             for i2 in range(temp_num):
-                output += '{:<20}'.format(correlation[i1][i2])
+                output += '{:<30}'.format(correlation[i1][i2])
             output += '\n'
-        for i in range(20 * temp_num + 22):
+        for i in range(30 * temp_num + 32):
             output += '-'
         output += '\n'
         print(output)
