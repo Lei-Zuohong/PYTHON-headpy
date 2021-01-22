@@ -461,7 +461,7 @@ class MYPWA():
             for i2 in output[i1]:
                 output[i1][i2] = []
                 for i in range(num):
-                    output[i1][i2].append(fractions[i1][i2])
+                    output[i1][i2].append(fractions[i][i1][i2])
                 output[i1][i2] = numpy.std(output[i1][i2])
         return output
 
