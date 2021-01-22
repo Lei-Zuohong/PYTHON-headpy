@@ -433,6 +433,36 @@ class MYPWA():
 
     # Special analysis
 
+    def get_error_sta_amplitude(self, target_folder='root_fit4c/root_truth'):
+        num = 100
+        # option
+        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        nums = hfile.pkl_read('%s/%1.4f_entries.pkl' % (target_folder, self.energy))
+        new_input_option_value['number_data'] = nums['signal']
+        new_input_option_value['do_fit_minuit'] = 0
+        new_input_option_value['do_output_amplitude'] = 1
+        # parameter
+        new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(self.input_parameter))
+        multi_parameter = new_input_parameter.generate_random_correlation(num)
+        # fitting
+        output = []
+        for new_input_parameter in multi_parameter:
+            amplitude = hdopwa.dopwa_amplitude(project_source_path=self.path_program_source,
+                                               project_source_name=self.project,
+                                               project_path=self.path_program_execute,
+                                               project_name='%1.4f_amplitude' % (self.energy),
+                                               root_path_data='%s' % (target_folder),
+                                               root_name_data='%1.4f_mc.root' % (self.energy),
+                                               root_path_mc=self.path_root_input,
+                                               root_name_mc=self.root_mc,
+                                               input_option_string=self.input_option_string,
+                                               input_option_value=new_input_option_value,
+                                               input_constant=self.input_constant,
+                                               input_parameter=new_input_parameter,
+                                               file_execute=self.project)
+            output.append(amplitude)
+        return output
+
     def get_error_sta_fraction(self):
         num = 100
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
