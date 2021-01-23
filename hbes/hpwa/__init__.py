@@ -433,8 +433,7 @@ class MYPWA():
 
     # Special analysis
 
-    def get_error_sta_amplitude(self, target_folder='root_fit4c/root_truth'):
-        num = 100
+    def get_error_sta_amplitude(self, num=100, target_folder='root_fit4c or root_truth'):
         # option
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         nums = hfile.pkl_read('%s/%1.4f_entries.pkl' % (target_folder, self.energy))
@@ -463,12 +462,14 @@ class MYPWA():
             output.append(amplitude)
         return output
 
-    def get_error_sta_fraction(self):
-        num = 100
+    def get_error_sta_fraction(self, num=100):
+        # option
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
+        new_input_option_value['do_fit_minuit'] = 0
+        # parameter
         new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(self.input_parameter))
         multi_parameter = new_input_parameter.generate_random_correlation(num)
-        new_input_option_value['do_fit_minuit'] = 0
+        # fitting
         fractions = []
         for new_input_parameter in multi_parameter:
             data = hdopwa.dopwa(project_source_path=self.path_program_source,
