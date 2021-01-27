@@ -39,8 +39,7 @@ def energy_list():
 
 def energy_sort():
     in_energy_list = energy_list()
-    out_energy_list = in_energy_list.keys()
-    out_energy_list.sort()
+    out_energy_list = sorted(in_energy_list)
     return out_energy_list
 
 

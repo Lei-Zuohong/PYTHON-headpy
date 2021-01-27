@@ -5,8 +5,11 @@ import re
 import copy
 import numpy
 # Private package
-import hdata as hdata
 import headpy.hfile as hfile
+try:
+    import headpy.hbes.hpwa.hdata as hdata
+except:
+    import hdata as hdata
 
 
 class MYDATA():
@@ -77,82 +80,34 @@ def dopwa(**argv):
     try:
         mydata.output_constant = copy.deepcopy(hdata.read_parameter('output_constant.txt'))
     except:
-        print('Info from hpwa.dopwa: Missing output file.')
+        print('Info from hpwa.dopwa: Missing file output_constant.')
     try:
         mydata.output_parameter = copy.deepcopy(hdata.read_parameter('output_parameter.txt'))
     except:
-        print('Info from hpwa.dopwa: Missing output file.')
+        print('Info from hpwa.dopwa: Missing file output_parameter.')
     try:
         mydata.least_likelihood = copy.deepcopy(hdata.read_likelihood('output_fitresult.txt'))
     except:
-        print('Info from hpwa.dopwa: Missing output file.')
+        print('Info from hpwa.dopwa: Missing file output_fitresult')
     try:
         mydata.fraction = copy.deepcopy(hdata.read_matrix('output_fraction.txt'))
     except:
-        print('Info from hpwa.dopwa: Missing output file.')
+        print('Info from hpwa.dopwa: Missing file output_fraction.')
+    try:
+        mydata.amplitude = hdata.read_amplitude('output_amplitude_data.txt', input_option_value['number_data'])
+    except:
+        print('Info from hpwa.dopwa: Missing file output_amplitude_data.txt')
     try:
         mydata.correlation = copy.deepcopy(hdata.read_correlation('minimum_covariance.txt'))
         mydata.output_parameter.add_correlation(mydata.correlation)
     except:
-        print('Info from hpwa.dopwa: Missing output file.')
+        print('Info from hpwa.dopwa: Missing file minimum_covariance.')
     # 4. 删除大体积文件
     os.system('rm %s' % (file_execute))
     os.system('rm -r data')
     # 4. 结束
     os.chdir(origin_path)
     return mydata
-
-
-def dopwa_amplitude(**argv):
-    '拟合时，返回data.root的振幅'
-    # 读取 argv
-    project_source_path = argv['project_source_path']
-    project_source_name = argv['project_source_name']
-    project_path = argv['project_path']
-    project_name = argv['project_name']
-    root_path_data = argv['root_path_data']
-    root_name_data = argv['root_name_data']
-    root_path_mc = argv['root_path_mc']
-    root_name_mc = argv['root_name_mc']
-    input_option_string = copy.deepcopy(argv['input_option_string'])
-    input_option_value = copy.deepcopy(argv['input_option_value'])
-    input_constant = copy.deepcopy(argv['input_constant'])
-    input_parameter = copy.deepcopy(argv['input_parameter'])
-    file_execute = argv['file_execute']
-    # 1. 初始化拟合
-    origin_path = os.getcwd()
-    # 2. 拷贝资料文件
-    hfile.copy_folder(source_path=project_source_path,
-                      source_name=project_source_name,
-                      path=project_path,
-                      name=project_name)
-    # 2. 拷贝root文件
-    hfile.copy_file(source_path=root_path_data,
-                    source_name=root_name_data,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
-                    name='data.root')
-    hfile.copy_file(source_path=root_path_mc,
-                    source_name=root_name_mc,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
-                    name='mc.root')
-    # 2. 变更执行地址
-    os.chdir('%s/%s' % (project_path, project_name))
-    # 2. 写入初值文件
-    hdata.write_option('input_option_string.txt', input_option_string)
-    hdata.write_option('input_option_value.txt', input_option_value)
-    hdata.write_parameter('input_constant.txt', input_constant)
-    hdata.write_parameter('input_parameter.txt', input_parameter)
-    # 3. 开始执行拟合
-    os.system('./%s | tee log.txt' % (file_execute))
-    # 4. 读取振幅文件
-    output = hdata.read_amplitude('output_amplitude_data.txt', input_option_value['number_data'])
-    ######################################## 读取振幅文件 ########################################
-    # 4. 删除大体积文件
-    os.system('rm %s' % (file_execute))
-    os.system('rm -r data')
-    # 4. 结束
-    os.chdir(origin_path)
-    return output
 
 
 def dopwa_plot(target_folder, target_file, **argv):

@@ -10,8 +10,7 @@ import headpy.hmath.hstatis as hstatis
 
 def write_option(file_name, dict_option):
     '把dictionary（单值）对象写入文件'
-    keys = dict_option.keys()
-    keys.sort()
+    keys = sorted(dict_option)
     output = ''
     for key in keys:
         output += '{:<25}'.format(key)

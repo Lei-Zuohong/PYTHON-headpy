@@ -7,8 +7,11 @@ import copy
 import numpy
 import random
 # Private package
-import hdopwa as hdopwa
 import headpy.hfile as hfile
+try:
+    import headpy.hbes.hpwa.hdopwa as hdopwa
+except:
+    import hdopwa as hdopwa
 
 
 class MYSCANER():
@@ -228,19 +231,20 @@ class MYPWA():
         for name in new_input_parameter.names:
             new_input_parameter.parameters[name].error = -1
 
-        output = hdopwa.dopwa_amplitude(project_source_path=self.path_program_source,
-                                        project_source_name=self.project,
-                                        project_path=self.path_program_execute,
-                                        project_name='%1.4f_amplitude' % (self.energy),
-                                        root_path_data='%s' % (target_folder),
-                                        root_name_data='%1.4f_mc.root' % (self.energy),
-                                        root_path_mc=self.path_root_input,
-                                        root_name_mc=self.root_mc,
-                                        input_option_string=self.input_option_string,
-                                        input_option_value=new_input_option_value,
-                                        input_constant=self.input_constant,
-                                        input_parameter=new_input_parameter,
-                                        file_execute=self.project)
+        output = hdopwa.dopwa(project_source_path=self.path_program_source,
+                              project_source_name=self.project,
+                              project_path=self.path_program_execute,
+                              project_name='%1.4f_amplitude' % (self.energy),
+                              root_path_data='%s' % (target_folder),
+                              root_name_data='%1.4f_mc.root' % (self.energy),
+                              root_path_mc=self.path_root_input,
+                              root_name_mc=self.root_mc,
+                              input_option_string=self.input_option_string,
+                              input_option_value=new_input_option_value,
+                              input_constant=self.input_constant,
+                              input_parameter=new_input_parameter,
+                              file_execute=self.project)
+        output = output.amplitude
         if(len(output) != nums['signal']):
             print("Input  entries: %d" % (nums['signal']))
             print("Output entries: %d" % (len(output)))
