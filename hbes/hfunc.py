@@ -199,3 +199,57 @@ def snd_line_shape(e,
 
     output = abs(resonance)**2 / e**3
     return output
+
+################################################################################
+# BESIII pipipi
+################################################################################
+
+
+def bes_line_shape_rho770pi(e, mr, wr, b, phase,
+                            p1, p2, p3):
+    resonance = 0.0 + 0.0j
+
+    resonance_omega = snd_resonance(e, mr, wr, hconst.rho770.mass, hconst.piz.mass, 1, b)
+    phi_omega = phase_to_value(phase)
+    resonance += resonance_omega * phi_omega
+
+    resonance += unit_real * p1 / pow(e - p3, p2)
+
+    output = abs(resonance)**2 / e**3
+    return output
+
+
+def bes_line_shape_rho1450pi(e, mr, wr, b, phase,
+                             p1, p2, p3):
+    resonance = 0.0 + 0.0j
+
+    resonance_omega = snd_resonance(e, mr, wr, hconst.rho1450.mass, hconst.piz.mass, 1, b)
+    phi_omega = phase_to_value(phase)
+    resonance += resonance_omega * phi_omega
+
+    resonance += unit_real * p1 / pow(e - p3, p2)
+
+    output = abs(resonance)**2 / e**3
+    return output
+
+
+def bes_line_shape_rho770pi_resonance(e, mr, wr, b, phase):
+    resonance = 0.0 + 0.0j
+
+    resonance_omega = snd_resonance(e, mr, wr, hconst.rho770.mass, hconst.piz.mass, 1, b)
+    phi_omega = phase_to_value(phase)
+    resonance += resonance_omega * phi_omega
+
+    output = abs(resonance)**2 / e**3
+    return output
+
+
+def bes_line_shape_rho1450pi_resonance(e, mr, wr, b, phase):
+    resonance = 0.0 + 0.0j
+
+    resonance_omega = snd_resonance(e, mr, wr, hconst.rho1450.mass, hconst.piz.mass, 1, b)
+    phi_omega = phase_to_value(phase)
+    resonance += resonance_omega * phi_omega
+
+    output = abs(resonance)**2 / e**3
+    return output

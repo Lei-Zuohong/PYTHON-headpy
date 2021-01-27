@@ -778,7 +778,7 @@ if(root_exit == 1):
                 weight = []
                 for i in range(num):
                     factor = 1
-                    for name in self.weights:
+                    for name in doweight:
                         factor = factor * ntree[name][i]
                     weight.append(factor)
                 tfilename, histname = hist2d(name_tfile=tfilename,
