@@ -56,7 +56,7 @@ def dopwa(**argv):
     hfile.copy_file(source=root_mc,
                     target='%s/%s/mc.root' % (project_target, 'data'))
     # 2. 变更执行地址
-    os.chdir('%s/%s' % (project_target))
+    os.chdir('%s' % (project_target))
     # 2. 写入初值文件
     hdata.write_option('input_option_string.txt', input_option_string)
     hdata.write_option('input_option_value.txt', input_option_value)
@@ -128,7 +128,7 @@ def dopwa_plot(target, **argv):
     hfile.copy_file(source=root_mc,
                     target='%s/%s/mc.root' % (project_target, 'data'))
     # 2. 变更执行地址
-    os.chdir('%s/%s' % (project_target))
+    os.chdir('%s' % (project_target))
     # 2. 写入初值文件
     hdata.write_option('input_option_string.txt', input_option_string)
     hdata.write_option('input_option_value.txt', input_option_value)
