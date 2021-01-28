@@ -52,11 +52,9 @@ def dopwa(**argv):
                       target=project_target)
     # 2. 拷贝root文件
     hfile.copy_file(source=root_data,
-                    target='%s/%s/data.root' % (project_target, 'data'),
-                    name='data.root')
+                    target='%s/%s/data.root' % (project_target, 'data'))
     hfile.copy_file(source=root_mc,
-                    target='%s/%s/mc.root' % (project_target, 'data'),
-                    name='mc.root')
+                    target='%s/%s/mc.root' % (project_target, 'data'))
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_target))
     # 2. 写入初值文件
@@ -126,11 +124,9 @@ def dopwa_plot(target, **argv):
                       target=project_target)
     # 2. 拷贝root文件
     hfile.copy_file(source=root_data,
-                    target='%s/%s/data.root' % (project_target, 'data'),
-                    name='data.root')
+                    target='%s/%s/data.root' % (project_target, 'data'))
     hfile.copy_file(source=root_mc,
-                    target='%s/%s/mc.root' % (project_target, 'data'),
-                    name='mc.root')
+                    target='%s/%s/mc.root' % (project_target, 'data'))
     # 2. 变更执行地址
     os.chdir('%s/%s' % (project_target))
     # 2. 写入初值文件
