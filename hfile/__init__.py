@@ -36,59 +36,56 @@ def argv(argv=sys.argv):
 ################################################################################
 
 
+def divide_path(in_string):
+    if(re.match(r'(.*)/([^/]*)', in_string)):
+        check = re.match(r'(.*)/([^/]*)', in_string)
+        path = check.group(1)
+        name = check.group(2)
+    else:
+        path = ''
+        name = in_string
+    return path, name
+
+
 def mv(path_source, path_target):
     '用法同shell语言'
     shutil.move(path_source, path_target)
 
 
-def add_folder(name='', path=''):
+def add_folder(path='', name=''):
     '查看某绝对路径下是否存在某名字的文件夹，没有则创建'
     filelist = os.listdir(path)
     if(name not in filelist):
         os.mkdir('%s/%s' % (path, name))
 
 
-def copy_file(source_path='',
-              source_name='',
-              path='',
-              name=''):
-    '''
-    复制单个文件，如果目标对象存在，则覆盖\n
-    复制文件为source_path/source_name\n
-    目标文件为path/name\n
-    '''
-    if(name in os.listdir(path)):
-        os.remove('%s/%s' % (path, name))
+def copy_file(source='', target=''):
+    source_path, source_name = divide_path(source)
+    target_path, target_name = divide_path(target)
+    if(target_name in os.listdir(target_path)):
+        os.remove('%s/%s' % (target_path, target_name))
     shutil.copy('%s/%s' % (source_path, source_name),
-                '%s' % (path))
-    if(source_name != name):
-        shutil.move('%s/%s' % (path, source_name),
-                    '%s/%s' % (path, name))
+                '%s' % (target_path))
+    if(source_name != target_name):
+        shutil.move('%s/%s' % (target_path, source_name),
+                    '%s/%s' % (target_path, target_name))
 
 
-def copy_folder(source_path='',
-                source_name='',
-                path='',
-                name=''):
-    '''
-    复制目标文件夹，如果目标文件夹存在，则删除原文件夹\n
-    复制文件夹为source_path/source_name\n
-    目标文件夹为path/name\n
-    '''
-    if(name in os.listdir(path)):
-        shutil.rmtree('%s/%s' % (path, name))
+def copy_folder(source='', target=''):
+    source_path, source_name = divide_path(source)
+    target_path, target_name = divide_path(target)
+    if(target_name in os.listdir(target_path)):
+        shutil.rmtree('%s/%s' % (target_path, target_name))
     shutil.copytree('%s/%s' % (source_path, source_name),
-                    '%s/%s' % (path, name))
+                    '%s/%s' % (target_path, target_name))
 
 
-def rm_file(path='',
-            name=''):
-    os.remove('%s/%s' % (path, name))
+def rm_file(filename):
+    os.remove(filename)
 
 
-def rm_folder(path='',
-              name=''):
-    shutil.rmtree('%s/%s' % (path, name))
+def rm_folder(filename):
+    shutil.rmtree(filename)
 
 
 ################################################################################
@@ -158,3 +155,9 @@ def txt_readlines(txt_name):
     with open(txt_name, 'r') as infile:
         output = infile.readlines()
     return output
+
+
+def txt_add(txt_name, out_string):
+    output = txt_read(txt_name)
+    output += out_string
+    txt_write(txt_name, output)

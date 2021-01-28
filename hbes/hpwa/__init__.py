@@ -187,14 +187,10 @@ class MYPWA():
     # Fitting
 
     def get_fit_nominal(self):  # 进行一次正常拟合
-        output = hdopwa.dopwa(project_source_path=self.path_program_source,
-                              project_source_name=self.project,
-                              project_path=self.path_program_execute,
-                              project_name='%1.4f_nominal' % (self.energy),
-                              root_path_data=self.path_root_input,
-                              root_name_data=self.root_data,
-                              root_path_mc=self.path_root_input,
-                              root_name_mc=self.root_mc,
+        output = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                              project_target='%s/%1.4f_nominal' % (self.path_program_execute, self.energy),
+                              root_data='%s/%s' % (self.path_root_input, self.root_data),
+                              root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                               input_option_string=self.input_option_string,
                               input_option_value=self.mywave.get_nominal_option(self.input_option_value),
                               input_constant=self.input_constant,
@@ -205,14 +201,10 @@ class MYPWA():
 
     def get_fit_nominal_spread(self):  # 进行一次撒点拟合
         output = hdopwa.dopwa_spread(50,
-                                     project_source_path=self.path_program_source,
-                                     project_source_name=self.project,
-                                     project_path=self.path_program_execute,
-                                     project_name='%1.4f_nominal' % (self.energy),
-                                     root_path_data=self.path_root_input,
-                                     root_name_data=self.root_data,
-                                     root_path_mc=self.path_root_input,
-                                     root_name_mc=self.root_mc,
+                                     project_source='%s/%s' % (self.path_program_source, self.project),
+                                     project_target='%s/%1.4f_nominal' % (self.path_program_execute, self.energy),
+                                     root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                     root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                      input_option_string=self.input_option_string,
                                      input_option_value=self.mywave.get_nominal_option(self.input_option_value),
                                      input_constant=self.input_constant,
@@ -231,14 +223,10 @@ class MYPWA():
         for name in new_input_parameter.names:
             new_input_parameter.parameters[name].error = -1
 
-        output = hdopwa.dopwa(project_source_path=self.path_program_source,
-                              project_source_name=self.project,
-                              project_path=self.path_program_execute,
-                              project_name='%1.4f_amplitude' % (self.energy),
-                              root_path_data='%s' % (target_folder),
-                              root_name_data='%1.4f_mc.root' % (self.energy),
-                              root_path_mc=self.path_root_input,
-                              root_name_mc=self.root_mc,
+        output = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                              project_target='%s/%1.4f_amplitude' % (self.path_program_execute, self.energy),
+                              root_data='%s/%1.4f_mc.root' % (target_folder, self.energy),
+                              root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                               input_option_string=self.input_option_string,
                               input_option_value=new_input_option_value,
                               input_constant=self.input_constant,
@@ -255,14 +243,10 @@ class MYPWA():
         new_input_option_value['do_output_root'] = 1
         new_input_option_value['do_fit_minuit'] = 0
         output = hdopwa.dopwa_plot(target_folder, '%1.4f.root' % (self.energy),
-                                   project_source_path=self.path_program_source,
-                                   project_source_name=self.project,
-                                   project_path=self.path_program_execute,
-                                   project_name='%1.4f_plot' % (self.energy),
-                                   root_path_data=self.path_root_input,
-                                   root_name_data=self.root_data,
-                                   root_path_mc=self.path_root_input,
-                                   root_name_mc=self.root_mc,
+                                   project_source='%s/%s' % (self.path_program_source, self.project),
+                                   project_target='%s/%1.4f_plot' % (self.path_program_execute, self.energy),
+                                   root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                   root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                    input_option_string=self.input_option_string,
                                    input_option_value=new_input_option_value,
                                    input_constant=self.input_constant,
@@ -274,14 +258,10 @@ class MYPWA():
         self.significance = {}
         for wave in self.mywave.wave_consider:
             print('Checking wave name: %s' % (wave))
-            data_check = hdopwa.dopwa(project_source_path=self.path_program_source,
-                                      project_source_name=self.project,
-                                      project_path=self.path_program_execute,
-                                      project_name='%1.4f_%s' % (self.energy, wave),
-                                      root_path_data=self.path_root_input,
-                                      root_name_data=self.root_data,
-                                      root_path_mc=self.path_root_input,
-                                      root_name_mc=self.root_mc,
+            data_check = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                                      project_target='%s/%1.4f_%s' % (self.path_program_execute, self.energy, wave),
+                                      root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                      root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                       input_option_string=self.input_option_string,
                                       input_option_value=self.mywave.get_check_option(self.input_option_value, wave),
                                       input_constant=self.input_constant,
@@ -311,14 +291,10 @@ class MYPWA():
             use_value = limitl + i * unit
             use_parameter.parameters[parameter].value = use_value
             use_parameter.parameters[parameter].error = -1
-            data = hdopwa.dopwa_spread(project_source_path=self.path_program_source,
-                                       project_source_name=self.project,
-                                       project_path=self.path_program_execute,
-                                       project_name='%1.4f_scan' % (self.energy),
-                                       root_path_data=self.path_root_input,
-                                       root_name_data=self.root_data,
-                                       root_path_mc=self.path_root_input,
-                                       root_name_mc=self.root_mc,
+            data = hdopwa.dopwa_spread(project_source='%s/%s' % (self.path_program_source, self.project),
+                                       project_target='%s/%1.4f_scan' % (self.path_program_execute, self.energy),
+                                       root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                       root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                        input_option_string=self.input_option_string,
                                        input_option_value=use_option_value,
                                        input_constant=self.input_constant,
@@ -353,14 +329,10 @@ class MYPWA():
                 use_constant.parameters[parameter1].error = -1
                 use_constant.parameters[parameter2].value = value2
                 use_constant.parameters[parameter2].error = -1
-                data = hdopwa.dopwa_spread(project_source_path=self.path_program_source,
-                                           project_source_name=self.project,
-                                           project_path=self.path_program_execute,
-                                           project_name='%1.4f_scan' % (self.energy),
-                                           root_path_data=self.path_root_input,
-                                           root_name_data=self.root_data,
-                                           root_path_mc=self.path_root_input,
-                                           root_name_mc=self.root_mc,
+                data = hdopwa.dopwa_spread(project_source='%s/%s' % (self.path_program_source, self.project),
+                                           project_target='%s/%1.4f_scan' % (self.path_program_execute, self.energy),
+                                           root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                           root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                            input_option_string=self.input_option_string,
                                            input_option_value=use_option_value,
                                            input_constant=use_constant,
@@ -449,14 +421,10 @@ class MYPWA():
         new_input_option_value['do_output_amplitude'] = 1
         # fitting
         new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(multi_parameters[choice]))
-        data = hdopwa.dopwa(project_source_path=self.path_program_source,
-                            project_source_name=self.project,
-                            project_path=self.path_program_execute,
-                            project_name='%1.4f_amplitude' % (self.energy),
-                            root_path_data='%s' % (target_folder),
-                            root_name_data='%1.4f_mc.root' % (self.energy),
-                            root_path_mc=self.path_root_input,
-                            root_name_mc=self.root_mc,
+        data = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                            project_target='%s/%1.4f_amplitude' % (self.path_program_execute, self.energy),
+                            root_data='%s/%1.4f_mc.root' % (target_folder, self.energy),
+                            root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                             input_option_string=self.input_option_string,
                             input_option_value=new_input_option_value,
                             input_constant=self.input_constant,
@@ -475,14 +443,10 @@ class MYPWA():
         for new_input_parameter in multi_parameters:
             # parameter
             new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(new_input_parameter))
-            data = hdopwa.dopwa(project_source_path=self.path_program_source,
-                                project_source_name=self.project,
-                                project_path=self.path_program_execute,
-                                project_name='%1.4f_nominal' % (self.energy),
-                                root_path_data=self.path_root_input,
-                                root_name_data=self.root_data,
-                                root_path_mc=self.path_root_input,
-                                root_name_mc=self.root_mc,
+            data = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                                project_target='%s/%1.4f_nominal' % (self.path_program_execute, self.energy),
+                                root_data='%s/%s' % (self.path_root_input, self.root_data),
+                                root_mc='%s/%s' % (self.path_root_input, self.root_mc),
                                 input_option_string=self.input_option_string,
                                 input_option_value=new_input_option_value,
                                 input_constant=self.input_constant,
@@ -490,41 +454,4 @@ class MYPWA():
                                 file_execute=self.project)
             data.fraction = copy.deepcopy(self.mywave.give_fraction_name(data.fraction))
             fractions.append(copy.deepcopy(data.fraction))
-        '''
-        output = copy.deepcopy(fractions[0])
-        for i1 in output:
-            for i2 in output[i1]:
-                output[i1][i2] = []
-                for i in range(len(multi_parameters)):
-                    output[i1][i2].append(fractions[i][i1][i2])
-                output[i1][i2] = numpy.std(output[i1][i2])     
-        '''
         return fractions
-
-    def analysis_bump(self,  # 得到关于一个关于参数扫描的细致图片
-                      parameter_name='rho1450pi_phase',
-                      parameter_left=0.0,
-                      parameter_right=1.0,
-                      parameter_inter=100,
-                      target_folder=''):
-        new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
-        new_input_option_value['do_output_root'] = 1
-        new_input_option_value['do_fit_minuit'] = 0
-        new_input_parameter = copy.deepcopy(self.input_parameter)
-        for i in range(parameter_inter):
-            temp_value = parameter_left + float(i) / parameter_inter * (parameter_right - parameter_left)
-            new_input_parameter[parameter_name]['value'] = temp_value
-            output = hdopwa.dopwa_plot(target_folder, '%1.4f_%03d.root' % (self.energy, i),
-                                       project_source_path=self.path_program_source,
-                                       project_source_name=self.project,
-                                       project_path=self.path_program_execute,
-                                       project_name='%1.4f_plot' % (self.energy),
-                                       root_path_data=self.path_root_input,
-                                       root_name_data=self.root_data,
-                                       root_path_mc=self.path_root_input,
-                                       root_name_mc=self.root_mc,
-                                       input_option_string=self.input_option_string,
-                                       input_option_value=new_input_option_value,
-                                       input_constant=self.input_constant,
-                                       input_parameter=new_input_parameter,
-                                       file_execute=self.project)

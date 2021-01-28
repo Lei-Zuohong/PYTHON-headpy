@@ -33,38 +33,32 @@ class MYDATA():
 def dopwa(**argv):
     '进行一次拟合操作，返回结果类'
     # 读取 argv
-    project_source_path = argv['project_source_path']
-    project_source_name = argv['project_source_name']
-    project_path = argv['project_path']
-    project_name = argv['project_name']
-    root_path_data = argv['root_path_data']
-    root_name_data = argv['root_name_data']
-    root_path_mc = argv['root_path_mc']
-    root_name_mc = argv['root_name_mc']
+    project_source = argv['project_source']
+    project_target = argv['project_target']
+    root_data = argv['root_data']
+    root_mc = argv['root_mc']
+
     input_option_string = copy.deepcopy(argv['input_option_string'])
     input_option_value = copy.deepcopy(argv['input_option_value'])
     input_constant = copy.deepcopy(argv['input_constant'])
     input_parameter = copy.deepcopy(argv['input_parameter'])
+
     file_execute = argv['file_execute']
     # 1. 初始化拟合
     origin_path = os.getcwd()
     mydata = MYDATA()
     # 2. 拷贝资料文件
-    hfile.copy_folder(source_path=project_source_path,
-                      source_name=project_source_name,
-                      path=project_path,
-                      name=project_name)
+    hfile.copy_folder(source=project_source,
+                      target=project_target)
     # 2. 拷贝root文件
-    hfile.copy_file(source_path=root_path_data,
-                    source_name=root_name_data,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+    hfile.copy_file(source=root_data,
+                    target='%s/%s/data.root' % (project_target, 'data'),
                     name='data.root')
-    hfile.copy_file(source_path=root_path_mc,
-                    source_name=root_name_mc,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+    hfile.copy_file(source=root_mc,
+                    target='%s/%s/mc.root' % (project_target, 'data'),
                     name='mc.root')
     # 2. 变更执行地址
-    os.chdir('%s/%s' % (project_path, project_name))
+    os.chdir('%s/%s' % (project_target))
     # 2. 写入初值文件
     hdata.write_option('input_option_string.txt', input_option_string)
     hdata.write_option('input_option_value.txt', input_option_value)
@@ -110,40 +104,35 @@ def dopwa(**argv):
     return mydata
 
 
-def dopwa_plot(target_folder, target_file, **argv):
+def dopwa_plot(target, **argv):
     '在拟合时，转移图片文件'
     # 读取 argv
-    project_source_path = argv['project_source_path']
-    project_source_name = argv['project_source_name']
-    project_path = argv['project_path']
-    project_name = argv['project_name']
-    root_path_data = argv['root_path_data']
-    root_name_data = argv['root_name_data']
-    root_path_mc = argv['root_path_mc']
-    root_name_mc = argv['root_name_mc']
+    project_source = argv['project_source']
+    project_target = argv['project_target']
+    root_data = argv['root_data']
+    root_mc = argv['root_mc']
+
     input_option_string = copy.deepcopy(argv['input_option_string'])
     input_option_value = copy.deepcopy(argv['input_option_value'])
     input_constant = copy.deepcopy(argv['input_constant'])
     input_parameter = copy.deepcopy(argv['input_parameter'])
+
     file_execute = argv['file_execute']
     # 1. 初始化拟合
     origin_path = os.getcwd()
+    mydata = MYDATA()
     # 2. 拷贝资料文件
-    hfile.copy_folder(source_path=project_source_path,
-                      source_name=project_source_name,
-                      path=project_path,
-                      name=project_name)
+    hfile.copy_folder(source=project_source,
+                      target=project_target)
     # 2. 拷贝root文件
-    hfile.copy_file(source_path=root_path_data,
-                    source_name=root_name_data,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+    hfile.copy_file(source=root_data,
+                    target='%s/%s/data.root' % (project_target, 'data'),
                     name='data.root')
-    hfile.copy_file(source_path=root_path_mc,
-                    source_name=root_name_mc,
-                    path='%s/%s/%s' % (project_path, project_name, 'data'),
+    hfile.copy_file(source=root_mc,
+                    target='%s/%s/mc.root' % (project_target, 'data'),
                     name='mc.root')
     # 2. 变更执行地址
-    os.chdir('%s/%s' % (project_path, project_name))
+    os.chdir('%s/%s' % (project_target))
     # 2. 写入初值文件
     hdata.write_option('input_option_string.txt', input_option_string)
     hdata.write_option('input_option_value.txt', input_option_value)
@@ -155,10 +144,8 @@ def dopwa_plot(target_folder, target_file, **argv):
     os.system('rm %s' % (file_execute))
     os.system('rm -r data')
     # 4. 转移文件
-    hfile.copy_file(source_path='.',
-                    source_name='output.root',
-                    path=target_folder,
-                    name=target_file)
+    hfile.copy_file(source='./output.root',
+                    target=target)
     # 4. 结束
     os.chdir(origin_path)
     return 1
