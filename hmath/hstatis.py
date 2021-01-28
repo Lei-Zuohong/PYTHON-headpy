@@ -116,12 +116,17 @@ class PARAMETERS():
                 exit(0)
         # 转换correlation and covariance
         if(hasattr(self, 'correlation')):
+            correlation = copy.deepcopy(self.correlation)
             covariance = copy.deepcopy(self.correlation)
             for i1 in range(temp_num):
                 for i2 in range(temp_num):
                     covariance[i1][i2] *= self.parameters[temp_names[i1]].error * self.parameters[temp_names[i2]].error
         else:
             covariance = copy.deepcopy(self.covariance)
+            correlation = copy.deepcopy(self.covariance)
+            for i1 in range(temp_num):
+                for i2 in range(temp_num):
+                    correlation[i1][i2] *= 1 / self.parameters[temp_names[i1]].error / self.parameters[temp_names[i2]].error
         # 转换变量，并放回参数
         value_matrix = numpy.array([new_data[temp_names[i]] for i in range(temp_num)])
         eigen_value, eigen_vector = scipy.linalg.eigh(covariance)
@@ -137,6 +142,19 @@ class PARAMETERS():
                 temp_parameters.parameters[name].value = new_data[name][i]
                 temp_parameters.parameters[name].error = -1.0
             output.append(temp_parameters)
+        # 输出过程
+        if(1 == 0):
+            check_covariance = numpy.zeros((temp_num, temp_num))
+            check_correlation = numpy.zeros((temp_num, temp_num))
+            for i1 in range(temp_num):
+                for i2 in range(temp_num):
+                    check_covariance[i1][i2] = numpy.cov(value_matrix[i1], value_matrix[i2])[0][1]
+                    check_correlation[i1][i2] = numpy.cov(value_matrix[i1], value_matrix[i2])[0][1] / self.parameters[temp_names[i1]].error / self.parameters[temp_names[i2]].error
+            print("Generating random correlation:\n")
+            print("Here is the origin correlation\n")
+            print(numpy.array(correlation))
+            print("Here is the generated correlation\n")
+            print(check_correlation)
         return output
 
     def generate_random_spread(self, num):
@@ -233,3 +251,8 @@ class PARAMETERS():
             output += '-'
         output += '\n'
         print(output)
+
+
+def get_correlation():
+    output = 0
+    return output

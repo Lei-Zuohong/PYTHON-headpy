@@ -437,45 +437,44 @@ class MYPWA():
 
     # Special analysis
 
-    def get_error_sta_amplitude(self, num=100, target_folder='root_fit4c or root_truth'):
+    def get_error_sta_amplitude(self,
+                                target_folder='root_fit4c or root_truth',
+                                multi_parameters=[],
+                                choice=0):
         # option
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         nums = hfile.pkl_read('%s/%1.4f_entries.pkl' % (target_folder, self.energy))
         new_input_option_value['number_data'] = nums['signal']
         new_input_option_value['do_fit_minuit'] = 0
         new_input_option_value['do_output_amplitude'] = 1
-        # parameter
-        new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(self.input_parameter))
-        multi_parameter = new_input_parameter.generate_random_correlation(num)
         # fitting
-        output = []
-        for new_input_parameter in multi_parameter:
-            amplitude = hdopwa.dopwa_amplitude(project_source_path=self.path_program_source,
-                                               project_source_name=self.project,
-                                               project_path=self.path_program_execute,
-                                               project_name='%1.4f_amplitude' % (self.energy),
-                                               root_path_data='%s' % (target_folder),
-                                               root_name_data='%1.4f_mc.root' % (self.energy),
-                                               root_path_mc=self.path_root_input,
-                                               root_name_mc=self.root_mc,
-                                               input_option_string=self.input_option_string,
-                                               input_option_value=new_input_option_value,
-                                               input_constant=self.input_constant,
-                                               input_parameter=new_input_parameter,
-                                               file_execute=self.project)
-            output.append(amplitude)
-        return output
+        new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(multi_parameters[choice]))
+        data = hdopwa.dopwa(project_source_path=self.path_program_source,
+                            project_source_name=self.project,
+                            project_path=self.path_program_execute,
+                            project_name='%1.4f_amplitude' % (self.energy),
+                            root_path_data='%s' % (target_folder),
+                            root_name_data='%1.4f_mc.root' % (self.energy),
+                            root_path_mc=self.path_root_input,
+                            root_name_mc=self.root_mc,
+                            input_option_string=self.input_option_string,
+                            input_option_value=new_input_option_value,
+                            input_constant=self.input_constant,
+                            input_parameter=new_input_parameter,
+                            file_execute=self.project)
+        amplitude = data.amplitude
+        return amplitude
 
-    def get_error_sta_fraction(self, num=100):
+    def get_error_sta_fraction(self,
+                               multi_parameters=[]):
         # option
         new_input_option_value = copy.deepcopy(self.mywave.get_nominal_option(self.input_option_value))
         new_input_option_value['do_fit_minuit'] = 0
-        # parameter
-        new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(self.input_parameter))
-        multi_parameter = new_input_parameter.generate_random_correlation(num)
         # fitting
         fractions = []
-        for new_input_parameter in multi_parameter:
+        for new_input_parameter in multi_parameters:
+            # parameter
+            new_input_parameter = copy.deepcopy(self.mywave.get_nominal_parameter(new_input_parameter))
             data = hdopwa.dopwa(project_source_path=self.path_program_source,
                                 project_source_name=self.project,
                                 project_path=self.path_program_execute,
@@ -491,14 +490,16 @@ class MYPWA():
                                 file_execute=self.project)
             data.fraction = copy.deepcopy(self.mywave.give_fraction_name(data.fraction))
             fractions.append(copy.deepcopy(data.fraction))
+        '''
         output = copy.deepcopy(fractions[0])
         for i1 in output:
             for i2 in output[i1]:
                 output[i1][i2] = []
-                for i in range(num):
+                for i in range(len(multi_parameters)):
                     output[i1][i2].append(fractions[i][i1][i2])
-                output[i1][i2] = numpy.std(output[i1][i2])
-        return output
+                output[i1][i2] = numpy.std(output[i1][i2])     
+        '''
+        return fractions
 
     def analysis_bump(self,  # 得到关于一个关于参数扫描的细致图片
                       parameter_name='rho1450pi_phase',
