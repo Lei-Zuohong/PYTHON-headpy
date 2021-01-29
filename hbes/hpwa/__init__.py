@@ -223,16 +223,16 @@ class MYPWA():
         for name in new_input_parameter.names:
             new_input_parameter.parameters[name].error = -1
 
-        output = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
-                              project_target='%s/%1.4f_amplitude' % (self.path_program_execute, self.energy),
-                              root_data='%s/%1.4f_mc.root' % (target_folder, self.energy),
-                              root_mc='%s/%s' % (self.path_root_input, self.root_mc),
-                              input_option_string=self.input_option_string,
-                              input_option_value=new_input_option_value,
-                              input_constant=self.input_constant,
-                              input_parameter=new_input_parameter,
-                              file_execute=self.project)
-        output = output.amplitude
+        data = hdopwa.dopwa(project_source='%s/%s' % (self.path_program_source, self.project),
+                            project_target='%s/%1.4f_amplitude' % (self.path_program_execute, self.energy),
+                            root_data='%s/%1.4f_mc.root' % (target_folder, self.energy),
+                            root_mc='%s/%s' % (self.path_root_input, self.root_mc),
+                            input_option_string=self.input_option_string,
+                            input_option_value=new_input_option_value,
+                            input_constant=self.input_constant,
+                            input_parameter=new_input_parameter,
+                            file_execute=self.project)
+        output = data.amplitude
         if(len(output) != nums['signal']):
             print("Input  entries: %d" % (nums['signal']))
             print("Output entries: %d" % (len(output)))
