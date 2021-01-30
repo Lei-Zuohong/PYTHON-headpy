@@ -586,7 +586,7 @@ if(root_exit == 1):
             lines = infile.readlines()
         # 匹配字符
         massage = {}
-        method = r'(.*):(.*) (endl|version)'
+        method = r'(\S*):(\S*)\s*(endl|version)'
         for line in lines:
             check = re.match(method, line)
             if(check):
